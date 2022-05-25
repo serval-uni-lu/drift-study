@@ -8,9 +8,8 @@ class NoDrift:
     ) -> None:
         pass
 
-    def fit(self, x, y, y_scores):
+    def fit(self, x, t, y, y_scores):
         pass
 
-    def update(self, x, y, y_scores):
-
+    def update(self, x, t, y, y_scores):
         return False, False, np.nan, np.nan
