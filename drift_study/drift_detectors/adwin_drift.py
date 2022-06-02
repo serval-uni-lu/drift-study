@@ -32,3 +32,7 @@ class AdwinDrift:
             return was_drift, was_warning, np.nan, np.nan
         else:
             raise NotImplementedError
+
+    @staticmethod
+    def needs_label():
+        return True

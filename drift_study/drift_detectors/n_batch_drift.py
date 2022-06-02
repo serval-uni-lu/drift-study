@@ -26,3 +26,6 @@ class NBatchDrift:
             return self.drift_detector.update(x, t, y, y_scores)
 
         return False, False, np.nan, np.nan
+
+    def needs_label(self):
+        return self.drift_detector.needs_label()

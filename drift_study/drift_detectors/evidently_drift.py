@@ -61,3 +61,7 @@ class EvidentlyDrift:
         )
 
         return in_drift, in_warning, np.nan, np.nan
+
+    @staticmethod
+    def needs_label():
+        return False

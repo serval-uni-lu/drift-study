@@ -5,7 +5,7 @@ class PeriodicDrift:
     def __init__(
         self,
         period,
-        **kwargs,
+        *_,
     ) -> None:
         self.period = period
         self.counter = 0
@@ -14,7 +14,6 @@ class PeriodicDrift:
         self.counter = 0
 
     def update(self, x, t, y, y_scores):
-        self.counter += 1
         if len(x.shape) == 1:
             self.counter += 1
         elif len(x.shape) == 2:
@@ -25,3 +24,7 @@ class PeriodicDrift:
         else:
 
             return True, True, np.nan, np.nan
+
+    @staticmethod
+    def needs_label():
+        return False

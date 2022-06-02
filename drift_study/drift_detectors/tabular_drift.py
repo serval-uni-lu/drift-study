@@ -89,3 +89,7 @@ class TabularDrift:
                     np.max(preds["data"]["distance"]),
                     np.min(preds["data"]["p_val"]),
                 )
+
+    @staticmethod
+    def needs_label():
+        return False

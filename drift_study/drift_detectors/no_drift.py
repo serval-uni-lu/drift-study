@@ -13,3 +13,7 @@ class NoDrift:
 
     def update(self, x, t, y, y_scores):
         return False, False, np.nan, np.nan
+
+    @staticmethod
+    def needs_label():
+        return False
