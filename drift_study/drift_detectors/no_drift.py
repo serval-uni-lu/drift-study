@@ -6,9 +6,13 @@ class NoDrift:
         self,
         **kwargs,
     ) -> None:
+        # No drift does not require parameters
+        # Used to be compliant with others drift detectors
         pass
 
     def fit(self, x, t, y, y_scores):
+        # No drift does not require fitting
+        # Used to be compliant with others drift detectors
         pass
 
     def update(self, x, t, y, y_scores):
