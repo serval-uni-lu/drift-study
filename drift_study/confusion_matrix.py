@@ -1,51 +1,16 @@
 import logging
 import os
 
+import configutils
 import h5py
 import joblib
 import numpy as np
 from mlc.datasets import load_datasets
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, precision_score, recall_score
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
 
-# Place here parameters that do not influence results
-performance_params = {
-    "predict_forward": 500000,
-    "n_jobs": 10,
-}
-
-common_params = {
-    "window_size": 100000,
-    "batch_size": 5000,
-    "random_state": 42,
-    "p_value": 0.05,
-    "period": 5000,
-}
-
-configs = [
-    {
-        "dataset_name": "lcld",
-        "model_name": "random_forest",
-        "drift_name": "periodic",
-    },
-    {
-        "dataset_name": "lcld",
-        "model_name": "random_forest",
-        "drift_name": "adwin",
-    },
-    {
-        "dataset_name": "lcld",
-        "model_name": "random_forest",
-        "drift_name": "evidently",
-    },
-    {
-        "dataset_name": "lcld",
-        "model_name": "random_forest",
-        "drift_name": "no_drift",
-    },
-]
 
 metrics_params = {"reference_methods": ["periodic"], "significance": 0.0}
 
@@ -54,8 +19,8 @@ def run(configs):
     print(configs)
     ref_configs = []
     other_configs = []
-    for config in configs:
-        if config.get("drift_name") in metrics_params.get("reference_methods"):
+    for config in configs.get("runs"):
+        if config.get("run_name") in metrics_params.get("reference_methods"):
             ref_configs.append(config)
         else:
             other_configs.append(config)
@@ -66,16 +31,17 @@ def run(configs):
     dataset = load_datasets(dataset_name)
     x, y, t = dataset.get_x_y_t()
 
+    common_params = configs.get("common_params")
     test_i = np.arange(len(x))[common_params.get("window_size") :]
 
     batch_size = common_params.get("batch_size")
     length = len(test_i) - (len(test_i) % batch_size)
     index_batches = np.split(test_i[:length], length / batch_size)
 
-    for config in configs:
+    for config in configs.get("runs"):
         drift_data_path = (
             f"./data/{dataset_name}/drift/"
-            f"{model_name}_{config.get('drift_name')}"
+            f"{model_name}_{config.get('run_name')}"
         )
         with h5py.File(drift_data_path, "r") as f:
             y_scores = f["y_scores"][()]
@@ -105,13 +71,17 @@ def run(configs):
     significance = metrics_params.get("significance")
     for ref_config in ref_configs:
         ref_config_name = ref_config.get("drift_name")
-        logger.info(f"Reference: {ref_config_name}")
+        logger.info(f"<><><> Reference: {ref_config_name} <><><>")
         ref_f1s = ref_config.get("f1s")
 
-        for eval_config in configs:
+        for eval_config in configs.get("runs"):
             TP, TN, FP, FN = 0, 0, 0, 0
-            eval_config_name = eval_config.get("drift_name")
-            logger.info(f"Config test: {eval_config_name}")
+            drift_pred = np.full(len(index_batches), np.nan)
+            drift_true = np.full(len(index_batches), np.nan)
+            eval_config_name = eval_config.get("run_name")
+            logger.info(
+                f"<><><> <><><> Config test: {eval_config_name} <><><> <><><>"
+            )
 
             model_used = eval_config.get("model_used")
             model_path = (
@@ -134,19 +104,32 @@ def run(configs):
                         f1_past = f1_score(y[index_batch], y_pred)
                         if (f1_past + significance) <= config_f1[i]:
                             TP += 1
+                            drift_true[i] = 1
+                            drift_pred[i] = 1
                         else:
                             FP += 1
+                            drift_true[i] = 0
+                            drift_pred[i] = 1
 
                 else:
                     if ref_f1s[i] <= (config_f1[i] + significance):
                         TN += 1
+                        drift_true[i] = 0
+                        drift_pred[i] = 0
                     else:
                         FN += 1
+                        drift_true[i] = 1
+                        drift_pred[i] = 0
 
             logger.info(f"TP: {TP}, TN: {TN}, FP: {FP}, FN: {FN}")
-            logger.info(f"Should be positive {TP + FN}")
-            logger.info(f"Should be negative {TN + FP}")
+            precision = precision_score(drift_true[1:], drift_pred[1:])
+            recall = recall_score(drift_true[1:], drift_pred[1:])
+            logger.info(f"Precision: {precision}, " f"Recall:  {recall}")
+            # logger.info(f"Should be positive {TP + FN}")
+            # logger.info(f"Should be negative {TN + FP}")
+            # logger.info(confusion_matrix(drift_true[1:], drift_pred[1:]))
 
 
 if __name__ == "__main__":
-    run(configs)
+    config = configutils.get_config()
+    run(config)
