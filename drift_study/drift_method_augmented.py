@@ -4,6 +4,8 @@ import os
 import configutils
 import numpy as np
 import pandas as pd
+from mlc.load_do_save import load_do_save
+from sklearn.base import BaseEstimator
 from tqdm import tqdm
 
 from drift_study.drift_detector_factory import get_drift_detector
@@ -52,7 +54,16 @@ def run(config, common_params, performance_params):
     models = []
 
     # Train first model
-    model.fit(x.iloc[:window_size], y[:window_size])
+
+    model_path = (
+        f"./models/{dataset_name}/" f"{model_name}_{0}_{window_size}.joblib"
+    )
+
+    def fit_l() -> BaseEstimator:
+        model.fit(x.iloc[start_index:end_index], y[start_index:end_index])
+        return model
+
+    model = load_do_save(path=model_path, executable=fit_l, verbose=True)
     drift_detector.fit(
         x.iloc[:window_size],
         t[:window_size],
@@ -60,7 +71,9 @@ def run(config, common_params, performance_params):
         model.predict_proba(x.iloc[:window_size]),
     )
 
-    models.append((t[:window_size].iloc[-1], model, drift_detector))
+    models.append(
+        (t[:window_size].iloc[-1], model, drift_detector, 0, window_size)
+    )
 
     model_used = np.full(len(x), -1)
     y_scores = np.full((len(x), 2), np.nan)
@@ -118,8 +131,20 @@ def run(config, common_params, performance_params):
                 )
 
                 model = clone_estimator(model)
-                model.fit(
-                    x.iloc[start_index:end_index], y[start_index:end_index]
+
+                model_path = (
+                    f"./models/{dataset_name}/"
+                    f"{model_name}_{start_index}_{end_index}.joblib"
+                )
+
+                def fit_l() -> BaseEstimator:
+                    model.fit(
+                        x.iloc[start_index:end_index], y[start_index:end_index]
+                    )
+                    return model
+
+                model = load_do_save(
+                    path=model_path, executable=fit_l, verbose=True
                 )
 
                 drift_detector.fit(
@@ -133,9 +158,13 @@ def run(config, common_params, performance_params):
                         t[current_index] + retraining_delay,
                         model,
                         drift_detector,
+                        start_index,
+                        end_index,
                     )
                 )
 
+    model_start_indexes = np.array(list(zip(*models))[3])
+    model_end_indexes = np.array(list(zip(*models))[4])
     numpy_to_save = {
         "is_drifts": is_drifts,
         "is_drift_warnings": is_drift_warnings,
@@ -143,6 +172,8 @@ def run(config, common_params, performance_params):
         "drift_p_values": drift_p_values,
         "y_scores": y_scores,
         "model_used": model_used,
+        "model_start_indexes": model_start_indexes,
+        "model_end_indexes": model_end_indexes,
     }
 
     save_drift(

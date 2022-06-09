@@ -84,11 +84,20 @@ def run(configs):
             )
 
             model_used = eval_config.get("model_used")
-            model_path = (
-                f"./models/{dataset_name}/{model_name}_{eval_config_name}"
+            drift_data_path = (
+                f"./data/{dataset_name}/drift/"
+                f"{model_name}_{eval_config.get('run_name')}"
             )
+            with h5py.File(drift_data_path, "r") as f:
+                model_start_indexes = f["model_start_indexes"][()]
+                model_end_indexes = f["model_end_indexes"][()]
+
+            model_path = f"./models/{dataset_name}/{model_name}"
             fitted_models = [
-                joblib.load(f"{model_path}_{i}.joblib")
+                joblib.load(
+                    f"{model_path}_{model_start_indexes[i]}_"
+                    f"{model_end_indexes[i]}.joblib"
+                )
                 for i in np.arange(np.max(model_used))
             ]
             retraineds = eval_config.get("is_retrained")
@@ -124,7 +133,7 @@ def run(configs):
             logger.info(f"TP: {TP}, TN: {TN}, FP: {FP}, FN: {FN}")
             precision = precision_score(drift_true[1:], drift_pred[1:])
             recall = recall_score(drift_true[1:], drift_pred[1:])
-            logger.info(f"Precision: {precision}, " f"Recall:  {recall}")
+            logger.info(f"Precision: {precision}, Recall:  {recall}")
             # logger.info(f"Should be positive {TP + FN}")
             # logger.info(f"Should be negative {TN + FP}")
             # logger.info(confusion_matrix(drift_true[1:], drift_pred[1:]))
