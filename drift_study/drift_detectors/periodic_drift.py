@@ -5,7 +5,7 @@ class PeriodicDrift:
     def __init__(
         self,
         period,
-        *_,
+        **kwargs,
     ) -> None:
         self.period = period
         self.counter = 0
