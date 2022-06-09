@@ -9,13 +9,15 @@ performance_params:
   predict_forward: 50000
   n_jobs: 10
 runs:
-  - dataset_name: lcld
+  - run_name: no_drift
+    dataset_name: lcld
     model_name: random_forest
     drift_name: no_drift
     label_delay: 0
     drift_delay: 0
     retraining_delay: 0
-  - dataset_name: lcld
+  - run_name: periodic
+    dataset_name: lcld
     model_name: random_forest
     drift_name: periodic
     label_delay: 0
