@@ -1,6 +1,7 @@
 from typing import List, Union
 
-from .adwin_drift import AdwinDrift
+from .adwin_drift import AdwinDrift, AdwinErrorDrift
+from .bayesian_uncertainty.rf_uncertainty_drift import RfUncertaintyDrift
 from .evidently_drift import EvidentlyDrift
 from .n_batch_drift import NBatchDrift
 from .no_drift import NoDrift
@@ -11,9 +12,11 @@ drift_detectors = {
     "tabular": TabularDrift,
     "periodic": PeriodicDrift,
     "adwin": AdwinDrift,
+    "adwin_error": AdwinErrorDrift,
     "evidently": EvidentlyDrift,
     "no_drift": NoDrift,
     "n_batch": NBatchDrift,
+    "rf_uncertainty": RfUncertaintyDrift,
 }
 
 
