@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 
 class NBatchDrift:
@@ -14,25 +13,19 @@ class NBatchDrift:
         self.counter = 0
         self.mem = []
 
-    def fit(self, x, t, y, y_scores):
-        self.drift_detector.fit(x, t, y, y_scores)
+    def fit(self, **kwargs):
+        self.drift_detector.fit(**kwargs)
         self.mem = []
         self.counter = 0
 
-    def update(self, x, t, y, y_scores):
-        self.mem.append((x, t, y, y_scores))
+    def update(self, **kwargs):
+        self.mem.append(kwargs)
         self.counter += 1
         if self.counter >= self.batch_size:
-            x, t, y, y_scores = zip(*self.mem)
-            x, t, y, y_scores = (
-                pd.DataFrame(x),
-                pd.Series(t),
-                np.array(y),
-                np.array(y_scores),
-            )
+            mem = {k: [dic[k] for dic in self.mem] for k in self.mem[0]}
             self.mem = []
             self.counter = 0
-            return self.drift_detector.update(x, t, y, y_scores)
+            return self.drift_detector.update(**mem)
 
         return False, False, np.nan, np.nan
 

@@ -28,7 +28,7 @@ class EvidentlyDrift:
         self.x_ref = None
         self.x_last = None
 
-    def fit(self, x, t, y, y_scores):
+    def fit(self, x, **kwargs):
         options = [DataDriftOptions(drift_share=0.01)]
         self.drift_detector = Profile(
             sections=[DataDriftProfileSection()], options=options
@@ -40,7 +40,7 @@ class EvidentlyDrift:
         self.x_ref = x
         self.x_last = x
 
-    def update(self, x, t, y, y_scores):
+    def update(self, x, **kwargs):
 
         self.x_last = pd.concat(
             [

@@ -10,10 +10,10 @@ class PeriodicDrift:
         self.period = period
         self.counter = 0
 
-    def fit(self, x, t, y, y_scores):
+    def fit(self, **kwargs):
         self.counter = 0
 
-    def update(self, x, t, y, y_scores):
+    def update(self, x, **kwargs):
         if len(x.shape) == 1:
             self.counter += 1
         elif len(x.shape) == 2:

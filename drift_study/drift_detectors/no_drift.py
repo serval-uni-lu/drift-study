@@ -10,12 +10,12 @@ class NoDrift:
         # Used to be compliant with others drift detectors
         pass
 
-    def fit(self, x, t, y, y_scores):
+    def fit(self, **kwargs):
         # No drift does not require fitting
         # Used to be compliant with others drift detectors
         pass
 
-    def update(self, x, t, y, y_scores):
+    def update(self, **kwargs):
         return False, False, np.nan, np.nan
 
     @staticmethod
