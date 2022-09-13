@@ -3,6 +3,7 @@ import os
 
 import configutils
 import h5py
+import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
 from mlc.datasets import load_datasets
@@ -13,6 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 metrics_params = {"reference_methods": ["periodic"]}
+markers = ["d", "v", "s", "*", "^", "d", "v", "s", "*", "^"]
+font = {"family": "normal", "size": 18}
+
+matplotlib.rc("font", **font)
 
 
 def run(configs):
@@ -73,36 +78,51 @@ def run(configs):
         logger.info(f"<><><> Reference: {ref_config_name} <><><>")
         ref_f1s = np.array(ref_config.get("f1s"))
         ref_f1s = ref_f1s[:-10]
+        plt.figure(figsize=(20, 6))
 
-        for eval_config in configs.get("runs"):
+        for i, eval_config in enumerate(configs.get("runs")):
             eval_config_name = eval_config.get("run_name")
+            model_used_max = eval_config.get("model_used").max()
             eval_f1s = np.array(eval_config.get("f1s"))
             eval_f1s = eval_f1s[:-10]
-            plt.plot(eval_f1s, label=eval_config_name)
+            label = f"{eval_config_name}: {model_used_max + 1}"
+            plt.plot(eval_f1s, label=label, marker=markers[i % len(markers)])
 
         plt.legend()
+        plt.xlabel("Time ordered batch")
+        plt.ylabel("f1 score")
         plt.savefig(
             f"reports/{dataset_name}/"
             f"f1_batch_{batch_size}_{ref_config_name}.pdf"
         )
+        plt.clf()
 
-    for ref_config in ref_configs:
+    for i, ref_config in enumerate(ref_configs):
         ref_config_name = ref_config.get("run_name")
         logger.info(f"<><><> Reference: {ref_config_name} <><><>")
         ref_f1s = np.array(ref_config.get("f1s"))
         ref_f1s = ref_f1s[:-10]
-
+        plt.figure(figsize=(20, 6))
         for eval_config in configs.get("runs"):
             eval_config_name = eval_config.get("run_name")
+            model_used_max = eval_config.get("model_used").max()
             eval_f1s = np.array(eval_config.get("f1s"))
             eval_f1s = eval_f1s[:-10]
-            plt.plot(eval_f1s - ref_f1s, label=eval_config_name)
+            label = f"{eval_config_name}: {model_used_max + 1}"
+            plt.plot(
+                eval_f1s - ref_f1s,
+                label=label,
+                marker=markers[i % len(markers)],
+            )
 
         plt.legend()
+        plt.xlabel("Time ordered batch")
+        plt.ylabel("f1 score")
         plt.savefig(
             f"reports/{dataset_name}/"
             f"f1_delta_batch_{batch_size}_{ref_config_name}.pdf"
         )
+        plt.clf()
 
 
 if __name__ == "__main__":

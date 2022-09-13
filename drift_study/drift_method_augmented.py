@@ -39,6 +39,7 @@ def run(config, common_params, performance_params):
         categorical_features=dataset.categorical_features,
         period=common_params.get("period"),
         batch_size=common_params.get("batch_size"),
+        **config.get("drift_parameters", {}),
     )
 
     # VARIABLES
@@ -56,8 +57,9 @@ def run(config, common_params, performance_params):
     # Train first model
 
     model_path = (
-        f"./models/{dataset_name}/" f"{model_name}_{0}_{window_size}.joblib"
+        f"./models/{dataset_name}/{model_name}_{0}_{window_size}.joblib"
     )
+    start_index, end_index = 0, window_size
 
     def fit_l() -> BaseEstimator:
         model.fit(x.iloc[start_index:end_index], y[start_index:end_index])
@@ -65,10 +67,11 @@ def run(config, common_params, performance_params):
 
     model = load_do_save(path=model_path, executable=fit_l, verbose=True)
     drift_detector.fit(
-        x.iloc[:window_size],
-        t[:window_size],
-        y[:window_size],
-        model.predict_proba(x.iloc[:window_size]),
+        x=x.iloc[:window_size],
+        t=t[:window_size],
+        y=y[:window_size],
+        y_scores=model.predict_proba(x.iloc[:window_size]),
+        model=model,
     )
 
     models.append(
@@ -115,10 +118,10 @@ def run(config, common_params, performance_params):
             drift_distances[current_index],
             drift_p_values[current_index],
         ) = drift_detector.update(
-            x.iloc[current_index],
-            t[current_index],
-            y[current_index],
-            y_scores[current_index],
+            x=x.iloc[current_index],
+            t=t[current_index],
+            y=y[current_index],
+            y_scores=y_scores[current_index],
         )
         # If we are already using the last model, retrain else not
         if current_model_i == len(models) - 1:
@@ -148,10 +151,13 @@ def run(config, common_params, performance_params):
                 )
 
                 drift_detector.fit(
-                    x.iloc[start_index:end_index],
-                    t[start_index:end_index],
-                    y[start_index:end_index],
-                    model.predict_proba(x.iloc[start_index:end_index]),
+                    x=x.iloc[start_index:end_index],
+                    t=t[start_index:end_index],
+                    y=y[start_index:end_index],
+                    y_scores=model.predict_proba(
+                        x.iloc[start_index:end_index]
+                    ),
+                    model=model,
                 )
                 models.append(
                     (
