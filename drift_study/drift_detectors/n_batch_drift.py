@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class NBatchDrift:
     def __init__(
         self,
@@ -27,7 +24,7 @@ class NBatchDrift:
             self.counter = 0
             return self.drift_detector.update(**mem)
 
-        return False, False, np.nan, np.nan
+        return False, False, None
 
     def needs_label(self):
         return self.drift_detector.needs_label()

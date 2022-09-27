@@ -14,8 +14,8 @@ class EvidentlyDrift:
     def __init__(
         self,
         window_size,
-        numerical_features,
-        categorical_features,
+        numerical_features=None,
+        categorical_features=None,
         **kwargs,
     ) -> None:
         self.window_size = window_size
@@ -28,7 +28,13 @@ class EvidentlyDrift:
         self.x_ref = None
         self.x_last = None
 
-    def fit(self, x, **kwargs):
+    def fit(self, **kwargs):
+        if "metric" in kwargs:
+            x = pd.DataFrame(kwargs["metric"], columns=["metric"])
+            self.numerical_features = ["metric"]
+            self.categorical_features = None
+        else:
+            x = kwargs["x"]
         options = [DataDriftOptions(drift_share=0.01)]
         self.drift_detector = Profile(
             sections=[DataDriftProfileSection()], options=options
@@ -40,7 +46,11 @@ class EvidentlyDrift:
         self.x_ref = x
         self.x_last = x
 
-    def update(self, x, **kwargs):
+    def update(self, **kwargs):
+        if "metric" in kwargs:
+            x = pd.DataFrame(kwargs["metric"], columns=["metric"])
+        else:
+            x = kwargs["x"]
 
         self.x_last = pd.concat(
             [

@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class NoDrift:
     def __init__(
         self,
@@ -16,7 +13,7 @@ class NoDrift:
         pass
 
     def update(self, **kwargs):
-        return False, False, np.nan, np.nan
+        return False, False, None
 
     @staticmethod
     def needs_label():

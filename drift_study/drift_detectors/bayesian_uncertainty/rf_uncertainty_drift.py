@@ -30,7 +30,13 @@ class RfUncertaintyDrift:
             random_forest=model[-1]
         )
         self.rf_uncertainty.fit(model[:-1].transform(x), y)
-        self.drift_detector.fit(x=x, y=y, model=model, **kwargs)
+        _, uncertainties = self.rf_uncertainty.predict_proba_with_uncertainty(
+            self.model[:-1].transform(x)
+        )
+        metric = [
+            e[UNCERTAINTY_TYPE[self.uncertainty_type]] for e in uncertainties
+        ]
+        self.drift_detector.fit(x=x, y=y, model=model, metric=metric, **kwargs)
 
     def update(self, x, **kwargs):
         x = pandas.DataFrame(x)
@@ -38,9 +44,15 @@ class RfUncertaintyDrift:
             self.model[:-1].transform(x)
         )
 
-        return self.drift_detector.update(
-            [e[UNCERTAINTY_TYPE[self.uncertainty_type]] for e in uncertainties]
+        uncertainties = [
+            e[UNCERTAINTY_TYPE[self.uncertainty_type]] for e in uncertainties
+        ]
+
+        is_drift, is_warning, metrics = self.drift_detector.update(
+            metric=uncertainties
         )
+        metrics[f"{self.uncertainty_type}_uncertainty"] = uncertainties
+        return is_drift, is_warning, metrics
 
     @staticmethod
     def needs_label():

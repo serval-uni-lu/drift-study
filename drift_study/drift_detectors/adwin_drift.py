@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from river.drift import ADWIN
 
 
@@ -14,7 +15,7 @@ class AdwinDrift:
 
     def _update_one(self, metric):
         in_drift, in_warning = self.drift_detector.update(metric)
-        return in_drift, in_warning, np.nan, np.nan
+        return in_drift, in_warning, None
 
     def update(self, metric):
         if len(metric) == 1:
@@ -23,10 +24,10 @@ class AdwinDrift:
             was_drift, was_warning = False, False
             for i in np.arange(len(metric)):
                 metric_0 = metric[i]
-                in_drift, in_warning, _, _ = self._update_one(metric_0)
+                in_drift, in_warning, _ = self._update_one(metric_0)
                 was_drift = was_drift or in_drift
                 was_warning = was_warning or in_warning
-            return was_drift, was_warning, np.nan, np.nan
+            return was_drift, was_warning, pd.DataFrame()
         else:
             raise NotImplementedError
 
@@ -44,19 +45,19 @@ class AdwinErrorDrift:
     def _update_one(self, y, y_scores):
         error = 1 - y_scores[y]
         in_drift, in_warning = self.drift_detector.update(error)
-        return in_drift, in_warning, np.nan, np.nan
+        return in_drift, in_warning, np.nan
 
     def update(self, y, y_scores, **kwargs):
-        if len(y) == 1:
+        if isinstance(y, np.int64) or (len(y) == 1):
             return self._update_one(y, y_scores)
         elif len(y) >= 2:
             was_drift, was_warning = False, False
             for i in np.arange(len(y)):
                 y0, y_scores0 = y[i], y_scores[i]
-                in_drift, in_warning, _, _ = self._update_one(y0, y_scores0)
+                in_drift, in_warning, _ = self._update_one(y0, y_scores0)
                 was_drift = was_drift or in_drift
                 was_warning = was_warning or in_warning
-            return was_drift, was_warning, np.nan, np.nan
+            return was_drift, was_warning, np.nan
         else:
             raise NotImplementedError
 

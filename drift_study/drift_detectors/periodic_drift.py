@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class PeriodicDrift:
     def __init__(
         self,
@@ -20,10 +17,10 @@ class PeriodicDrift:
             self.counter += len(x.shape[0])
 
         if self.counter < self.period:
-            return False, False, np.nan, np.nan
+            return False, False, None
         else:
 
-            return True, True, np.nan, np.nan
+            return True, True, None
 
     @staticmethod
     def needs_label():
