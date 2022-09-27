@@ -1,0 +1,31 @@
+---
+common_params:
+  window_size: 100000
+  batch_size: 50000
+  random_state: 42
+  p_value: 0.05
+  period: 50000
+performance_params:
+  predict_forward: 50000
+  n_jobs: 10
+evaluation_params:
+  reference_methods:
+    - no_drift
+    - periodic
+  batch_size: 50000
+  rolling: False
+runs:
+#  - run_name: no_drift
+#    dataset_name: flight_delay_ord_classification
+#    model_name: random_forest
+#    drift_name: no_drift
+#    label_delay: 0
+#    drift_delay: 0
+#    retraining_delay: 0
+  - run_name: periodic
+    dataset_name: flight_delay_ord_classification
+    model_name: random_forest
+    drift_name: periodic
+    label_delay: 0
+    drift_delay: 0
+    retraining_delay: 0
