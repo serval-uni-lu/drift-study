@@ -3,6 +3,7 @@ import os
 
 import h5py
 import joblib
+import pandas as pd
 from mlc.datasets import load_datasets
 from mlc.models import load_models
 from sklearn.base import clone as sk_clone
@@ -79,10 +80,13 @@ def save_arrays(numpy_to_save, drift_data_path):
             f.create_dataset(key, data=numpy_to_save[key], compression="gzip")
 
 
-def save_drift(numpy_to_save, models, dataset_name, model_name, run_name):
+def save_drift(
+    numpy_to_save, metrics: pd.DataFrame, dataset_name, model_name, run_name
+):
     drift_data_path = f"./data/{dataset_name}/drift/{model_name}_{run_name}"
 
     save_arrays(numpy_to_save, drift_data_path)
+    metrics.to_hdf(f"{drift_data_path}_metrics.hdf5", "metrics")
 
     # save_models(
     #     models,

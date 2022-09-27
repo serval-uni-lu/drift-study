@@ -8,8 +8,8 @@ from mlc.load_do_save import load_do_save
 from sklearn.base import BaseEstimator
 from tqdm import tqdm
 
-from drift_study.drift_detector_factory import get_drift_detector
-from drift_study.helpers import (
+from drift_study.utils.drift_detector_factory import get_drift_detector
+from drift_study.utils.helpers import (
     clone_estimator,
     compute_y_scores,
     get_current_models,
@@ -83,12 +83,12 @@ def run(config, common_params, performance_params):
 
     is_drifts = np.full(len(x), np.nan)
     is_drift_warnings = np.full(len(x), np.nan)
-    drift_distances = np.full(len(x), np.nan)
-    drift_p_values = np.full(len(x), np.nan)
 
     predict_forward = performance_params.get("predict_forward")
 
     last_model_used = 0
+
+    metrics = []
 
     for current_index in tqdm(np.arange(window_size, len(x))):
 
@@ -115,14 +115,14 @@ def run(config, common_params, performance_params):
         (
             is_drifts[current_index],
             is_drift_warnings[current_index],
-            drift_distances[current_index],
-            drift_p_values[current_index],
+            metric,
         ) = drift_detector.update(
             x=x.iloc[current_index],
             t=t[current_index],
             y=y[current_index],
             y_scores=y_scores[current_index],
         )
+        metrics.append(metric)
         # If we are already using the last model, retrain else not
         if current_model_i == len(models) - 1:
             if is_drifts[current_index]:
@@ -174,16 +174,23 @@ def run(config, common_params, performance_params):
     numpy_to_save = {
         "is_drifts": is_drifts,
         "is_drift_warnings": is_drift_warnings,
-        "drift_distances": drift_distances,
-        "drift_p_values": drift_p_values,
         "y_scores": y_scores,
         "model_used": model_used,
         "model_start_indexes": model_start_indexes,
         "model_end_indexes": model_end_indexes,
     }
+    any_df = any([isinstance(e, pd.DataFrame) for e in metrics])
+    if any_df:
+        metrics = pd.concat(metrics).reset_index(drop=True)
+    else:
+        metrics = pd.DataFrame()
 
     save_drift(
-        numpy_to_save, models, dataset_name, model_name, config.get("run_name")
+        numpy_to_save,
+        metrics,
+        dataset_name,
+        model_name,
+        config.get("run_name"),
     )
 
 
