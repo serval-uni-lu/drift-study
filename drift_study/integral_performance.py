@@ -8,6 +8,7 @@ from mlc.datasets import load_datasets
 from sklearn.metrics import f1_score
 
 from drift_study.utils.evaluation import rolling_f1
+from drift_study.utils.helpers import get_ref_eval_config
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
@@ -15,17 +16,12 @@ logger = logging.getLogger(__name__)
 
 def run(configs):
     print(configs)
-    ref_configs = []
-    other_configs = []
+
     evaluation_params = configs.get("evaluation_params")
 
-    for config in configs.get("runs"):
-        if config.get("run_name") in evaluation_params.get(
-            "reference_methods"
-        ):
-            ref_configs.append(config)
-        else:
-            other_configs.append(config)
+    ref_configs, eval_configs = get_ref_eval_config(
+        configs, configs.get("evaluation_params").get("reference_methods")
+    )
     dataset_name = ref_configs[0].get("dataset_name")
     model_name = ref_configs[0].get("model_name")
     logger.info(f"Starting dataset {dataset_name}, model {model_name}")

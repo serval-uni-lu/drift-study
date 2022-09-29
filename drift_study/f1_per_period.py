@@ -9,11 +9,12 @@ from matplotlib import pyplot as plt
 from mlc.datasets import load_datasets
 from sklearn.metrics import f1_score
 
+from drift_study.utils.helpers import get_ref_eval_config
+
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
 
 
-metrics_params = {"reference_methods": ["periodic"]}
 markers = ["d", "v", "s", "*", "^", "d", "v", "s", "*", "^"]
 font = {"family": "normal", "size": 18}
 
@@ -22,17 +23,12 @@ matplotlib.rc("font", **font)
 
 def run(configs):
     print(configs)
-    ref_configs = []
-    other_configs = []
-    for config in configs.get("runs"):
-        if config.get("run_name") in metrics_params.get("reference_methods"):
-            ref_configs.append(config)
-        else:
-            other_configs.append(config)
+    ref_configs, eval_configs = get_ref_eval_config(
+        configs, configs.get("evaluation_params").get("reference_methods")
+    )
     dataset_name = ref_configs[0].get("dataset_name")
     model_name = ref_configs[0].get("model_name")
     logger.info(f"Starting dataset {dataset_name}, model {model_name}")
-
     dataset = load_datasets(dataset_name)
     x, y, t = dataset.get_x_y_t()
 
@@ -43,6 +39,7 @@ def run(configs):
     length = len(test_i) - (len(test_i) % batch_size)
     index_batches = np.split(test_i[:length], length / batch_size)
 
+    # --- For each config, collect data needed
     for config in configs.get("runs"):
         drift_data_path = (
             f"./data/{dataset_name}/drift/"
@@ -54,6 +51,8 @@ def run(configs):
 
         y_pred = np.argmax(y_scores, axis=1)
 
+        # Check if retrained
+        config["model_used"] = model_used
         config["is_retrained"] = []
         for i, index_batch in enumerate(index_batches):
             if i == 0:
@@ -71,13 +70,10 @@ def run(configs):
             f1_score(y[index_batch], y_pred[index_batch])
             for index_batch in index_batches
         ]
-        config["model_used"] = model_used
 
     for ref_config in ref_configs:
         ref_config_name = ref_config.get("run_name")
         logger.info(f"<><><> Reference: {ref_config_name} <><><>")
-        ref_f1s = np.array(ref_config.get("f1s"))
-        ref_f1s = ref_f1s[:-10]
         plt.figure(figsize=(20, 6))
 
         for i, eval_config in enumerate(configs.get("runs")):
@@ -126,5 +122,5 @@ def run(configs):
 
 
 if __name__ == "__main__":
-    config = configutils.get_config()
-    run(config)
+    main_config = configutils.get_config()
+    run(main_config)

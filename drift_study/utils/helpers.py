@@ -92,3 +92,14 @@ def save_drift(
     #     models,
     #     f"./models/{dataset_name}/{model_name}_{run_name}",
     # )
+
+
+def get_ref_eval_config(configs, ref_config_names):
+    ref_configs = []
+    eval_configs = []
+    for config in configs.get("runs"):
+        if config.get("run_name") in ref_config_names:
+            ref_configs.append(config)
+        else:
+            eval_configs.append(config)
+    return ref_configs, eval_configs
