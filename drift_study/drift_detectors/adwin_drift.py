@@ -15,12 +15,12 @@ class AdwinDrift:
 
     def _update_one(self, metric):
         in_drift, in_warning = self.drift_detector.update(metric)
-        return in_drift, in_warning, None
+        return in_drift, in_warning, pd.DataFrame()
 
     def update(self, metric):
-        if len(metric) == 1:
+        if not hasattr(metric, "__len__"):
             return self._update_one(metric)
-        elif len(metric) >= 2:
+        else:
             was_drift, was_warning = False, False
             for i in np.arange(len(metric)):
                 metric_0 = metric[i]
@@ -28,8 +28,6 @@ class AdwinDrift:
                 was_drift = was_drift or in_drift
                 was_warning = was_warning or in_warning
             return was_drift, was_warning, pd.DataFrame()
-        else:
-            raise NotImplementedError
 
 
 class AdwinErrorDrift:

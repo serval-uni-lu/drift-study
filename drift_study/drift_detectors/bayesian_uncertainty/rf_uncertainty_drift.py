@@ -25,11 +25,14 @@ class RfUncertaintyDrift:
         self.x_last = None
 
     def fit(self, x, y, model, **kwargs):
-        self.model = model
+        internal_model = model
+        while hasattr(internal_model, "model"):
+            internal_model = internal_model.model
+        self.model = internal_model
         self.rf_uncertainty = RandomForestClassifierWithUncertainty(
-            random_forest=model[-1]
+            random_forest=internal_model[-1]
         )
-        self.rf_uncertainty.fit(model[:-1].transform(x), y)
+        self.rf_uncertainty.fit(self.model[:-1].transform(x), y)
         _, uncertainties = self.rf_uncertainty.predict_proba_with_uncertainty(
             self.model[:-1].transform(x)
         )

@@ -1,6 +1,5 @@
 import warnings
 
-import numpy as np
 import pandas as pd
 from evidently import ColumnMapping
 from evidently.model_profile import Profile
@@ -70,7 +69,11 @@ class EvidentlyDrift:
             report["data_drift"]["data"]["metrics"]["n_drifted_features"] > 0
         )
 
-        return in_drift, in_warning, np.nan, np.nan
+        return (
+            in_drift,
+            in_warning,
+            report["data_drift"]["data"]["metrics"].copy(),
+        )
 
     @staticmethod
     def needs_label():

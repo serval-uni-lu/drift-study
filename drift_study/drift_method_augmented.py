@@ -1,18 +1,22 @@
 import logging
 import os
+from pathlib import Path
+from typing import List, Tuple
 
 import configutils
 import numpy as np
 import pandas as pd
-from mlc.load_do_save import load_do_save
-from sklearn.base import BaseEstimator
+from mlc.models.model import Model
+from numpy.typing import ArrayLike
 from tqdm import tqdm
 
-from drift_study.utils.drift_detector_factory import get_drift_detector
+from drift_study.utils.drift_detector_factory import (
+    get_drift_detector_from_conf,
+)
 from drift_study.utils.helpers import (
-    clone_estimator,
     compute_y_scores,
     get_current_models,
+    get_model_arch,
     initialize,
     save_drift,
 )
@@ -21,56 +25,68 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
 
 
-def run(config, common_params, performance_params):
-    dataset, model, x, y, t = initialize(
-        config, common_params, performance_params
-    )
-    dataset_name = config.get("dataset_name")
-    model_name = config.get("model_name")
+def load_do_save_model(model: Model, path: str, x, y) -> Model:
+    if Path(path).exists():
+        model.load(path)
+        logger.info(f"Model {path} loaded.")
+    else:
+        logger.info(f"Fitting model {path}.")
+        model.fit(x, y)
+        model.save(path)
+    return model
 
-    window_size = common_params.get("window_size")
-    drift_detector = get_drift_detector(
-        drift_detectors_names=config.get("drift_name"),
-        window_size=window_size,
-        batch=common_params.get("batch_size"),
-        p_val=common_params.get("p_value"),
-        features=x.columns,
-        numerical_features=dataset.numerical_features,
-        categorical_features=dataset.categorical_features,
-        period=common_params.get("period"),
-        batch_size=common_params.get("batch_size"),
-        **config.get("drift_parameters", {}),
+
+def run(config, run_i):
+
+    run_config = config.get("runs")[run_i]
+
+    dataset, model, x, y, t = initialize(config, run_config)
+    window_size = config.get("window_size")
+    metadata = dataset.get_metadata(only_x=True)
+    auto_detector_params = {
+        "features": metadata["feature"].to_list(),
+        "numerical_features": metadata["feature"][
+            metadata["type"] != "cat"
+        ].to_list(),
+        "categorical_features": metadata["feature"][
+            metadata["type"] == "cat"
+        ].to_list(),
+        "window_size": window_size,
+    }
+    drift_detector = get_drift_detector_from_conf(
+        run_config.get("detectors"),
+        {**config.get("common_detectors_params"), **auto_detector_params},
     )
 
     # VARIABLES
-    label_delay = pd.Timedelta(config.get("label_delay"))
-    drift_detection_delay = pd.Timedelta(config.get("drift_delay"))
+    label_delay = pd.Timedelta(run_config.get("label_delay"))
+    drift_detection_delay = pd.Timedelta(run_config.get("drift_delay"))
     if drift_detector.needs_label():
         drift_detection_delay = drift_detection_delay + label_delay
     retraining_delay = max(label_delay, drift_detection_delay) + pd.Timedelta(
-        config.get("retraining_delay")
+        run_config.get("retraining_delay")
     )
 
     # DATA STRUCTURE
-    models = []
+    models: List[Tuple[ArrayLike, Model, any, int, int]] = []
 
     # Train first model
-
     model_path = (
-        f"./models/{dataset_name}/{model_name}_{0}_{window_size}.joblib"
+        f"./models/{dataset.name}/{model.name}_{0}_{window_size}.joblib"
     )
     start_index, end_index = 0, window_size
+    model = load_do_save_model(
+        model,
+        model_path,
+        x.iloc[start_index:end_index],
+        y[start_index:end_index],
+    )
 
-    def fit_l() -> BaseEstimator:
-        model.fit(x.iloc[start_index:end_index], y[start_index:end_index])
-        return model
-
-    model = load_do_save(path=model_path, executable=fit_l, verbose=True)
     drift_detector.fit(
         x=x.iloc[:window_size],
         t=t[:window_size],
         y=y[:window_size],
-        y_scores=model.predict_proba(x.iloc[:window_size]),
+        y_scores=model.predict(x.iloc[:window_size]),
         model=model,
     )
 
@@ -84,7 +100,7 @@ def run(config, common_params, performance_params):
     is_drifts = np.full(len(x), np.nan)
     is_drift_warnings = np.full(len(x), np.nan)
 
-    predict_forward = performance_params.get("predict_forward")
+    predict_forward = config.get("performance").get("predict_forward")
 
     last_model_used = 0
 
@@ -133,30 +149,22 @@ def run(config, common_params, performance_params):
                     f"start_index {start_index}, end_index {end_index}."
                 )
 
-                model = clone_estimator(model)
-
                 model_path = (
-                    f"./models/{dataset_name}/"
-                    f"{model_name}_{start_index}_{end_index}.joblib"
+                    f"./models/{dataset.name}/"
+                    f"{model.name}_{start_index}_{end_index}.joblib"
                 )
-
-                def fit_l() -> BaseEstimator:
-                    model.fit(
-                        x.iloc[start_index:end_index], y[start_index:end_index]
-                    )
-                    return model
-
-                model = load_do_save(
-                    path=model_path, executable=fit_l, verbose=True
+                model = load_do_save_model(
+                    get_model_arch(config, run_config, metadata),
+                    model_path,
+                    x=x.iloc[start_index:end_index],
+                    y=y[start_index:end_index],
                 )
 
                 drift_detector.fit(
                     x=x.iloc[start_index:end_index],
                     t=t[start_index:end_index],
                     y=y[start_index:end_index],
-                    y_scores=model.predict_proba(
-                        x.iloc[start_index:end_index]
-                    ),
+                    y_scores=model.predict(x.iloc[start_index:end_index]),
                     model=model,
                 )
                 models.append(
@@ -188,20 +196,18 @@ def run(config, common_params, performance_params):
     save_drift(
         numpy_to_save,
         metrics,
-        dataset_name,
-        model_name,
-        config.get("run_name"),
+        dataset.name,
+        model.name,
+        run_config.get("name"),
     )
 
 
-def run_many(configs_l, common_params, performance_params):
-    for config in configs_l:
-        run(config, common_params, performance_params)
+def run_many():
+    config_all = configutils.get_config()
+
+    for i in range(len(config_all.get("runs"))):
+        run(config_all, i)
 
 
 if __name__ == "__main__":
-    configs = configutils.get_config()
-    runs = configs.get("runs")
-    common_params_l = configs.get("common_params")
-    performance_params_l = configs.get("performance_params")
-    run_many(runs, common_params_l, performance_params_l)
+    run_many()
