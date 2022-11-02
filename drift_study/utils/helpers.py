@@ -1,17 +1,19 @@
 import logging
 import os
-from pathlib import Path
+from typing import List
 
-import h5py
-import joblib
 import pandas as pd
 from mlc.datasets.dataset import Dataset
 from mlc.datasets.dataset_factory import get_dataset
 from mlc.models.model import Model
-from mlc.models.samples import load_model
+from mlc.models.model_factory import get_model
+from mlc.transformers.pipeline import Pipeline
+from mlc.transformers.tabular_transformer import TabTransformer
 from numpy.typing import ArrayLike
 from sklearn.base import clone as sk_clone
-from sklearn.pipeline import Pipeline
+
+from drift_study.utils.drift_model import DriftModel
+from drift_study.utils.io_utils import load_do_save_model
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
@@ -25,19 +27,24 @@ def initialize(
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
 
+    metadata = dataset.get_metadata(only_x=True)
     model = get_model_arch(
         config, run_config, dataset.get_metadata(only_x=True)
+    )
+    model = Pipeline(
+        steps=[
+            TabTransformer(metadata=metadata, scale=True, one_hot_encode=True),
+            model,
+        ]
     )
 
     return dataset, model, x, y, t
 
 
 def get_model_arch(config, run_config, metadata):
-    model_name = run_config.get("model").get("name")
 
-    model_class = load_model(model_name)
+    model_class = get_model(run_config.get("model"))
     model = model_class(
-        name=model_name,
         x_metadata=metadata,
         verbose=0,
         n_jobs=config.get("performance").get("n_jobs"),
@@ -47,13 +54,21 @@ def get_model_arch(config, run_config, metadata):
     return model
 
 
-def get_current_models(models, t, last_model_used=None):
-    to_add = 0
-    if last_model_used is not None:
-        models = models[last_model_used:]
-        to_add = last_model_used
-    past_models = list(filter(lambda x: x[1][0] <= t, enumerate(models)))
-    return past_models[-1][0] + to_add
+def get_current_models(models: List[DriftModel], t, last_model_used_i=None):
+    # Filter out the model that are known outdated
+    idx_to_add = 0
+    if last_model_used_i is not None:
+        models = models[last_model_used_i:]
+        idx_to_add = last_model_used_i
+    # From these models, get the one that are in the past
+    past_models = list(
+        filter(lambda x: x[1].available_time <= t, enumerate(models))
+    )
+    # Get the latest one, index
+    model_i = past_models[-1][0]
+    # Re-add the latest model index
+    model_i = model_i + idx_to_add
+    return model_i
 
 
 def compute_y_scores(
@@ -67,9 +82,14 @@ def compute_y_scores(
 ):
     if model_used[current_index] < current_model_i:
         logger.debug(f"Seeing forward at index {current_index}")
-        y_scores[
-            current_index : current_index + predict_forward
-        ] = model.predict(x[current_index : current_index + predict_forward])
+        x_to_pred = x[current_index : current_index + predict_forward]
+        if model.objective in ["regression"]:
+            y_pred = model.predict(x_to_pred)
+        elif model.objective in ["binary", "category"]:
+            y_pred = model.predict_proba(x_to_pred)
+        else:
+            raise NotImplementedError
+        y_scores[current_index : current_index + predict_forward] = y_pred
         model_used[
             current_index : current_index + predict_forward
         ] = current_model_i
@@ -78,32 +98,6 @@ def compute_y_scores(
 
 def clone_estimator(estimator) -> Pipeline:
     return sk_clone(estimator)
-
-
-def save_models(models, model_path):
-    for i, model in enumerate(list(zip(*models))[1]):
-        joblib.dump(model, f"{model_path}_{i}.joblib")
-
-
-def save_arrays(numpy_to_save, drift_data_path):
-    Path(drift_data_path).parent.mkdir(parents=True, exist_ok=True)
-    with h5py.File(drift_data_path, "w") as f:
-        for key in numpy_to_save.keys():
-            f.create_dataset(key, data=numpy_to_save[key], compression="gzip")
-
-
-def save_drift(
-    numpy_to_save, metrics: pd.DataFrame, dataset_name, model_name, run_name
-):
-    drift_data_path = f"./data/{dataset_name}/drift/{model_name}_{run_name}"
-
-    save_arrays(numpy_to_save, drift_data_path)
-    metrics.to_hdf(f"{drift_data_path}_metrics.hdf5", "metrics")
-
-    # save_models(
-    #     models,
-    #     f"./models/{dataset_name}/{model_name}_{run_name}",
-    # )
 
 
 def get_ref_eval_config(configs, ref_config_names):
@@ -115,3 +109,58 @@ def get_ref_eval_config(configs, ref_config_names):
         else:
             eval_configs.append(config)
     return ref_configs, eval_configs
+
+
+def get_common_detectors_params(config, metadata):
+    auto_detector_params = {
+        "features": metadata["feature"].to_list(),
+        "numerical_features": metadata["feature"][
+            metadata["type"] != "cat"
+        ].to_list(),
+        "categorical_features": metadata["feature"][
+            metadata["type"] == "cat"
+        ].to_list(),
+        "window_size": config.get("window_size"),
+    }
+    return {**config.get("common_detectors_params"), **auto_detector_params}
+
+
+def get_delays(run_config, drift_detector):
+    label_delay = pd.Timedelta(run_config.get("label_delay"))
+    drift_detection_delay = pd.Timedelta(run_config.get("drift_delay"))
+    if drift_detector.needs_label():
+        drift_detection_delay = drift_detection_delay + label_delay
+    retraining_delay = max(label_delay, drift_detection_delay) + pd.Timedelta(
+        run_config.get("retraining_delay")
+    )
+    return label_delay, drift_detection_delay, retraining_delay
+
+
+def add_model(
+    models: List[DriftModel],
+    model_path,
+    model,
+    drift_detector,
+    t_available,
+    x,
+    y,
+    t,
+    start_idx,
+    end_idx,
+):
+    model = load_do_save_model(
+        model,
+        model_path,
+        x.iloc[start_idx:end_idx],
+        y[start_idx:end_idx],
+    )
+
+    drift_detector.fit(
+        x=x.iloc[start_idx:end_idx],
+        t=t[start_idx:end_idx],
+        y=y[start_idx:end_idx],
+        y_scores=model.predict(x.iloc[start_idx:end_idx]),
+        model=model,
+    )
+
+    models.append(DriftModel(t_available, model, drift_detector, 0, end_idx))
