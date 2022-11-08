@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 def run(config, run_i):
 
     run_config = config.get("runs")[run_i]
-
+    logger.info(f"Running config {run_config.get('name')}")
     dataset, model, x, y, t = initialize(config, run_config)
     window_size = config.get("window_size")
     metadata = dataset.get_metadata(only_x=True)

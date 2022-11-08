@@ -15,11 +15,13 @@ class EvidentlyDrift:
         window_size,
         numerical_features=None,
         categorical_features=None,
+        drift_share=0.01,
         **kwargs,
     ) -> None:
         self.window_size = window_size
         self.numerical_features = numerical_features
         self.categorical_features = categorical_features
+        self.drift_share = drift_share
 
         self.drift_detector = None
         self.column_mapping = None
@@ -34,7 +36,7 @@ class EvidentlyDrift:
             self.categorical_features = None
         else:
             x = kwargs["x"]
-        options = [DataDriftOptions(drift_share=0.01)]
+        options = [DataDriftOptions(drift_share=self.drift_share)]
         self.drift_detector = Profile(
             sections=[DataDriftProfileSection()], options=options
         )
@@ -72,7 +74,7 @@ class EvidentlyDrift:
         return (
             in_drift,
             in_warning,
-            report["data_drift"]["data"]["metrics"].copy(),
+            pd.DataFrame(report["data_drift"]["data"]["metrics"].copy()),
         )
 
     @staticmethod

@@ -23,7 +23,7 @@ def initialize(
     config,
     run_config,
 ) -> (Dataset, Model, ArrayLike, ArrayLike, ArrayLike):
-    logger.info(f"Starting dataset {config.get('dataset').get('name')}")
+    logger.debug(f"Loading dataset {config.get('dataset').get('name')}")
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
 
@@ -85,7 +85,7 @@ def compute_y_scores(
         x_to_pred = x[current_index : current_index + predict_forward]
         if model.objective in ["regression"]:
             y_pred = model.predict(x_to_pred)
-        elif model.objective in ["binary", "category"]:
+        elif model.objective in ["binary", "classification"]:
             y_pred = model.predict_proba(x_to_pred)
         else:
             raise NotImplementedError
@@ -154,12 +154,17 @@ def add_model(
         x.iloc[start_idx:end_idx],
         y[start_idx:end_idx],
     )
-
+    if model.objective in ["regression"]:
+        y_scores = model.predict(x.iloc[start_idx:end_idx])
+    elif model.objective in ["binary", "classification"]:
+        y_scores = model.predict_proba(x.iloc[start_idx:end_idx])
+    else:
+        raise NotImplementedError
     drift_detector.fit(
         x=x.iloc[start_idx:end_idx],
         t=t[start_idx:end_idx],
         y=y[start_idx:end_idx],
-        y_scores=model.predict(x.iloc[start_idx:end_idx]),
+        y_scores=y_scores,
         model=model,
     )
 

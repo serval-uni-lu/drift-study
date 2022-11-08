@@ -21,20 +21,23 @@ class RfUncertaintyDrift:
         self.drift_detector = drift_detector
         self.uncertainty_type = uncertainty_type
         self.rf_uncertainty = None
+        self.rf = None
         self.model = None
         self.x_last = None
 
     def fit(self, x, y, model, **kwargs):
-        internal_model = model
+        internal_model = model[-1]
         while hasattr(internal_model, "model"):
             internal_model = internal_model.model
-        self.model = internal_model
+        self.rf = internal_model
+        self.model = model
+
         self.rf_uncertainty = RandomForestClassifierWithUncertainty(
-            random_forest=internal_model[-1]
+            random_forest=self.rf
         )
-        self.rf_uncertainty.fit(self.model[:-1].transform(x), y)
+        self.rf_uncertainty.fit(self.model.transform(x), y)
         _, uncertainties = self.rf_uncertainty.predict_proba_with_uncertainty(
-            self.model[:-1].transform(x)
+            self.model.transform(x)
         )
         metric = [
             e[UNCERTAINTY_TYPE[self.uncertainty_type]] for e in uncertainties
@@ -44,7 +47,7 @@ class RfUncertaintyDrift:
     def update(self, x, **kwargs):
         x = pandas.DataFrame(x)
         _, uncertainties = self.rf_uncertainty.predict_proba_with_uncertainty(
-            self.model[:-1].transform(x)
+            self.model.transform(x)
         )
 
         uncertainties = [

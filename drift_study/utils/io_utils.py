@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 def load_do_save_model(model: Model, path: str, x, y) -> Model:
     if Path(path).exists():
         model.load(path)
-        logger.info(f"Model {path} loaded.")
+        logger.debug(f"Model {path} loaded.")
     else:
-        logger.info(f"Fitting model {path}.")
+        logger.debug(f"Fitting model {path}.")
         model.fit(x, y)
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         model.save(path)

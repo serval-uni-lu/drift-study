@@ -67,6 +67,7 @@ def run():
             eval_metric = eval_config.get("prediction_metric")
             area = np.trapz(eval_metric - ref_metric)
             area_scaled = area / len(eval_metric)
+            diff = eval_metric - ref_metric
             out.append(
                 {
                     "reference": ref_config_name,
@@ -74,6 +75,10 @@ def run():
                     "n_train": eval_config.get("model_used").max() + 1,
                     "area": area,
                     "area_scaled": area_scaled,
+                    "max_diff": diff.max(),
+                    "mean_diff": diff.mean(),
+                    "med_diff": np.median(diff),
+                    "min_diff": diff.min(),
                 }
             )
             logger.info(f"Eval: {eval_config_name}, Area = {area_scaled}")
