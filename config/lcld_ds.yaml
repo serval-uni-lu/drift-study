@@ -1,5 +1,5 @@
 ---
-window_size: 5000
+window_size: 100000
 performance:
   predict_forward: 5000
   n_jobs: 14
@@ -9,22 +9,22 @@ evaluation_params:
   reference_methods:
     - no_drift
     - periodic
-  batch_size: 1000
+  batch_size: 25000
   rolling: False
   significance: 0.0
   metric:
     name: f1
   n_score: 2
 dataset:
-  name: electricity
+  name: lcld_201317_ds_time
 common_detectors_params:
   p_value: 0.05
-  period: 1000
+  period: 5000
 runs:
 #  - name: no_drift
 #    model:
 #      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
+#      name: rf_lcld
 #    detectors:
 #      - name: no_drift
 #        params: {}
@@ -34,7 +34,7 @@ runs:
 #  - name: periodic
 #    model:
 #      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
+#      name: rf_lcld
 #    detectors:
 #      - name: periodic
 #        params: {}
@@ -44,7 +44,7 @@ runs:
 #  - name: adwin_error
 #    model:
 #      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
+#      name: rf_lcld
 #    detectors:
 #      - name: metric
 #        params:
@@ -58,7 +58,7 @@ runs:
 #  - name: adwin_error_D
 #    model:
 #      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
+#      name: rf_lcld
 #    detectors:
 #      - name: metric
 #        params:
@@ -72,7 +72,7 @@ runs:
 #  - name: ddm_error_D
 #    model:
 #      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
+#      name: rf_lcld
 #    detectors:
 #      - name: metric
 #        params:
@@ -88,7 +88,7 @@ runs:
 #  - name: eddm_error_D
 #    model:
 #      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
+#      name: rf_lcld
 #    detectors:
 #      - name: metric
 #        params:
@@ -99,23 +99,37 @@ runs:
 #    label_delay: 10days
 #    drift_delay: 0
 #    retraining_delay: 1W
-  - name: data_D
+#  - name: data_D
+#    model:
+#      source: drift_study.model_arch.tree_model
+#      name: rf_lcld
+#    detectors:
+#      - name: n_batch
+#        params:
+#          batch_size: 5000
+#      - name: evidently
+#        params: {}
+#    label_delay: 10days
+#    drift_delay: 0
+#    retraining_delay: 1W
+  - name: data_3_D
     model:
       source: drift_study.model_arch.tree_model
-      name: rf_classifier
+      name: rf_lcld
     detectors:
       - name: n_batch
         params:
-          batch_size: 1000
+          batch_size: 5000
       - name: evidently
-        params: {}
+        params:
+          drift_share: 0.3333
     label_delay: 10days
     drift_delay: 0
     retraining_delay: 1W
 #  - name: uncertainty_total_D
 #    model:
 #      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
+#      name: rf_lcld
 #    detectors:
 #      - name: n_batch
 #        params:
@@ -131,7 +145,7 @@ runs:
 #  - name: uncertainty_epistemic_D
 #    model:
 #      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
+#      name: rf_lcld
 #    detectors:
 #      - name: n_batch
 #        params:
@@ -147,7 +161,7 @@ runs:
 #  - name: uncertainty_aleatoric_D
 #    model:
 #      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
+#      name: rf_lcld
 #    detectors:
 #      - name: n_batch
 #        params:
@@ -159,4 +173,113 @@ runs:
 #        params: { }
 #    label_delay: 10days
 #    drift_delay: 0
+#    retraining_delay: 1W
+#  - name: periodic_delay
+#    model:
+#      source: drift_study.model_arch.tree_model
+#      name: rf_lcld
+#    detectors:
+#      - name: periodic
+#        params: { }
+#    label_delay: 10days
+#    drift_delay: 0
+#    retraining_delay: 1W
+#  - name: adwin_no_batch
+#    model:
+#      name: rf_lcld
+#    detectors:
+#      - name: adwin_error
+#        params: {}
+#    label_delay: 0
+#    drift_delay: 0
+#    retraining_delay: 0
+#  - name: adwin_no_delay
+#    model:
+#      name: rf_lcld
+#    detectors:
+#      - name: n_batch
+#        params:
+#          batch_size: 5000
+#      - name: adwin_error
+#        params: { }
+#    label_delay: 0
+#    drift_delay: 0
+#    retraining_delay: 0
+#  - name: adwin
+#    model:
+#      name: rf_lcld
+#    detectors:
+#      - name: adwin_error
+#        params: { }
+#    label_delay: 10days
+#    drift_delay: 0
+#    retraining_delay: 1W
+#  - name: data
+#    model:
+#      name: rf_lcld
+#    detectors:
+#      - name: n_batch
+#        params:
+#          batch_size: 5000
+#      - name: evidently
+#        params: {}
+#    label_delay: 10days
+#    drift_delay: 0
+#    retraining_delay: 1W
+#  - name: uncertainty_total
+#    model:
+#      name: rf_lcld
+#    detectors:
+#      - name: rf_uncertainty
+#        params:
+#          uncertainty_type: total
+#      - name: adwin
+#        params: {}
+#    label_delay: 10days
+#    drift_delay: 0
+#    retraining_delay: 1W
+#  - name: uncertainty_total_batch
+#    model:
+#      name: rf_lcld
+#    detectors:
+#      - name: n_batch
+#        params:
+#          batch_size: 5000
+#      - name: rf_uncertainty
+#        params:
+#          uncertainty_type: total
+#      - name: adwin
+#        params: { }
+#    label_delay: 10days
+#    drift_delay: 0
+#    retraining_delay: 1W
+#  - name: uncertainty_epistemic_batch
+#    model:
+#      name: rf_lcld
+#    detectors:
+#      - name: n_batch
+#        params:
+#          batch_size: 5000
+#      - name: rf_uncertainty
+#        params:
+#          uncertainty_type: epistemic
+#      - name: adwin
+#        params: { }
+#    label_delay: 10days
+#    drift_delay: 00
+#    retraining_delay: 1W
+#  - name: uncertainty_aleatoric_batch
+#    model:
+#      name: rf_lcld
+#    detectors:
+#      - name: n_batch
+#        params:
+#          batch_size: 5000
+#      - name: rf_uncertainty
+#        params:
+#          uncertainty_type: aleatoric
+#      - name: adwin
+#        params: { }
+#    label_delay: 10days
+#    drift_delay: 00
 #    retraining_delay: 1W
