@@ -7,7 +7,7 @@ from mlc.datasets.dataset import Dataset
 from mlc.datasets.dataset_factory import get_dataset
 from mlc.models.model import Model
 from mlc.models.model_factory import get_model
-from mlc.transformers.pipeline import Pipeline
+from mlc.models.pipeline import Pipeline
 from mlc.transformers.tabular_transformer import TabTransformer
 from numpy.typing import ArrayLike
 from sklearn.base import clone as sk_clone
