@@ -1,14 +1,15 @@
+import math
+
 import numpy as np
 import pandas as pd
-from menelaus.change_detection.page_hinkley import PageHinkley
-from menelaus.drift_detector import DriftDetector
+from river.drift import PageHinkley
 from scipy.spatial.distance import jensenshannon
+from scipy.stats import entropy
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KernelDensity
-from sklearn.preprocessing import StandardScaler
 
 
-class PCACD(DriftDetector):
+class PcaCdDrift:
     """Principal Component Analysis Change Detection (PCA-CD) is a drift
     detection algorithm which checks for change in the distribution of the
     given data using one of several divergence metrics calculated on the data's
@@ -28,12 +29,6 @@ class PCACD(DriftDetector):
     Ref. :cite:t:`qahtan2015pca`
 
     Attributes:
-        total_updates (int): number of samples the drift detector has ever
-            been updated with
-        updates_since_reset (int): number of samples since the last time the
-            drift detector was reset
-        drift_state (str): detector's current drift state. Can take values
-            ``"drift"`` or ``None``.
         step (int): how frequently (by number of samples), to detect drift.
             This is either 100 samples or ``sample_period * window_size``,
             whichever is smaller.
@@ -48,11 +43,12 @@ class PCACD(DriftDetector):
     def __init__(
         self,
         window_size,
+        batch_size,
+        divergence_metric,
         ev_threshold=0.99,
         delta=0.005,
-        divergence_metric="kl",
-        sample_period=0.05,
-        online_scaling=True,
+        ph_t_ratio=0.001,
+        **kwargs,
     ):
         """
         Args:
@@ -82,240 +78,167 @@ class PCACD(DriftDetector):
             sample_period (float, optional): how often to check for drift. This
                 is 100 samples or ``sample_period * window_size``, whichever is
                 smaller. Default .05, or 5% of the window size.
-            online_scaling (bool, optional): whether to standardize the data as
-                it comes in, using the reference window, before applying PCA.
-                Defaults to ``True``.
         """
-        super().__init__()
+
         self.window_size = window_size
-        self.ev_threshold = ev_threshold
-        self.divergence_metric = divergence_metric
-        self.sample_period = sample_period
-
-        # Initialize parameters
-        self.step = min(100, round(self.sample_period * window_size))
-        self.ph_threshold = round(0.001 * window_size) / self.step
-        self.bins = int(np.floor(np.sqrt(self.window_size)))
-        self.delta = delta
-
-        self._drift_detection_monitor = PageHinkley(
-            delta=self.delta, threshold=self.ph_threshold, burn_in=0
+        self.batch_size = batch_size
+        self.ph_t_ratio = ph_t_ratio
+        self.ph_threshold = (
+            round(self.ph_t_ratio * self.window_size) / self.batch_size
         )
 
+        self.bins = int(np.floor(np.sqrt(self.window_size)))
+        self.ev_threshold = ev_threshold
+        self.divergence_metric = divergence_metric
+
+        # Initialize parameters
+
+        self.delta = delta
+
+        self._drift_detection_monitor = None
         self.num_pcs = None
 
-        self.online_scaling = online_scaling
-        if self.online_scaling is True:
-            self._reference_scaler = StandardScaler()
-
-        self._build_reference_and_test = True
         self._reference_window = pd.DataFrame()
         self._test_window = pd.DataFrame()
         self._pca = None
         self._reference_pca_projection = pd.DataFrame()
         self._test_pca_projection = pd.DataFrame()
         self._density_reference = {}
-        self._change_score = [0]
 
-    def update(self, next_obs):
-        """Update the detector with a new observation.
+    def fit(self, x, **kwargs):
 
-        Args:
-            next_obs: next observation, as a ``pandas`` ``Series``
-        """
+        self._reference_window = x
+        self._test_window = x
+        self._pca = PCA(self.ev_threshold)
+        self._pca.fit(self._reference_window)
+        self.num_pcs = len(self._pca.components_)
 
-        if self._build_reference_and_test:
-            if self.drift_state is not None:
-                self._reference_window = self._test_window.copy()
-                if self.online_scaling is True:
-                    # we'll need to refit the scaler. this occurs when both
-                    # reference and test windows are full,
-                    # so, inverse_transform
-                    # first, here
-                    self._reference_window = pd.DataFrame(
-                        self._reference_scaler.inverse_transform(
-                            self._reference_window
-                        )
+        self._drift_detection_monitor = PageHinkley(
+            delta=self.delta, threshold=self.ph_threshold, min_instances=0
+        )
+
+        # Project ref window onto PCs
+        self._reference_pca_projection = pd.DataFrame(
+            self._pca.transform(self._reference_window),
+        )
+
+        # Project test window onto PCs
+        self._test_pca_projection = pd.DataFrame(
+            self._pca.transform(self._test_window),
+        )
+
+        for i in range(self.num_pcs):
+
+            if self.divergence_metric in ["intersection", "mkl"]:
+                # Histograms need the same bin edges
+                # so find bounds from
+                # both windows to inform range for reference and test
+                self.lower = min(
+                    self._reference_pca_projection.iloc[:, i].min(),
+                    self._test_pca_projection.iloc[:, i].min(),
+                )
+
+                self.upper = max(
+                    self._reference_pca_projection.iloc[:, i].max(),
+                    self._test_pca_projection.iloc[:, i].max(),
+                )
+
+                self._density_reference[f"PC{i + 1}"] = self._build_histograms(
+                    self._reference_pca_projection.iloc[:, i],
+                    bins=self.bins,
+                    bin_range=(self.lower, self.upper),
+                )
+
+            else:
+                self._density_reference[f"PC{i + 1}"] = self._build_kde(
+                    self._reference_pca_projection.iloc[:, i]
+                )
+
+    def update(self, x, **kwargs):
+        x = pd.DataFrame(x)
+        self._test_window = pd.concat([self._test_window, x])
+        self._test_window = self._test_window.iloc[-self.window_size :]
+
+        # Project new observation onto PCs
+        next_proj = pd.DataFrame(
+            self._pca.transform(x),
+        )
+
+        # Winsorize incoming data to align with
+        # reference and test histograms
+        if self.divergence_metric in ["intersection", "mkl"]:
+            for i in range(self.num_pcs):
+                if next_proj.iloc[0, i] < self.lower:
+                    next_proj.iloc[0, i] = self.lower
+
+                elif next_proj.iloc[0, i] > self.upper:
+                    next_proj.iloc[0, i] = self.upper
+
+        # Add projection to test projection data
+        self._test_pca_projection = pd.concat(
+            [self._test_pca_projection, next_proj]
+        )
+        self._test_pca_projection = self._test_pca_projection.iloc[
+            -self.window_size :
+        ]
+
+        # Compute density distribution for test data
+        self._density_test = {}
+        for i in range(self.num_pcs):
+
+            if self.divergence_metric in ["intersection", "mkl"]:
+
+                self._density_test[f"PC{i + 1}"] = self._build_histograms(
+                    self._test_pca_projection.iloc[:, i],
+                    bins=self.bins,
+                    bin_range=(self.lower, self.upper),
+                )
+
+            elif self.divergence_metric in ["js"]:
+                self._density_test[f"PC{i + 1}"] = self._build_kde(
+                    self._test_pca_projection.iloc[:, i]
+                )
+
+        # Compute current score
+        change_scores = []
+
+        if self.divergence_metric == "js":
+            for i in range(self.num_pcs):
+
+                change_scores.append(
+                    self._jensen_shannon_distance(
+                        self._density_reference[f"PC{i + 1}"],
+                        self._density_test[f"PC{i + 1}"],
                     )
-                self._test_window = pd.DataFrame()
-                self.reset()
-                self._drift_detection_monitor.reset()
-
-            elif len(self._reference_window) < self.window_size:
-                self._reference_window = pd.concat(
-                    [self._reference_window, pd.DataFrame(next_obs)]
                 )
 
-            elif len(self._test_window) < self.window_size:
-                self._test_window = pd.concat(
-                    [self._test_window, pd.DataFrame(next_obs)]
-                )
-
-            if len(self._test_window) == self.window_size:
-                self._build_reference_and_test = False
-
-                # Fit Reference window onto PCs
-                if self.online_scaling is True:
-                    self._reference_window = pd.DataFrame(
-                        self._reference_scaler.fit_transform(
-                            self._reference_window
-                        )
+        elif self.divergence_metric == "mkl":
+            for i in range(self.num_pcs):
+                change_scores.append(
+                    self._max_kl(
+                        self._density_reference[f"PC{i + 1}"],
+                        self._density_test[f"PC{i + 1}"],
                     )
-                    self._test_window = pd.DataFrame(
-                        self._reference_scaler.transform(self._test_window)
+                )
+
+        elif self.divergence_metric == "intersection":
+            for i in range(self.num_pcs):
+                change_scores.append(
+                    self._intersection_divergence(
+                        self._density_reference[f"PC{i + 1}"],
+                        self._density_test[f"PC{i + 1}"],
                     )
-
-                # Compute principal components
-                self._pca = PCA(self.ev_threshold)
-                self._pca.fit(self._reference_window)
-                self.num_pcs = len(self._pca.components_)
-
-                # Project reference window onto PCs
-                self._reference_pca_projection = pd.DataFrame(
-                    self._pca.transform(self._reference_window),
                 )
 
-                # Project test window onto PCs
-                self._test_pca_projection = pd.DataFrame(
-                    self._pca.transform(self._test_window),
-                )
+        change_score = max(change_scores)
 
-                # Compute reference distribution
-                for i in range(self.num_pcs):
+        self._drift_detection_monitor.update(change_score)
 
-                    if self.divergence_metric == "intersection":
-                        # Histograms need the same bin edges
-                        # so find bounds from
-                        # both windows to inform range for reference and test
-                        self.lower = min(
-                            self._reference_pca_projection.iloc[:, i].min(),
-                            self._test_pca_projection.iloc[:, i].min(),
-                        )
-
-                        self.upper = max(
-                            self._reference_pca_projection.iloc[:, i].max(),
-                            self._test_pca_projection.iloc[:, i].max(),
-                        )
-
-                        self._density_reference[
-                            f"PC{i + 1}"
-                        ] = self._build_histograms(
-                            self._reference_pca_projection.iloc[:, i],
-                            bins=self.bins,
-                            bin_range=(self.lower, self.upper),
-                        )
-
-                    else:
-                        self._density_reference[
-                            f"PC{i + 1}"
-                        ] = self._build_kde(
-                            self._reference_pca_projection.iloc[:, i]
-                        )
-
-        else:
-
-            self.total_updates += len(next_obs)
-            self.updates_since_reset += len(next_obs)
-
-            # Add new obs to test window
-            if self.online_scaling is True:
-                next_obs = pd.DataFrame(
-                    self._reference_scaler.transform(next_obs)
-                )
-            self._test_window = pd.concat([self._test_window, next_obs])
-            self._test_window = self._test_window.iloc[-self.window_size :]
-
-            # Project new observation onto PCs
-            next_proj = pd.DataFrame(
-                self._pca.transform(next_obs),
-            )
-
-            # Winsorize incoming data to align with
-            # reference and test histograms
-            if self.divergence_metric == "intersection":
-                for i in range(self.num_pcs):
-                    if next_proj.iloc[0, i] < self.lower:
-                        next_proj.iloc[0, i] = self.lower
-
-                    elif next_proj.iloc[0, i] > self.upper:
-                        next_proj.iloc[0, i] = self.upper
-
-            # Add projection to test projection data
-            self._test_pca_projection = pd.concat(
-                [self._test_pca_projection, next_proj]
-            )
-            self._test_pca_projection = self._test_pca_projection.iloc[
-                -self.window_size :
-            ]
-
-            # Compute change score
-            if (
-                self.total_updates % self.step
-            ) == 0 and self.total_updates != 0:
-
-                # Compute density distribution for test data
-                self._density_test = {}
-                for i in range(self.num_pcs):
-
-                    if self.divergence_metric == "intersection":
-
-                        self._density_test[
-                            f"PC{i + 1}"
-                        ] = self._build_histograms(
-                            self._test_pca_projection.iloc[:, i],
-                            bins=self.bins,
-                            bin_range=(self.lower, self.upper),
-                        )
-
-                    elif self.divergence_metric == "kl":
-                        self._density_test[f"PC{i + 1}"] = self._build_kde(
-                            self._test_pca_projection.iloc[:, i]
-                        )
-
-                # Compute current score
-                change_scores = []
-
-                if self.divergence_metric == "kl":
-                    for i in range(self.num_pcs):
-
-                        change_scores.append(
-                            self._jensen_shannon_distance(
-                                self._density_reference[f"PC{i + 1}"],
-                                self._density_test[f"PC{i + 1}"],
-                            )
-                        )
-
-                elif self.divergence_metric == "intersection":
-                    for i in range(self.num_pcs):
-                        change_scores.append(
-                            self._intersection_divergence(
-                                self._density_reference[f"PC{i + 1}"],
-                                self._density_test[f"PC{i + 1}"],
-                            )
-                        )
-
-                change_score = max(change_scores)
-                self._change_score.append(change_score)
-
-                self._drift_detection_monitor.update(
-                    next_obs=change_score, obs_id=next_obs.index.values[0]
-                )
-
-                if self._drift_detection_monitor.drift_state is not None:
-                    self._build_reference_and_test = True
-                    self.drift_state = "drift"
-
-                return (
-                    self._drift_detection_monitor.drift_state is not None,
-                    False,
-                    pd.DataFrame({"change_score": [change_score]}),
-                )
-
-    def reset(self):
-        """Initialize the detector's drift state and other relevant attributes.
-        Intended for use after ``drift_state == 'drift'``.
-        """
-        super().reset()
+        return (
+            self._drift_detection_monitor.change_detected,
+            False,
+            pd.DataFrame({"change_score": [change_score]}),
+        )
 
     @classmethod
     def _build_kde(cls, sample):
@@ -389,6 +312,37 @@ class PCACD(DriftDetector):
         )
         return js
 
+    @classmethod
+    def _max_kl(cls, density_reference, density_test):
+        """Computes Jensen Shannon between two distributions
+
+        Args:
+            density_reference (dict): dictionary of density values and object
+                from ref distribution
+            density_test (dict): dictionary of density values and object from
+                test distribution
+
+        Returns:
+            Change Score
+
+        """
+        p = np.array(density_reference["density"])
+        q = np.array(density_test["density"])
+
+        p_c = p.copy()
+        q_c = q.copy()
+
+        q_c[(p != 0) & (q == 0)] = np.finfo(float).eps
+        p_c[(q != 0) & (p == 0)] = np.finfo(float).eps
+
+        mkl = max(
+            entropy(p, q_c),
+            entropy(q, p_c),
+        )
+        if math.isinf(mkl):
+            print("Problem")
+        return mkl
+
     @staticmethod
     def _intersection_divergence(density_reference, density_test):
         """
@@ -414,3 +368,7 @@ class PCACD(DriftDetector):
         divergence = 1 - intersection
 
         return divergence
+
+    @staticmethod
+    def needs_label():
+        return False

@@ -7,7 +7,7 @@ from .evidently_drift import EvidentlyDrift
 from .metric_drift import MetricDrift
 from .n_batch_drift import NBatchDrift
 from .no_drift import NoDrift
-from .pca_drift import PcaCdDrift, PcaDrift
+from .pca_cd import PcaCdDrift
 from .periodic_drift import PeriodicDrift
 from .tabular_drift import TabularDrift
 
@@ -23,8 +23,7 @@ drift_detectors = {
     "metric": MetricDrift,
     "ddm": DdmDrift,
     "eddm": EddmDrift,
-    "pca": PcaDrift,
-    "pca-cd": PcaCdDrift,
+    "pca_cd": PcaCdDrift,
 }
 
 
