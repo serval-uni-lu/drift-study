@@ -49,7 +49,7 @@ class PCACD(DriftDetector):
         self,
         window_size,
         ev_threshold=0.99,
-        delta=0.1,
+        delta=0.005,
         divergence_metric="kl",
         sample_period=0.05,
         online_scaling=True,
@@ -94,7 +94,7 @@ class PCACD(DriftDetector):
 
         # Initialize parameters
         self.step = min(100, round(self.sample_period * window_size))
-        self.ph_threshold = round(0.01 * window_size)
+        self.ph_threshold = round(0.001 * window_size) / self.step
         self.bins = int(np.floor(np.sqrt(self.window_size)))
         self.delta = delta
 

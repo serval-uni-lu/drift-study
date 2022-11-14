@@ -59,7 +59,10 @@ class PcaCdDrift:
     def update(self, x, **kwargs):
         x = pd.DataFrame(x)
         # self.detector.update(x.to_numpy().reshape(1, -1))
-        return self.detector.update(x)
+        out = self.detector.update(x)
+        if out is None:
+            return False, False, pd.DataFrame()
+        return out
 
     @staticmethod
     def needs_label():
