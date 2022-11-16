@@ -15,7 +15,8 @@ serval-config-utils = "^0.1.4"
 serval-ml-commons = {path = "../mlc/", develop = true }
 
 tables = "^3.7.0"
-
+menelaus = "^0.1.2"
+torch = "~1.12.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
