@@ -1,6 +1,7 @@
 from typing import List, Union
 
 from .adwin_drift import AdwinDrift, AdwinErrorDrift
+from .aries_drift import AriesDrift
 from .bayesian_uncertainty.rf_uncertainty_drift import RfUncertaintyDrift
 from .ddm_drift import DdmDrift, EddmDrift
 from .evidently_drift import EvidentlyDrift
@@ -9,10 +10,11 @@ from .n_batch_drift import NBatchDrift
 from .no_drift import NoDrift
 from .pca_cd import PcaCdDrift
 from .periodic_drift import PeriodicDrift
-from .tabular_drift import TabularDrift
+
+# from .tabular_drift import TabularDrift
 
 drift_detectors = {
-    "tabular": TabularDrift,
+    # "tabular": TabularDrift,
     "periodic": PeriodicDrift,
     "adwin": AdwinDrift,
     "adwin_error": AdwinErrorDrift,
@@ -24,6 +26,7 @@ drift_detectors = {
     "ddm": DdmDrift,
     "eddm": EddmDrift,
     "pca_cd": PcaCdDrift,
+    "aries": AriesDrift,
 }
 
 
