@@ -62,8 +62,11 @@ def run():
         plt.legend()
         plt.xlabel("Time ordered batch")
         plt.ylabel(prediction_metric.metric_name)
+        Path(f"{fig_folder}/{ref_config.get('model').get('name')}/").mkdir(
+            parents=True, exist_ok=True
+        )
         plt.savefig(
-            f"{fig_folder}/"
+            f"{fig_folder}/{ref_config.get('model').get('name')}/"
             f"{prediction_metric.metric_name}_"
             f"batch_{batch_size}_{ref_config_name}.pdf"
         )
@@ -91,7 +94,7 @@ def run():
         plt.xlabel("Time ordered batch")
         plt.ylabel(prediction_metric.metric_name)
         plt.savefig(
-            f"{fig_folder}/"
+            f"{fig_folder}/{ref_config.get('model').get('name')}/"
             f"{prediction_metric.metric_name}_"
             f"batch_{batch_size}_{ref_config_name}_delta.pdf"
         )
