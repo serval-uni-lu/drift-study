@@ -74,7 +74,11 @@ def load_config_eval(config, dataset, model_name, prediction_metric, y):
 
         if isinstance(prediction_metric, PredClassificationMetric):
             y_scores = np.argmax(y_scores, axis=1)
-        run_config["prediction_metric"] = np.array(
+
+        run_config["prediction_metric"] = prediction_metric.compute(
+            y[test_i], y_scores[test_i]
+        )
+        run_config["prediction_metric_batch"] = np.array(
             [
                 prediction_metric.compute(
                     y[index_batch], y_scores[index_batch]
