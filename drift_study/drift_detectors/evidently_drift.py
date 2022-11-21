@@ -16,6 +16,7 @@ class EvidentlyDrift:
         numerical_features=None,
         categorical_features=None,
         drift_share=0.01,
+        fit_first_update=False,
         **kwargs,
     ) -> None:
         self.window_size = window_size
@@ -28,6 +29,8 @@ class EvidentlyDrift:
 
         self.x_ref = None
         self.x_last = None
+        self.fit_first_update = fit_first_update
+        self.is_first_update = True
 
     def fit(self, **kwargs):
         if "metric" in kwargs:
@@ -46,12 +49,18 @@ class EvidentlyDrift:
         self.column_mapping.categorical_features = self.categorical_features
         self.x_ref = x
         self.x_last = x
+        self.is_first_update = True
 
     def update(self, **kwargs):
+
         if "metric" in kwargs:
             x = pd.DataFrame(kwargs["metric"], columns=["metric"])
         else:
             x = kwargs["x"]
+
+        if self.fit_first_update and self.is_first_update:
+            self.window_size = len(x)
+            self.fit(**kwargs)
 
         self.x_last = pd.concat(
             [
@@ -71,6 +80,7 @@ class EvidentlyDrift:
             report["data_drift"]["data"]["metrics"]["n_drifted_features"] > 0
         )
 
+        self.is_first_update = False
         return (
             in_drift,
             in_warning,

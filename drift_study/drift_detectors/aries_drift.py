@@ -5,31 +5,33 @@ import numpy as np
 import pandas as pd
 from numpy.typing import ArrayLike
 from scipy import stats
+from sklearn.ensemble import RandomForestClassifier
+from torch import nn
 
 
 class AriesDrift:
     def __init__(
         self,
-        window_size,
         drift_detector,
         acc,
+        section_num=50,
         **kwargs,
     ):
 
         self.drift_detector = drift_detector
-        self.window_size = window_size
         self.pred_hist = None
         self.model = None
         self.base_acc = -1
         self.acc = acc
+        self.section_num = section_num
 
     def fit(self, x, y, model, **kwargs):
-
-        internal_model = model[-1]
-        while hasattr(internal_model, "model"):
-            internal_model = internal_model.model
         self.model = model
-        self.pred_hist = build_hist(self.model, x, y)
+        if isinstance(self.model[-1].model, RandomForestClassifier):
+            self.section_num = self.model[-1].model.n_estimators
+        self.pred_hist = build_hist(
+            self.model, x, y, section_num=self.section_num
+        )
         self.base_acc = (self.model.predict(x) == y).mean()
         self.drift_detector.fit()
 
@@ -41,7 +43,7 @@ class AriesDrift:
             model=self.model,
             ori_hist=self.pred_hist,
             base_acc=self.base_acc,
-            section_num=50,
+            section_num=self.section_num,
         )
         estimated_acc = accs[self.acc]
 
@@ -103,12 +105,40 @@ def deep_et_estimation(
 
 
 def predict_n_times(model, x, n_times):
+    model[-1].train()
     x_l = pd.concat([x] * n_times, ignore_index=True)
     prediction = model.predict(x_l)
     prediction = prediction.reshape(
         n_times, int(prediction.shape[0] / n_times), *prediction.shape[1:]
     )
+    model[-1].eval()
     return prediction
+
+
+def compute_mode(model, x, section_num) -> np.ndarray:
+    if isinstance(model[-1].model, nn.Module):
+        # Make many prediction
+        t_predictions_list = predict_n_times(model, x, section_num)
+        # Calculate the mode
+        mode_list = []
+        for _ in range(len(x)):
+            mode_num = stats.mode(
+                t_predictions_list[:, _ : (_ + 1)].reshape(
+                    -1,
+                )
+            )[1][0]
+            mode_list.append(mode_num)
+        return np.asarray(mode_list)
+    elif isinstance(model[-1].model, RandomForestClassifier):
+        prediction = model.predict_proba(x)
+        prediction = np.max(prediction, axis=1)
+        mode_list = np.round(prediction * model[-1].model.n_estimators).astype(
+            int
+        )
+        return mode_list
+
+    else:
+        raise NotImplementedError
 
 
 def build_hist(model, x, y=None, section_num=50) -> PredHist:
@@ -130,19 +160,7 @@ def build_hist(model, x, y=None, section_num=50) -> PredHist:
     else:
         y_correct_idx = None
 
-    # Make many prediction
-    model[-1].train()
-    t_predictions_list = predict_n_times(model, x, section_num)
-    model[-1].eval()
-
-    # Calculate the mode
-    mode_list = []
-    for _ in range(len(x)):
-        mode_num = stats.mode(t_predictions_list[:, _ : (_ + 1)].reshape(-1,))[
-            1
-        ][0]
-        mode_list.append(mode_num)
-    mode_list = np.asarray(mode_list)
+    mode_list = compute_mode(model, x, section_num)
 
     # Compute mode histogram
     hist_mode = []

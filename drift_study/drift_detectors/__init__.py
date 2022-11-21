@@ -1,5 +1,6 @@
 from typing import List, Union
 
+from .adversarial_drift import AdversarialDrift
 from .adwin_drift import AdwinDrift, AdwinErrorDrift
 from .aries_drift import AriesDrift
 from .bayesian_uncertainty.rf_uncertainty_drift import RfUncertaintyDrift
@@ -27,6 +28,7 @@ drift_detectors = {
     "eddm": EddmDrift,
     "pca_cd": PcaCdDrift,
     "aries": AriesDrift,
+    "adversarial": AdversarialDrift,
 }
 
 
