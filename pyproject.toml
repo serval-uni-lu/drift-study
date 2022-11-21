@@ -17,6 +17,8 @@ serval-ml-commons = {path = "../mlc/", develop = true }
 tables = "^3.7.0"
 menelaus = "^0.1.2"
 torch = "~1.12.1"
+autoattack = { git = "https://github.com/fra31/auto-attack.git", rev = "6482e4d6fbeeb51ae9585c41b16d50d14576aadc" }
+seaborn = "^0.12.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
