@@ -25,33 +25,6 @@ def run():
     logger.info(f"Starting dataset {dataset.name}, model {model_name}")
     x, y, t = dataset.get_x_y_t()
 
-    # test_i = np.arange(len(x))[config.get("window_size") :]
-    # batch_size = config.get("evaluation_params").get("batch_size")
-    # length = len(test_i) - (len(test_i) % batch_size)
-    # index_batches = np.split(test_i[:length], length / batch_size)
-    # for run_config in config.get("runs"):
-    #     drift_data_path = (
-    #         f"./data/{dataset.name}/drift/"
-    #         f"{model_name}_{run_config.get('name')}"
-    #     )
-    #     with h5py.File(drift_data_path, "r") as f:
-    #         y_scores = f["y_scores"][()]
-    #         model_used = f["model_used"][()]
-    #
-    #     y_pred = np.argmax(y_scores, axis=1)
-    #
-    #     run_config["model_used"] = model_used
-    #     if config.get("evaluation_params").get("rolling"):
-    #         run_config["f1s"] = rolling_f1(
-    #             y[test_i], y_pred[test_i], n=batch_size
-    #         )
-    #     else:
-    #         run_config["f1s"] = np.array(
-    #             [
-    #                 f1_score(y[index_batch], y_pred[index_batch])
-    #                 for index_batch in index_batches
-    #             ]
-    #         )
     prediction_metric = create_metric(config["evaluation_params"]["metric"])
     config = load_config_eval(
         config, dataset, model_name, prediction_metric, y
@@ -60,11 +33,11 @@ def run():
     for ref_config in ref_configs:
         ref_config_name = ref_config.get("name")
         logger.info(f"<><><> Reference: {ref_config_name} <><><>")
-        ref_metric = ref_config.get("prediction_metric")
+        ref_metric = ref_config.get("prediction_metric_batch")
 
         for eval_config in config.get("runs"):
             eval_config_name = eval_config.get("name")
-            eval_metric = eval_config.get("prediction_metric")
+            eval_metric = eval_config.get("prediction_metric_batch")
             area = np.trapz(eval_metric - ref_metric)
             area_scaled = area / len(eval_metric)
             diff = eval_metric - ref_metric
