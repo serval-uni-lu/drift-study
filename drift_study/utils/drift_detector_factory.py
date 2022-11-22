@@ -1,5 +1,7 @@
 from typing import List, Union
 
+from configutils.utils import merge_parameters
+
 from drift_study.drift_detectors import get_drift_detectors
 
 
@@ -25,8 +27,9 @@ def get_drift_detector_from_conf(detectors, common_detectors_params):
     for detector in detectors:
         local_detector_class = get_drift_detectors(detector.get("name"))
         out_detector = local_detector_class(
-            **common_detectors_params,
-            **detector.get("params"),
+            **merge_parameters(
+                common_detectors_params, detector.get("params")
+            ),
             drift_detector=out_detector,
         )
     return out_detector

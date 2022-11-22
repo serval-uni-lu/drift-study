@@ -4,6 +4,7 @@ from typing import List
 
 import configutils
 import numpy as np
+from configutils.utils import merge_parameters
 from tqdm import tqdm
 
 from drift_study.utils.drift_detector_factory import (
@@ -26,7 +27,10 @@ logger = logging.getLogger(__name__)
 
 def run(config, run_i):
 
-    run_config = config.get("runs")[run_i]
+    run_config = merge_parameters(
+        config.get("common_runs_params"), config.get("runs")[run_i]
+    )
+
     logger.info(f"Running config {run_config.get('name')}")
     dataset, model, x, y, t = initialize(config, run_config)
     window_size = config.get("window_size")

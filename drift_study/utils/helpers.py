@@ -113,6 +113,7 @@ def get_ref_eval_config(configs, ref_config_names):
 
 def get_common_detectors_params(config, metadata):
     auto_detector_params = {
+        "x_metadata": metadata,
         "features": metadata["feature"].to_list(),
         "numerical_features": metadata["feature"][
             metadata["type"] != "cat"
@@ -126,12 +127,13 @@ def get_common_detectors_params(config, metadata):
 
 
 def get_delays(run_config, drift_detector):
-    label_delay = pd.Timedelta(run_config.get("label_delay"))
-    drift_detection_delay = pd.Timedelta(run_config.get("drift_delay"))
+    delays = run_config.get("delays")
+    label_delay = pd.Timedelta(delays.get("label"))
+    drift_detection_delay = pd.Timedelta(delays.get("drift"))
     if drift_detector.needs_label():
         drift_detection_delay = drift_detection_delay + label_delay
     retraining_delay = max(label_delay, drift_detection_delay) + pd.Timedelta(
-        run_config.get("retraining_delay")
+        delays.get("retraining")
     )
     return label_delay, drift_detection_delay, retraining_delay
 
