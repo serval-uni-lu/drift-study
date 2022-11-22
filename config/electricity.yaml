@@ -6,157 +6,21 @@ performance:
 experience:
   random_state: 42
 evaluation_params:
-  reference_methods:
-    - no_drift
-    - periodic
   batch_size: 1000
   rolling: False
   significance: 0.0
   metric:
-    name: f1
+    name: mcc
   n_score: 2
 dataset:
   name: electricity
 common_detectors_params:
-  p_value: 0.05
+  p_value: 0.01
   period: 1000
-runs:
-#  - name: no_drift
-#    model:
-#      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
-#    detectors:
-#      - name: no_drift
-#        params: {}
-#    label_delay: 0
-#    drift_delay: 0
-#    retraining_delay: 0
-#  - name: periodic
-#    model:
-#      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
-#    detectors:
-#      - name: periodic
-#        params: {}
-#    label_delay: 0
-#    drift_delay: 0
-#    retraining_delay: 0
-#  - name: adwin_error
-#    model:
-#      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
-#    detectors:
-#      - name: metric
-#        params:
-#          metric_conf:
-#            name: proba_error
-#      - name: adwin
-#        params: { }
-#    label_delay: 0
-#    drift_delay: 0
-#    retraining_delay: 0
-#  - name: adwin_error_D
-#    model:
-#      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
-#    detectors:
-#      - name: metric
-#        params:
-#          metric_conf:
-#            name: proba_error
-#      - name: adwin
-#        params: { }
-#    label_delay: 10days
-#    drift_delay: 0
-#    retraining_delay: 1W
-#  - name: ddm_error_D
-#    model:
-#      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
-#    detectors:
-#      - name: metric
-#        params:
-#          metric_conf:
-#            name: class_error
-#      - name: ddm
-#        params:
-#          ddm_args:
-#            out_control_level: 1.5
-#    label_delay: 10days
-#    drift_delay: 0
-#    retraining_delay: 1W
-#  - name: eddm_error_D
-#    model:
-#      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
-#    detectors:
-#      - name: metric
-#        params:
-#          metric_conf:
-#            name: class_error
-#      - name: eddm
-#        params: {}
-#    label_delay: 10days
-#    drift_delay: 0
-#    retraining_delay: 1W
-  - name: data_D
-    model:
-      source: drift_study.model_arch.tree_model
-      name: rf_classifier
-    detectors:
-      - name: n_batch
-        params:
-          batch_size: 1000
-      - name: evidently
-        params: {}
-    label_delay: 10days
-    drift_delay: 0
-    retraining_delay: 1W
-#  - name: uncertainty_total_D
-#    model:
-#      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
-#    detectors:
-#      - name: n_batch
-#        params:
-#          batch_size: 5000
-#      - name: rf_uncertainty
-#        params:
-#          uncertainty_type: total
-#      - name: adwin
-#        params: { }
-#    label_delay: 10days
-#    drift_delay: 0
-#    retraining_delay: 1W
-#  - name: uncertainty_epistemic_D
-#    model:
-#      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
-#    detectors:
-#      - name: n_batch
-#        params:
-#          batch_size: 5000
-#      - name: rf_uncertainty
-#        params:
-#          uncertainty_type: epistemic
-#      - name: adwin
-#        params: { }
-#    label_delay: 10days
-#    drift_delay: 0
-#    retraining_delay: 1W
-#  - name: uncertainty_aleatoric_D
-#    model:
-#      source: drift_study.model_arch.tree_model
-#      name: rf_classifier
-#    detectors:
-#      - name: n_batch
-#        params:
-#          batch_size: 5000
-#      - name: rf_uncertainty
-#        params:
-#          uncertainty_type: aleatoric
-#      - name: adwin
-#        params: { }
-#    label_delay: 10days
-#    drift_delay: 0
-#    retraining_delay: 1W
+  ev_threshold: 0.99
+  batch_size: 1000
+common_runs_params:
+  delays:
+    label: 10days
+    drift: 0
+    retraining: 1W

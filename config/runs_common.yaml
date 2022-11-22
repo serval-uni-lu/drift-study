@@ -1,0 +1,215 @@
+---
+runs:
+# ------------ NO Drift
+  - name: no_drift
+    detectors:
+      - name: no_drift
+        params: {}
+## ------------ Periodic
+  - name: periodic
+    detectors:
+      - name: periodic
+        params: {}
+  - name: periodic
+    detectors:
+      - name: periodic
+        params:
+          period: 5000
+## ------------ Error Based
+  - name: adwin_proba_error
+    detectors:
+      - name: metric
+        params:
+          metric_conf:
+            name: proba_error
+      - name: adwin
+        params: { }
+  - name: adwin_error
+    detectors:
+      - name: metric
+        params:
+          metric_conf:
+            name: class_error
+      - name: adwin
+        params: { }
+  - name: ddm_error
+    detectors:
+      - name: metric
+        params:
+          metric_conf:
+            name: class_error
+      - name: ddm
+        params: {}
+  - name: eddm_error
+    detectors:
+      - name: metric
+        params:
+          metric_conf:
+            name: class_error
+      - name: eddm
+        params: {}
+  - name: hddm_a_error
+    detectors:
+      - name: metric
+        params:
+          metric_conf:
+            name: class_error
+      - name: hddm_a
+        params: {}
+  - name: hddm_w_error
+    detectors:
+      - name: metric
+        params:
+          metric_conf:
+            name: class_error
+      - name: hddm_w
+        params: {}
+  - name: kswin_error
+    detectors:
+      - name: metric
+        params:
+          metric_conf:
+            name: class_error
+      - name: kswin
+        params: {}
+  - name: kswin_proba_error
+    detectors:
+      - name: metric
+        params:
+          metric_conf:
+            name: proba_error
+      - name: kswin
+        params: {}
+  - name: page_hinkley_error
+    detectors:
+      - name: metric
+        params:
+          metric_conf:
+            name: class_error
+      - name: page_hinkley
+        params: { }
+  - name: page_hinkley_proba_error
+    detectors:
+      - name: metric
+        params:
+          metric_conf:
+            name: proba_error
+      - name: page_hinkley
+        params: {}
+  - name: data_evidently
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: evidently
+        params: {}
+  - name: pca_cd_intersection
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: pca_cd
+        params:
+          divergence_metric: intersection
+  - name: pca_cd_js
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: pca_cd
+        params:
+          divergence_metric: js
+  - name: pca_cd_mkl
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: pca_cd
+        params:
+          divergence_metric: mkl
+  - name: ks_test
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: ks_test
+        params: {}
+  - name: tabular_alibi_bonferroni
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: tabular_alibi
+        params:
+          correction: bonferroni
+  - name: tabular_alibi_fdr
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: tabular_alibi
+        params:
+          correction: fdr
+  - name: mmd
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: mmd
+        params: {}
+  - name: mmd_lk
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: mmd_lk
+        params: { }
+## ------------ PREDICTIVE
+  - name: aries_all
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: aries
+        params:
+          acc: 0
+      - name: adwin
+        params: {}
+  - name: aries_acc_1
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: aries
+        params:
+          acc: 1
+      - name: adwin
+        params: {}
+  - name: aries_acc_2
+    detectors:
+      - name: n_batch
+        params: {}
+      - name: aries
+        params:
+          acc: 2
+      - name: adwin
+        params: {}
+  - name: uncertainty_total
+    detectors:
+      - name: n_batch
+        params:
+          batch_size: 5000
+      - name: rf_uncertainty
+        params:
+          uncertainty_type: total
+      - name: adwin
+        params: { }
+  - name: uncertainty_epistemic
+    detectors:
+      - name: n_batch
+        params:
+          batch_size: 5000
+      - name: rf_uncertainty
+        params:
+          uncertainty_type: epistemic
+      - name: adwin
+        params: { }
+  - name: uncertainty_aleatoric
+    detectors:
+      - name: n_batch
+        params:
+          batch_size: 5000
+      - name: rf_uncertainty
+        params:
+          uncertainty_type: aleatoric
+      - name: adwin
+        params: { }

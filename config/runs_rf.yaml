@@ -1,0 +1,32 @@
+runs:
+## ------------ PREDICTIVE
+  - name: uncertainty_total
+    detectors:
+      - name: n_batch
+        params:
+          batch_size: 5000
+      - name: rf_uncertainty
+        params:
+          uncertainty_type: total
+      - name: adwin
+        params: { }
+  - name: uncertainty_epistemic
+    detectors:
+      - name: n_batch
+        params:
+          batch_size: 5000
+      - name: rf_uncertainty
+        params:
+          uncertainty_type: epistemic
+      - name: adwin
+        params: { }
+  - name: uncertainty_aleatoric
+    detectors:
+      - name: n_batch
+        params:
+          batch_size: 5000
+      - name: rf_uncertainty
+        params:
+          uncertainty_type: aleatoric
+      - name: adwin
+        params: { }
