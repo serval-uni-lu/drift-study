@@ -149,12 +149,12 @@ runs:
         params: {}
       - name: mmd
         params: {}
-  - name: mmd_lk
-    detectors:
-      - name: n_batch
-        params: {}
-      - name: mmd_lk
-        params: { }
+#  - name: mmd_lk
+#    detectors:
+#      - name: n_batch
+#        params: {}
+#      - name: mmd_lk
+#        params: { }
 ## ------------ PREDICTIVE
   - name: aries_all
     detectors:
@@ -183,33 +183,3 @@ runs:
           acc: 2
       - name: adwin
         params: {}
-  - name: uncertainty_total
-    detectors:
-      - name: n_batch
-        params:
-          batch_size: 5000
-      - name: rf_uncertainty
-        params:
-          uncertainty_type: total
-      - name: adwin
-        params: { }
-  - name: uncertainty_epistemic
-    detectors:
-      - name: n_batch
-        params:
-          batch_size: 5000
-      - name: rf_uncertainty
-        params:
-          uncertainty_type: epistemic
-      - name: adwin
-        params: { }
-  - name: uncertainty_aleatoric
-    detectors:
-      - name: n_batch
-        params:
-          batch_size: 5000
-      - name: rf_uncertainty
-        params:
-          uncertainty_type: aleatoric
-      - name: adwin
-        params: { }

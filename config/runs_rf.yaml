@@ -13,8 +13,7 @@ runs:
   - name: uncertainty_epistemic
     detectors:
       - name: n_batch
-        params:
-          batch_size: 5000
+        params: {}
       - name: rf_uncertainty
         params:
           uncertainty_type: epistemic
@@ -23,8 +22,7 @@ runs:
   - name: uncertainty_aleatoric
     detectors:
       - name: n_batch
-        params:
-          batch_size: 5000
+        params: {}
       - name: rf_uncertainty
         params:
           uncertainty_type: aleatoric
