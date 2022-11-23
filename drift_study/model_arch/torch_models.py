@@ -66,6 +66,7 @@ class ElectricityModel(BaseModelTorch):
         self.model = ElectricityNet(
             self.objective,
         )
+        self.to_device()
 
 
 class LcldNet(nn.Module):
@@ -133,6 +134,7 @@ class LcldModel(BaseModelTorch):
         self.model = LcldNet(
             self.objective,
         )
+        self.to_device()
 
 
 models = [("mlp_electricity", ElectricityModel), ("mlp_lcld", LcldModel)]
