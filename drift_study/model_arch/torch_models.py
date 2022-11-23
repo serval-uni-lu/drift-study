@@ -61,6 +61,8 @@ class ElectricityModel(BaseModelTorch):
             epochs,
             early_stopping_rounds,
             learning_rate,
+            class_weight="balanced",
+            force_device="cpu",
             **kwargs,
         )
         self.model = ElectricityNet(
@@ -129,6 +131,7 @@ class LcldModel(BaseModelTorch):
             early_stopping_rounds,
             learning_rate,
             class_weight=class_weight,
+            force_device="cpu",
             **kwargs,
         )
         self.model = LcldNet(
