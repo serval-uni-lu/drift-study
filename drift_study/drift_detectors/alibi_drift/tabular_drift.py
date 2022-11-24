@@ -29,9 +29,10 @@ class TabularAlibiDrift:
 
         for index, row in self.x_metadata.iterrows():
             if row["type"] == "cat":
-                categories_per_feature[int(index)] = np.arange(
-                    int(row["min"]), int(row["max"]) + 1
-                ).tolist()
+                # categories_per_feature[int(index)] = np.arange(
+                #     int(row["min"]), int(row["max"]) + 1
+                # ).tolist()
+                categories_per_feature[int(index)] = None
         self.drift_detector = InternalTabularDrift(
             np.array(x),
             p_val=self.p_value,
