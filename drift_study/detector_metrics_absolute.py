@@ -61,7 +61,8 @@ def run():
     dataset = get_dataset(config.get("dataset"))
     for i in range(len(config.get("runs"))):
         config.get("runs")[i] = merge_parameters(
-            config.get("common_runs_params"), config.get("runs")[i]
+            config.get("common_runs_params").copy(),
+            config.get("runs")[i].copy(),
         )
 
     model_name = config.get("runs")[0].get("model").get("name")
