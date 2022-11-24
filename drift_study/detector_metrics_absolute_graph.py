@@ -35,9 +35,9 @@ def run():
         )
 
     model_name = config.get("runs")[0].get("model").get("name")
-
+    offset = 0.02 * (df["metric"].max() - df["metric"].min())
     def plotlabel(xvar, yvar, label, alternate=0):
-        ax.text(xvar + 0.2, yvar + alternate * 0.002, label)
+        ax.text(xvar + 0.2, yvar + alternate * offset, label)
 
     df_show_text = df[df["pareto_front"] == 1]
     df_show_text = df_show_text.sort_values(by="n_train")
