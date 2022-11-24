@@ -4,6 +4,7 @@ import os
 import configutils
 import matplotlib.pyplot as plt
 import seaborn as sns
+from configutils.utils import merge_parameters
 
 from drift_study import detector_metrics_absolute
 
@@ -19,6 +20,13 @@ def run():
     print(df)
     ax = sns.scatterplot(df, x="n_train", y="metric", hue="pareto_front")
     dataset_name = config.get("dataset").get("name")
+
+    for i in range(len(config.get("runs"))):
+        config.get("runs")[i] = merge_parameters(
+            config.get("common_runs_params").copy(),
+            config.get("runs")[i].copy(),
+        )
+
     model_name = config.get("runs")[0].get("model").get("name")
 
     def plotlabel(xvar, yvar, label):
