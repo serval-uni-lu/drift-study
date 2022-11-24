@@ -4,11 +4,11 @@ import os
 import configutils
 import numpy as np
 import pandas as pd
+from configutils.utils import merge_parameters
 from mlc.datasets.dataset_factory import get_dataset
 from mlc.metrics.metric_factory import create_metric
 
 from drift_study.utils.evaluation import load_config_eval
-from drift_study.utils.helpers import get_ref_eval_config
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
@@ -58,9 +58,6 @@ def calc_pareto_rank(df: pd.DataFrame) -> pd.DataFrame:
 def run():
     config = configutils.get_config()
 
-    ref_configs, eval_configs = get_ref_eval_config(
-        config, config.get("evaluation_params").get("reference_methods")
-    )
     dataset = get_dataset(config.get("dataset"))
     model_name = config.get("runs")[0].get("model").get("name")
     logger.info(f"Starting dataset {dataset.name}, model {model_name}")
@@ -73,6 +70,9 @@ def run():
     out = []
 
     for eval_config in config.get("runs"):
+        eval_config = merge_parameters(
+            config.get("common_runs_params"), eval_config
+        )
         eval_config_name = eval_config.get("name")
         logger.info(f"Eval: {eval_config_name}")
 
