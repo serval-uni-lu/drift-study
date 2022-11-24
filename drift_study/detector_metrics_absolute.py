@@ -59,6 +59,11 @@ def run():
     config = configutils.get_config()
 
     dataset = get_dataset(config.get("dataset"))
+    for i in range(len(config.get("runs"))):
+        config.get("runs")[i] = merge_parameters(
+            config.get("common_runs_params"), config.get("runs")[i]
+        )
+
     model_name = config.get("runs")[0].get("model").get("name")
     logger.info(f"Starting dataset {dataset.name}, model {model_name}")
     x, y, t = dataset.get_x_y_t()
@@ -70,9 +75,6 @@ def run():
     out = []
 
     for eval_config in config.get("runs"):
-        eval_config = merge_parameters(
-            config.get("common_runs_params"), eval_config
-        )
         eval_config_name = eval_config.get("name")
         logger.info(f"Eval: {eval_config_name}")
 
