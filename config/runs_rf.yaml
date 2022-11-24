@@ -1,6 +1,7 @@
 runs:
 ## ------------ PREDICTIVE
   - name: uncertainty_total
+    type: predictive
     detectors:
       - name: n_batch
         params:
@@ -11,6 +12,7 @@ runs:
       - name: adwin
         params: { }
   - name: uncertainty_epistemic
+    type: predictive
     detectors:
       - name: n_batch
         params: {}
@@ -20,6 +22,7 @@ runs:
       - name: adwin
         params: { }
   - name: uncertainty_aleatoric
+    type: predictive
     detectors:
       - name: n_batch
         params: {}

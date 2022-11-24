@@ -2,21 +2,19 @@
 runs:
 # ------------ NO Drift
   - name: no_drift
+    type: baseline
     detectors:
       - name: no_drift
         params: {}
 ## ------------ Periodic
   - name: periodic
+    type: baseline
     detectors:
       - name: periodic
         params: {}
-  - name: periodic
-    detectors:
-      - name: periodic
-        params:
-          period: 5000
 ## ------------ Error Based
   - name: adwin_proba_error
+    type: error
     detectors:
       - name: metric
         params:
@@ -25,6 +23,7 @@ runs:
       - name: adwin
         params: { }
   - name: adwin_error
+    type: error
     detectors:
       - name: metric
         params:
@@ -33,6 +32,7 @@ runs:
       - name: adwin
         params: { }
   - name: ddm_error
+    type: error
     detectors:
       - name: metric
         params:
@@ -41,6 +41,7 @@ runs:
       - name: ddm
         params: {}
   - name: eddm_error
+    type: error
     detectors:
       - name: metric
         params:
@@ -49,6 +50,7 @@ runs:
       - name: eddm
         params: {}
   - name: hddm_a_error
+    type: error
     detectors:
       - name: metric
         params:
@@ -57,6 +59,7 @@ runs:
       - name: hddm_a
         params: {}
   - name: hddm_w_error
+    type: error
     detectors:
       - name: metric
         params:
@@ -65,6 +68,7 @@ runs:
       - name: hddm_w
         params: {}
   - name: kswin_error
+    type: error
     detectors:
       - name: metric
         params:
@@ -73,6 +77,7 @@ runs:
       - name: kswin
         params: {}
   - name: kswin_proba_error
+    type: error
     detectors:
       - name: metric
         params:
@@ -81,6 +86,7 @@ runs:
       - name: kswin
         params: {}
   - name: page_hinkley_error
+    type: error
     detectors:
       - name: metric
         params:
@@ -89,6 +95,7 @@ runs:
       - name: page_hinkley
         params: { }
   - name: page_hinkley_proba_error
+    type: error
     detectors:
       - name: metric
         params:
@@ -96,13 +103,16 @@ runs:
             name: proba_error
       - name: page_hinkley
         params: {}
+# --- DATA
   - name: data_evidently
+    type: data
     detectors:
       - name: n_batch
         params: {}
       - name: evidently
         params: {}
   - name: pca_cd_intersection
+    type: data
     detectors:
       - name: n_batch
         params: {}
@@ -110,6 +120,7 @@ runs:
         params:
           divergence_metric: intersection
   - name: pca_cd_js
+    type: data
     detectors:
       - name: n_batch
         params: {}
@@ -117,6 +128,7 @@ runs:
         params:
           divergence_metric: js
   - name: pca_cd_mkl
+    type: data
     detectors:
       - name: n_batch
         params: {}
@@ -124,12 +136,14 @@ runs:
         params:
           divergence_metric: mkl
   - name: ks_test
+    type: data
     detectors:
       - name: n_batch
         params: {}
       - name: ks_test
         params: {}
   - name: tabular_alibi_bonferroni
+    type: data
     detectors:
       - name: n_batch
         params: {}
@@ -137,6 +151,7 @@ runs:
         params:
           correction: bonferroni
   - name: tabular_alibi_fdr
+    type: data
     detectors:
       - name: n_batch
         params: {}
@@ -144,19 +159,15 @@ runs:
         params:
           correction: fdr
   - name: mmd
+    type: data
     detectors:
       - name: n_batch
         params: {}
       - name: mmd
         params: {}
-#  - name: mmd_lk
-#    detectors:
-#      - name: n_batch
-#        params: {}
-#      - name: mmd_lk
-#        params: { }
 ## ------------ PREDICTIVE
   - name: aries_all
+    type: predictive
     detectors:
       - name: n_batch
         params: {}
@@ -166,6 +177,7 @@ runs:
       - name: adwin
         params: {}
   - name: aries_acc_1
+    type: predictive
     detectors:
       - name: n_batch
         params: {}
@@ -175,6 +187,7 @@ runs:
       - name: adwin
         params: {}
   - name: aries_acc_2
+    type: predictive
     detectors:
       - name: n_batch
         params: {}
