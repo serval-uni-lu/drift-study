@@ -82,6 +82,7 @@ def run():
         eval_metric = eval_config.get("prediction_metric")
         out.append(
             {
+                "type": eval_config.get("type"),
                 "method_name": eval_config_name,
                 "n_train": eval_config.get("model_used").max() + 1,
                 "metric": eval_metric,

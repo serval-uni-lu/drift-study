@@ -3,6 +3,8 @@ import os
 
 import configutils
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
 from configutils.utils import merge_parameters
 
@@ -14,11 +16,16 @@ logger = logging.getLogger(__name__)
 
 def run():
     config = configutils.get_config()
-
-    df = detector_metrics_absolute.run()
+    if config.get("metric_path") is not None:
+        df = pd.read_csv(config.get("metric_path"))
+    else:
+        df = detector_metrics_absolute.run()
 
     print(df)
-    ax = sns.scatterplot(df, x="n_train", y="metric", hue="pareto_front")
+    ax = sns.scatterplot(
+        df, x="n_train", y="metric", hue="pareto_front", style="type"
+    )
+    ax.set(ylabel=config.get("evaluation_params").get("metric").get("name"))
     dataset_name = config.get("dataset").get("name")
 
     for i in range(len(config.get("runs"))):
@@ -29,11 +36,32 @@ def run():
 
     model_name = config.get("runs")[0].get("model").get("name")
 
-    def plotlabel(xvar, yvar, label):
-        ax.text(xvar + 0.002, yvar, label)
+    def plotlabel(xvar, yvar, label, alternate=0):
+        ax.text(xvar + 0.2, yvar + alternate * 0.002, label)
 
-    df.apply(
-        lambda x: plotlabel(x["n_train"], x["metric"], x["pareto_front"]),
+    df_show_text = df[df["pareto_front"] == 1]
+    df_show_text = df_show_text.sort_values(by="n_train")
+    df_show_text["alternate"] = np.tile(np.array([-2, 1]), len(df_show_text))[
+        : len(df_show_text)
+    ]
+
+    df_show_text_gr = df_show_text.groupby(
+        ["n_train", "metric"], as_index=False
+    ).agg(
+        {
+            "method_name": lambda x: " / ".join(x.tolist()),
+            "pareto_front": "min",
+            "alternate": lambda x: x.tolist()[-1],
+        }
+    )
+
+    df_show_text_gr.apply(
+        lambda x: plotlabel(
+            x["n_train"],
+            x["metric"],
+            x["method_name"],
+            x["alternate"],
+        ),
         axis=1,
     )
     plt.show()
