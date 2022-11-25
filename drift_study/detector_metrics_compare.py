@@ -4,9 +4,11 @@ import os
 import configutils
 import numpy as np
 import pandas as pd
+from configutils.utils import merge_parameters
 from mlc.datasets.dataset_factory import get_dataset
 from mlc.metrics.metric_factory import create_metric
 
+from drift_study.detector_metrics_absolute import calc_pareto_rank
 from drift_study.utils.evaluation import load_config_eval
 from drift_study.utils.helpers import get_ref_eval_config
 
@@ -17,10 +19,17 @@ logger = logging.getLogger(__name__)
 def run():
     config = configutils.get_config()
 
+    dataset = get_dataset(config.get("dataset"))
+    for i in range(len(config.get("runs"))):
+        config.get("runs")[i] = merge_parameters(
+            config.get("common_runs_params").copy(),
+            config.get("runs")[i].copy(),
+        )
+
     ref_configs, eval_configs = get_ref_eval_config(
         config, config.get("evaluation_params").get("reference_methods")
     )
-    dataset = get_dataset(config.get("dataset"))
+
     model_name = config.get("runs")[0].get("model").get("name")
     logger.info(f"Starting dataset {dataset.name}, model {model_name}")
     x, y, t = dataset.get_x_y_t()
@@ -43,6 +52,8 @@ def run():
             diff = eval_metric - ref_metric
             out.append(
                 {
+                    "type": eval_config.get("type"),
+                    "method_name": eval_config_name,
                     "reference": ref_config_name,
                     "eval": eval_config_name,
                     "n_train": eval_config.get("model_used").max() + 1,
@@ -54,11 +65,12 @@ def run():
                     "min_diff": diff.min(),
                 }
             )
-            logger.info(f"Eval: {eval_config_name}, Area = {area_scaled}")
 
     out_path = f"./reports/{dataset.name}/{model_name}_integral.csv"
     out = pd.DataFrame(out)
+    out = calc_pareto_rank(out)
     out.to_csv(out_path, index=False)
+    return out
 
 
 if __name__ == "__main__":
