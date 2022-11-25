@@ -89,7 +89,10 @@ def run():
             }
         )
 
-    out_path = f"./reports/{dataset.name}/{model_name}_absolute.csv"
+    out_path = (
+        f"./reports/{dataset.name}/"
+        f"{model_name}_{prediction_metric.metric_name}_absolute.csv"
+    )
     out = pd.DataFrame(out)
     out = calc_pareto_rank(out)
     out.to_csv(out_path, index=False)

@@ -25,7 +25,8 @@ def run():
     ax = sns.scatterplot(
         df, x="n_train", y="metric", hue="pareto_front", style="type"
     )
-    ax.set(ylabel=config.get("evaluation_params").get("metric").get("name"))
+    metric_name = config.get("evaluation_params").get("metric").get("name")
+    ax.set(ylabel=metric_name)
     dataset_name = config.get("dataset").get("name")
 
     for i in range(len(config.get("runs"))):
@@ -36,6 +37,7 @@ def run():
 
     model_name = config.get("runs")[0].get("model").get("name")
     offset = 0.02 * (df["metric"].max() - df["metric"].min())
+
     def plotlabel(xvar, yvar, label, alternate=0):
         ax.text(xvar + 0.2, yvar + alternate * offset, label)
 
@@ -65,7 +67,9 @@ def run():
         axis=1,
     )
     plt.show()
-    plt.savefig(f"./reports/{dataset_name}/{model_name}_absolute.pdf")
+    plt.savefig(
+        f"./reports/{dataset_name}/" f"{model_name}_{metric_name}_absolute.pdf"
+    )
 
 
 if __name__ == "__main__":

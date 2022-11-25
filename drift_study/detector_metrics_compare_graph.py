@@ -67,7 +67,9 @@ def run():
         axis=1,
     )
     plt.show()
-    plt.savefig(f"./reports/{dataset_name}/{model_name}_compare.pdf")
+    plt.savefig(
+        f"./reports/{dataset_name}/" f"{model_name}_{metric_name}_compare.pdf"
+    )
 
 
 if __name__ == "__main__":
