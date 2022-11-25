@@ -22,7 +22,6 @@ def run():
         df = detector_metrics_compare.run()
 
     print(df)
-    df["metric"] = df["min_diff"]
     ax = sns.scatterplot(
         df, x="n_train", y="metric", hue="pareto_front", style="type"
     )

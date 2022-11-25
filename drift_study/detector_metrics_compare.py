@@ -68,6 +68,7 @@ def run():
 
     out_path = f"./reports/{dataset.name}/{model_name}_integral.csv"
     out = pd.DataFrame(out)
+    out["metric"] = out["min_diff"]
     out = calc_pareto_rank(out)
     out.to_csv(out_path, index=False)
     return out
