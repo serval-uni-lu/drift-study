@@ -1,11 +1,13 @@
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 from configutils.utils import merge_parameters
 
 from drift_study.drift_detectors import get_drift_detectors
 
 
-def get_drift_detector(drift_detectors_names: Union[str, List[str]], **kwargs):
+def get_drift_detector(
+    drift_detectors_names: Union[str, List[str]], **kwargs: Dict[str, Any]
+):
 
     if isinstance(drift_detectors_names, str):
         return get_drift_detectors(drift_detectors_names)(**kwargs)
@@ -19,7 +21,9 @@ def get_drift_detector(drift_detectors_names: Union[str, List[str]], **kwargs):
         return detector
 
 
-def get_drift_detector_from_conf(detectors, common_detectors_params):
+def get_drift_detector_from_conf(
+    detectors, common_detectors_params: Dict[str, Any]
+):
 
     detectors = detectors.copy()
     detectors.reverse()

@@ -1,15 +1,17 @@
+from typing import Any
+
 from mlc.models.sk_models import SkModel
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 
 class RandomForestRegressorModel(SkModel):
-    def __init__(self, name="rf_regression", **kwargs):
+    def __init__(self, name: str = "rf_regression", **kwargs: Any):
         super().__init__(name=name, objective="regression", **kwargs)
         self.model = RandomForestRegressor(n_jobs=-1)
 
 
 class RfLcld(SkModel):
-    def __init__(self, name="rf_lcld", **kwargs):
+    def __init__(self, name: str = "rf_lcld", **kwargs: Any):
         super(RfLcld, self).__init__(name=name, objective="binary", **kwargs)
         rf_parameters = {
             "n_estimators": 125,
@@ -29,7 +31,10 @@ class RfLcld(SkModel):
 
 class Rf(SkModel):
     def __init__(
-        self, name="rf_classifier", objective="classification", **kwargs
+        self,
+        name: str = "rf_classifier",
+        objective: str = "classification",
+        **kwargs: Any,
     ):
         super(Rf, self).__init__(name=name, objective=objective, **kwargs)
         rf_parameters = {

@@ -1,7 +1,8 @@
 import logging
 import os
-from typing import List
+from typing import Any, Dict, List, Tuple, Union
 
+import numpy as np
 import pandas as pd
 from mlc.datasets.dataset import Dataset
 from mlc.datasets.dataset_factory import get_dataset
@@ -20,10 +21,10 @@ logger = logging.getLogger(__name__)
 
 
 def initialize(
-    config,
-    run_config,
-) -> (Dataset, Model, ArrayLike, ArrayLike, ArrayLike):
-    logger.debug(f"Loading dataset {config.get('dataset').get('name')}")
+    config: Dict[str, Any],
+    run_config: Dict[str, Any],
+) -> Tuple[Dataset, Model, ArrayLike, ArrayLike, ArrayLike]:
+    logger.debug(f"Loading dataset {config.get('dataset', {}).get('name')}")
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
 
@@ -41,7 +42,9 @@ def initialize(
     return dataset, model, x, y, t
 
 
-def get_model_arch(config, run_config, metadata):
+def get_model_arch(
+    config: dict, run_config: dict, metadata: pd.DataFrame
+) -> Model:
 
     model_class = get_model(run_config.get("model"))
     model = model_class(
@@ -72,13 +75,13 @@ def get_current_models(models: List[DriftModel], t, last_model_used_i=None):
 
 
 def compute_y_scores(
-    model,
-    current_index,
-    current_model_i,
-    model_used,
-    y_scores,
-    x,
-    predict_forward,
+    model: Model,
+    current_index: int,
+    current_model_i: int,
+    model_used: np.ndarray,
+    y_scores: np.ndarray,
+    x: Union[np.ndarray, pd.DataFrame],
+    predict_forward: int,
 ):
     if model_used[current_index] < current_model_i:
         logger.debug(f"Seeing forward at index {current_index}")
@@ -100,7 +103,7 @@ def clone_estimator(estimator) -> Pipeline:
     return sk_clone(estimator)
 
 
-def get_ref_eval_config(configs, ref_config_names):
+def get_ref_eval_config(configs: dict, ref_config_names: List[str]):
     ref_configs = []
     eval_configs = []
     for config in configs.get("runs"):
@@ -111,7 +114,7 @@ def get_ref_eval_config(configs, ref_config_names):
     return ref_configs, eval_configs
 
 
-def get_common_detectors_params(config, metadata):
+def get_common_detectors_params(config: dict, metadata: pd.DataFrame):
     auto_detector_params = {
         "x_metadata": metadata,
         "features": metadata["feature"].to_list(),
@@ -126,7 +129,7 @@ def get_common_detectors_params(config, metadata):
     return {**config.get("common_detectors_params"), **auto_detector_params}
 
 
-def get_delays(run_config, drift_detector):
+def get_delays(run_config: dict, drift_detector):
     delays = run_config.get("delays")
     label_delay = pd.Timedelta(delays.get("label"))
     drift_detection_delay = pd.Timedelta(delays.get("drift"))
@@ -140,7 +143,7 @@ def get_delays(run_config, drift_detector):
 
 def add_model(
     models: List[DriftModel],
-    model_path,
+    model_path: str,
     model,
     drift_detector,
     t_available,
@@ -149,7 +152,7 @@ def add_model(
     t,
     start_idx,
     end_idx,
-):
+) -> None:
     model = load_do_save_model(
         model,
         model_path,

@@ -1,9 +1,11 @@
 import h5py
 import numpy as np
+from mlc.datasets.dataset import Dataset
+from mlc.metrics.metric import Metric
 from mlc.metrics.metrics import PredClassificationMetric
 
 
-def score_to_pred(y_score, threshold=None):
+def score_to_pred(y_score: np.ndarray, threshold=None):
     if threshold is None:
         y_pred = np.argmax(y_score, axis=1)
     else:
@@ -11,7 +13,7 @@ def score_to_pred(y_score, threshold=None):
     return y_pred
 
 
-def confusion(y_true, y_pred):
+def confusion(y_true: np.ndarray, y_pred: np.ndarray):
 
     t = y_true.astype(np.bool)
     f = ~t
@@ -26,24 +28,30 @@ def confusion(y_true, y_pred):
     )
 
 
-def rolling_sum(a, n):
+def rolling_sum(a: np.ndarray, n: int):
     ret = np.cumsum(a)
     ret[n:] = ret[n:] - ret[:-n]
     return ret[n - 1 :]
 
 
-def rolling_confusion(y_true, y_pred, n):
+def rolling_confusion(y_true: np.ndarray, y_pred: np.ndarray, n: int):
     tn, fp, fn, tp = confusion(y_true, y_pred)
     tn, fp, fn, tp = (rolling_sum(e, n) for e in (tn, fp, fn, tp))
     return tn, fp, fn, tp
 
 
-def rolling_f1(y_true, y_pred, n):
+def rolling_f1(y_true: np.ndarray, y_pred: np.ndarray, n: int):
     tn, fp, fn, tp = rolling_confusion(y_true, y_pred, n)
     return tp / (tp + 0.5 * (fp + fn))
 
 
-def load_config_eval(config, dataset, model_name, prediction_metric, y):
+def load_config_eval(
+    config: dict,
+    dataset: Dataset,
+    model_name: str,
+    prediction_metric: Metric,
+    y: np.ndarray,
+):
     test_i = np.arange(len(y))[config.get("window_size") :]
     batch_size = config.get("evaluation_params").get("batch_size")
     length = len(test_i) - (len(test_i) % batch_size)

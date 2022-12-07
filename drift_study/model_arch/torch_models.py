@@ -1,10 +1,13 @@
+from typing import Any, Dict
+
+import torch
 import torch.nn.functional as F
 from mlc.models.torch_models import BaseModelTorch
 from torch import nn
 
 
 class ElectricityNet(nn.Module):
-    def __init__(self, task: str, input_dim=12):
+    def __init__(self, task: str, input_dim: int = 12):
         super(ElectricityNet, self).__init__()
         self.task = task
 
@@ -25,7 +28,7 @@ class ElectricityNet(nn.Module):
         # Output Layer
         self.output_layer = nn.Linear(32, 1)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = F.relu(self.input_layer(x))
 
         # Use ReLU as activation for all linear hidden layers
@@ -46,12 +49,12 @@ class ElectricityNet(nn.Module):
 class ElectricityModel(BaseModelTorch):
     def __init__(
         self,
-        batch_size=64,
-        epochs=10,
-        early_stopping_rounds=2,
-        learning_rate=0.001,
-        **kwargs,
-    ):
+        batch_size: int = 64,
+        epochs: int = 10,
+        early_stopping_rounds: int = 2,
+        learning_rate: float = 0.001,
+        **kwargs: Any,
+    ) -> None:
         name = "mlp_electricity"
         objective = "binary"
         super().__init__(
@@ -72,7 +75,7 @@ class ElectricityModel(BaseModelTorch):
 
 
 class LcldNet(nn.Module):
-    def __init__(self, task: str, input_dim=47):
+    def __init__(self, task: str, input_dim: int = 47) -> None:
         super(LcldNet, self).__init__()
         self.task = task
 
@@ -93,7 +96,7 @@ class LcldNet(nn.Module):
         # Output Layer
         self.output_layer = nn.Linear(32, 1)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = F.relu(self.input_layer(x))
 
         # Use ReLU as activation for all linear hidden layers
@@ -114,13 +117,13 @@ class LcldNet(nn.Module):
 class LcldModel(BaseModelTorch):
     def __init__(
         self,
-        batch_size=64,
-        epochs=10,
-        early_stopping_rounds=2,
-        learning_rate=0.001,
-        class_weight="balanced",
-        **kwargs,
-    ):
+        batch_size: int = 64,
+        epochs: int = 10,
+        early_stopping_rounds: int = 2,
+        learning_rate: float = 0.001,
+        class_weight: str = "balanced",
+        **kwargs: Dict[str, Any],
+    ) -> None:
         name = "mlp_lcld"
         objective = "binary"
         super().__init__(

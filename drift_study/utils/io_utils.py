@@ -1,16 +1,23 @@
 import logging
 from pathlib import Path
+from typing import Union
 
 import h5py
 import joblib
 import numpy as np
 import pandas as pd
 from mlc.models.model import Model
+from pandas._typing import npt
 
 logger = logging.getLogger(__name__)
 
 
-def load_do_save_model(model: Model, path: str, x, y) -> Model:
+def load_do_save_model(
+    model: Model,
+    path: str,
+    x: Union[npt.NDArray, pd.DataFrame],
+    y: Union[npt.NDArray, pd.Series],
+) -> Model:
     if Path(path).exists():
         model.load(path)
         logger.debug(f"Model {path} loaded.")
