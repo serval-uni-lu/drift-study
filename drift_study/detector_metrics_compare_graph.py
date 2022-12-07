@@ -68,7 +68,7 @@ def run():
     )
     plt.show()
     plt.savefig(
-        f"./reports/{dataset_name}/" f"{model_name}_{metric_name}_compare.pdf"
+        f"./reports/{dataset_name}/{model_name}_{metric_name}_compare.pdf"
     )
 
 

@@ -39,28 +39,27 @@ class AdversarialDrift:
         attack = AutoAttack(
             internal_model, norm="L2", eps=5.0, device="cpu", verbose=0
         )
+        # Possible values
+        # "apgd-ce",
+        # "apgd-dlr",
+        # "fab",
+        # "square",
+        # "apgd-t",
+        # "fab-t",
         attack.attacks_to_run = [
-            # "apgd-ce",
-            # "apgd-dlr",
             "fab",
-            # "square",
-            # "apgd-t",
-            # "fab-t",
         ]
 
         y = self.model.predict(x)
         x_t = torch.tensor(x_t).float()
         y = torch.tensor(y)
-        # y = torch.reshape(y, (-1, 1))
-        # y = torch.cat([1 - y, y], dim=1)
         x_adv = attack.run_standard_evaluation(x_t, y, bs=len(x_t))
         norm = np.linalg.norm(x_t - x_adv, axis=1)
 
         is_drift, is_warning, metrics = self.drift_detector.update(metric=norm)
-        # metrics[f"adv_norm"] = norm
 
         return is_drift, is_warning, metrics
 
     @staticmethod
-    def needs_label():
+    def needs_label() -> bool:
         return False

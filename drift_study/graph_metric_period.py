@@ -76,13 +76,11 @@ def run():
         ref_config_name = ref_config.get("name")
         logger.info(f"<><><> Reference: {ref_config_name} <><><>")
         ref_metric = np.array(ref_config.get("prediction_metric_batch"))
-        # ref_metric = ref_metric[:-10]
         plt.figure(figsize=(20, 6))
         for eval_config in config.get("runs"):
             eval_config_name = eval_config.get("name")
             model_used_max = eval_config.get("model_used").max()
             eval_metric = np.array(eval_config.get("prediction_metric_batch"))
-            # eval_metric = eval_metric[:-10]
             label = f"{eval_config_name}: {model_used_max + 1}"
             plt.plot(
                 eval_metric - ref_metric,

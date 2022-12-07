@@ -26,30 +26,30 @@ class RandomForestClassifierWithUncertainty:
         self._labels = None
         self.used_features = None
 
-    def fit(self, X, y):
+    def fit(self, x, y):
 
         # produce a map of the counts of labels in each leaf
-        self.leafs_content = self._binary_leaf_split_counter(X, y)
+        self.leafs_content = self._binary_leaf_split_counter(x, y)
         # all possible labels:
         self._labels = list(set(y))
         # summarize the features used in the trees:
         # self.used_features = self._output_used_features(X)
 
     def predict_with_uncertainty(
-        self, X_test
+        self, x_test
     ) -> (np.ndarray, List[Uncertainty]):
-        predictions = self.rf.predict(X_test)
-        end_leafs = self.rf.apply(X_test)
+        predictions = self.rf.predict(x_test)
+        end_leafs = self.rf.apply(x_test)
         uncertainties = self._extract_uncertainty_of_prediction(
             end_leafs, method="entropy"
         )
         return predictions, uncertainties
 
     def predict_proba_with_uncertainty(
-        self, X_test
+        self, x_test
     ) -> (np.ndarray, List[Uncertainty]):
-        predictions = self.predict_proba_1d(X_test)
-        end_leafs = self.rf.apply(X_test)
+        predictions = self.predict_proba_1d(x_test)
+        end_leafs = self.rf.apply(x_test)
         uncertainties = self._extract_uncertainty_of_prediction(
             end_leafs, method="entropy"
         )
@@ -86,16 +86,16 @@ class RandomForestClassifierWithUncertainty:
         predictions = res
         return predictions
 
-    def _output_used_features(self, X_train) -> OrderedDict:
+    def _output_used_features(self, x_train) -> OrderedDict:
         """
         Go through all the trees and sum up the usage of each feature.
         Then summarize it in a sorted descending dictionary, from feature
         name to count.
-        :param X_train: dataframe with the training data, used for feature
+        :param x_train: dataframe with the training data, used for feature
         names
         :return: oredered dictionary from feature name to usage count
         """
-        feature_names = list(X_train.columns)
+        feature_names = list(x_train.columns)
         features_count = {key: 0 for key in feature_names}
         for estimator in self.rf.estimators_:
             tree_features = np.where(estimator.feature_importances_)[0]
@@ -110,7 +110,7 @@ class RandomForestClassifierWithUncertainty:
         return OrderedDict(sorted_x)
 
     def _binary_leaf_split_counter(
-        self, X_train, y_train
+        self, x_train, y_train
     ) -> List[Dict[int, List[int]]]:
         """
         A method to count the number of training data samples that
@@ -133,7 +133,7 @@ class RandomForestClassifierWithUncertainty:
                 d[abs(node)][s] = count
             return d
 
-        leaves_index = self.rf.apply(X_train)
+        leaves_index = self.rf.apply(x_train)
 
         def f(x):
             return [-1, 1][x]
