@@ -13,6 +13,7 @@ from mlc.transformers.tabular_transformer import TabTransformer
 from numpy.typing import ArrayLike
 from sklearn.base import clone as sk_clone
 
+from drift_study.utils.delays import Delays
 from drift_study.utils.drift_model import DriftModel
 from drift_study.utils.io_utils import load_do_save_model
 
@@ -57,21 +58,46 @@ def get_model_arch(
     return model
 
 
-def get_current_models(models: List[DriftModel], t, last_model_used_i=None):
-    # Filter out the model that are known outdated
+def get_current_model(
+    models: List[DriftModel],
+    t,
+    model_type: str,
+    last_model_used_idx=None,
+):
     idx_to_add = 0
-    if last_model_used_i is not None:
-        models = models[last_model_used_i:]
-        idx_to_add = last_model_used_i
-    # From these models, get the one that are in the past
-    past_models = list(
-        filter(lambda x: x[1].available_time <= t, enumerate(models))
+    if last_model_used_idx is not None:
+        models = models[last_model_used_idx:]
+        idx_to_add = last_model_used_idx
+
+    model_idx = -1
+    for model in models:
+        if model_type == "ml":
+            t_model = model.ml_available_time
+        elif model_type == "drift":
+            t_model = model.drift_available_time
+        else:
+            raise NotImplementedError
+
+        if t_model <= t:
+            model_idx += 1
+        else:
+            break
+
+    model_idx = model_idx + idx_to_add
+    return model_idx
+
+
+def get_current_models(
+    models: List[DriftModel],
+    t,
+    last_ml_model_used=None,
+    last_drift_model_used=None,
+) -> Tuple[int, int]:
+
+    return (
+        get_current_model(models, t, "ml", last_ml_model_used),
+        get_current_model(models, t, "drift", last_drift_model_used),
     )
-    # Get the latest one, index
-    model_i = past_models[-1][0]
-    # Re-add the latest model index
-    model_i = model_i + idx_to_add
-    return model_i
 
 
 def compute_y_scores(
@@ -129,24 +155,13 @@ def get_common_detectors_params(config: dict, metadata: pd.DataFrame):
     return {**config.get("common_detectors_params"), **auto_detector_params}
 
 
-def get_delays(run_config: dict, drift_detector):
-    delays = run_config.get("delays")
-    label_delay = pd.Timedelta(delays.get("label"))
-    drift_detection_delay = pd.Timedelta(delays.get("drift"))
-    if drift_detector.needs_label():
-        drift_detection_delay = drift_detection_delay + label_delay
-    retraining_delay = max(label_delay, drift_detection_delay) + pd.Timedelta(
-        delays.get("retraining")
-    )
-    return label_delay, drift_detection_delay, retraining_delay
-
-
 def add_model(
     models: List[DriftModel],
     model_path: str,
     model,
     drift_detector,
-    t_available,
+    x_idx,
+    delays: Delays,
     x,
     y,
     t,
@@ -173,4 +188,13 @@ def add_model(
         model=model,
     )
 
-    models.append(DriftModel(t_available, model, drift_detector, 0, end_idx))
+    models.append(
+        DriftModel(
+            t[x_idx] + delays.ml_model,
+            model,
+            t[x_idx] + delays.drift_detector,
+            drift_detector,
+            0,
+            end_idx,
+        )
+    )

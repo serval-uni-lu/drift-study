@@ -8,6 +8,7 @@ import pandas as pd
 from configutils.utils import merge_parameters
 from tqdm import tqdm
 
+from drift_study.utils.delays import get_delays
 from drift_study.utils.drift_detector_factory import (
     get_drift_detector_from_conf,
 )
@@ -17,7 +18,6 @@ from drift_study.utils.helpers import (
     compute_y_scores,
     get_common_detectors_params,
     get_current_models,
-    get_delays,
     initialize,
 )
 from drift_study.utils.io_utils import save_drift_run
@@ -38,7 +38,7 @@ def find_index_in_past(
         return np.argwhere(series > future_date)[0][0] - 1
 
 
-def run(config, run_i):
+def run(config, run_i) -> None:
 
     # CONFIG
     run_config = merge_parameters(
@@ -56,9 +56,7 @@ def run(config, run_i):
         run_config.get("detectors"),
         get_common_detectors_params(config, dataset.get_metadata(only_x=True)),
     )
-    label_delay, drift_detection_delay, retraining_delay = get_delays(
-        run_config, drift_detector
-    )
+    delays = get_delays(run_config, drift_detector)
 
     # PREPARE DATASTRUCTURES
     models: List[DriftModel] = []
@@ -71,7 +69,8 @@ def run(config, run_i):
         )
     is_drifts = np.full(len(x), np.nan)
     is_drift_warnings = np.full(len(x), np.nan)
-    last_model_used = 0
+    last_ml_model_used = 0
+    last_drift_model_used = 0
     metrics = []
 
     # TRAIN FIRST MODEL
@@ -79,13 +78,13 @@ def run(config, run_i):
         f"./models/{dataset.name}/{model.name}_{0}_{window_size}.joblib"
     )
     start_idx, end_idx = 0, window_size
-    t_available = t[:window_size].iloc[-1]
     add_model(
         models,
         model_path,
         model,
         drift_detector,
-        t_available,
+        0,
+        delays,
         x,
         y,
         t,
@@ -97,16 +96,19 @@ def run(config, run_i):
     for x_idx in tqdm(np.arange(window_size, len(x))):
 
         # Find current model
-        model_idx = get_current_models(models, t[x_idx], last_model_used)
-        last_model_used = model_idx
-        model = models[model_idx].ml_model
-        drift_detector = models[model_idx].drift_detector
+        ml_model_idx, drift_model_idx = get_current_models(
+            models, t[x_idx], last_ml_model_used, last_drift_model_used
+        )
+        last_ml_model_used, drift_model_idx = ml_model_idx, drift_model_idx
+        # logger.debug(ml_model_idx)
+        model = models[ml_model_idx].ml_model
+        drift_detector = models[drift_model_idx].drift_detector
 
         # Update predictions if needed
         y_scores, model_used = compute_y_scores(
             model,
             x_idx,
-            model_idx,
+            ml_model_idx,
             model_used,
             y_scores,
             x,
@@ -125,9 +127,9 @@ def run(config, run_i):
             y_scores=y_scores[x_idx],
         )
         metrics.append(metric)
-        # Do not retrain if we are not using the latest model available
+        # Do not retrain if we are not using the latest drift model available
         # Due to delay
-        if model_idx == len(models) - 1:
+        if drift_model_idx == len(models) - 1:
             if is_drifts[x_idx]:
                 logger.debug(f"Drift at index {x_idx}")
                 start_idx = (x_idx + 1) - window_size
@@ -138,13 +140,13 @@ def run(config, run_i):
                     f"./models/{dataset.name}/"
                     f"{model.name}_{start_idx}_{end_idx}.joblib"
                 )
-                t_available = t[x_idx] + retraining_delay
                 add_model(
                     models,
                     model_path,
                     model,
                     drift_detector,
-                    t_available,
+                    x_idx,
+                    delays,
                     x,
                     y,
                     t,
@@ -168,7 +170,7 @@ def run(config, run_i):
     )
 
 
-def run_many():
+def run_many() -> None:
     config_all = configutils.get_config()
 
     for i in range(len(config_all.get("runs"))):
