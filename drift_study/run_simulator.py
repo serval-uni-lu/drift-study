@@ -1,9 +1,10 @@
 import logging
 import os
-from typing import List
+from typing import Dict, List
 
 import configutils
 import numpy as np
+import pandas as pd
 from configutils.utils import merge_parameters
 from tqdm import tqdm
 
@@ -25,29 +26,55 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
 
 
+def find_index_in_past(
+    current_index: int, series: pd.Series, delta: Dict[str, int], past: bool
+) -> int:
+    current_date = series[current_index]
+    if past:
+        past_date = current_date - pd.DateOffset(**delta)
+        return np.argwhere(series < past_date)[0][-1] + 1
+    else:
+        future_date = current_date + pd.DateOffset(**delta)
+        return np.argwhere(series > future_date)[0][0] - 1
+
+
 def run(config, run_i):
 
+    # CONFIG
     run_config = merge_parameters(
         config.get("common_runs_params"), config.get("runs")[run_i]
     )
-
     logger.info(f"Running config {run_config.get('name')}")
-    dataset, model, x, y, t = initialize(config, run_config)
+
+    # INITIALIZE PARAMETERS
     window_size = config.get("window_size")
-    metadata = dataset.get_metadata(only_x=True)
+    predict_forward = config.get("performance").get("predict_forward")
+
+    # LOAD AND CREATE OBJECTS
+    dataset, model, x, y, t = initialize(config, run_config)
     drift_detector = get_drift_detector_from_conf(
         run_config.get("detectors"),
-        get_common_detectors_params(config, metadata),
+        get_common_detectors_params(config, dataset.get_metadata(only_x=True)),
     )
-
     label_delay, drift_detection_delay, retraining_delay = get_delays(
         run_config, drift_detector
     )
 
-    # DATA STRUCTURE
+    # PREPARE DATASTRUCTURES
     models: List[DriftModel] = []
+    model_used = np.full(len(x), -1)
+    if config["evaluation_params"]["n_score"] == 1:
+        y_scores = np.full((len(x)), np.nan)
+    else:
+        y_scores = np.full(
+            (len(x), config["evaluation_params"]["n_score"]), np.nan
+        )
+    is_drifts = np.full(len(x), np.nan)
+    is_drift_warnings = np.full(len(x), np.nan)
+    last_model_used = 0
+    metrics = []
 
-    # Train first model
+    # TRAIN FIRST MODEL
     model_path = (
         f"./models/{dataset.name}/{model.name}_{0}_{window_size}.joblib"
     )
@@ -65,20 +92,6 @@ def run(config, run_i):
         start_idx,
         end_idx,
     )
-
-    # Running var
-    model_used = np.full(len(x), -1)
-    if config["evaluation_params"]["n_score"] == 1:
-        y_scores = np.full((len(x)), np.nan)
-    else:
-        y_scores = np.full(
-            (len(x), config["evaluation_params"]["n_score"]), np.nan
-        )
-    is_drifts = np.full(len(x), np.nan)
-    is_drift_warnings = np.full(len(x), np.nan)
-    predict_forward = config.get("performance").get("predict_forward")
-    last_model_used = 0
-    metrics = []
 
     # Main loop
     for x_idx in tqdm(np.arange(window_size, len(x))):
