@@ -80,12 +80,16 @@ def run():
         logger.info(f"Eval: {eval_config_name}")
 
         eval_metric = eval_config.get("prediction_metric")
+        eval_metric_batch = eval_config.get("prediction_metric_batch")
         out.append(
             {
                 "type": eval_config.get("type"),
                 "method_name": eval_config_name,
                 "n_train": eval_config.get("model_used").max() + 1,
                 "metric": eval_metric,
+                "metric_batch_min": np.min(eval_metric_batch),
+                "metric_batch_mean": np.mean(eval_metric_batch),
+                "metric_batch_max": np.max(eval_metric_batch),
             }
         )
 

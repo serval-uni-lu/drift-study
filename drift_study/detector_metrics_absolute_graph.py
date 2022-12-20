@@ -21,6 +21,9 @@ def run():
     else:
         df = detector_metrics_absolute.run()
 
+    if config["evaluation_params"]["metric_eval"] == "min":
+        df["metric"] = df["metric_batch_min"]
+
     print(df)
     ax = sns.scatterplot(
         df, x="n_train", y="metric", hue="pareto_front", style="type"
