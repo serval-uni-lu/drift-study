@@ -43,15 +43,15 @@ def initialize(
 
 
 def get_model_arch(
-    config: dict, run_config: dict, metadata: pd.DataFrame
+    config: Dict[str, Any], run_config: Dict[str, Any], metadata: pd.DataFrame
 ) -> Model:
 
     model_class = get_model(run_config.get("model"))
     model = model_class(
         x_metadata=metadata,
         verbose=0,
-        n_jobs=config.get("performance").get("n_jobs"),
-        random_state=config.get("experience").get("random_state"),
+        n_jobs=config.get("performance", {"n_jobs": 1}).get("n_jobs", 1),
+        random_state=config.get("experience", {}).get("random_state"),
     )
 
     return model

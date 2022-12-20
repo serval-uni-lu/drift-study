@@ -1,11 +1,17 @@
+from typing import Any, Dict, Optional, Tuple
+
 import h5py
 import numpy as np
+import numpy.typing as npt
+import pandas as pd
 from mlc.datasets.dataset import Dataset
 from mlc.metrics.metric import Metric
 from mlc.metrics.metrics import PredClassificationMetric
 
 
-def score_to_pred(y_score: np.ndarray, threshold=None):
+def score_to_pred(
+    y_score: npt.NDArray[np.float_], threshold: Optional[float] = None
+) -> npt.NDArray[np.int_]:
     if threshold is None:
         y_pred = np.argmax(y_score, axis=1)
     else:
@@ -13,11 +19,18 @@ def score_to_pred(y_score: np.ndarray, threshold=None):
     return y_pred
 
 
-def confusion(y_true: np.ndarray, y_pred: np.ndarray):
+def confusion(
+    y_true: npt.NDArray[np.int_], y_pred: npt.NDArray[np.int_]
+) -> Tuple[
+    npt.NDArray[np.int_],
+    npt.NDArray[np.int_],
+    npt.NDArray[np.int_],
+    npt.NDArray[np.int_],
+]:
 
-    t = y_true.astype(np.bool)
+    t = y_true.astype(np.bool_)
     f = ~t
-    p = y_pred.astype(np.bool)
+    p = y_pred.astype(np.bool_)
     n = ~p
 
     return (
@@ -28,35 +41,57 @@ def confusion(y_true: np.ndarray, y_pred: np.ndarray):
     )
 
 
-def rolling_sum(a: np.ndarray, n: int):
+def rolling_sum(a: npt.NDArray[Any], n: int) -> npt.NDArray[Any]:
     ret = np.cumsum(a)
     ret[n:] = ret[n:] - ret[:-n]
     return ret[n - 1 :]
 
 
-def rolling_confusion(y_true: np.ndarray, y_pred: np.ndarray, n: int):
+def rolling_confusion(
+    y_true: npt.NDArray[np.int_], y_pred: npt.NDArray[np.int_], n: int
+) -> Tuple[
+    npt.NDArray[np.int_],
+    npt.NDArray[np.int_],
+    npt.NDArray[np.int_],
+    npt.NDArray[np.int_],
+]:
     tn, fp, fn, tp = confusion(y_true, y_pred)
     tn, fp, fn, tp = (rolling_sum(e, n) for e in (tn, fp, fn, tp))
     return tn, fp, fn, tp
 
 
-def rolling_f1(y_true: np.ndarray, y_pred: np.ndarray, n: int):
+def rolling_f1(
+    y_true: npt.NDArray[np.int_], y_pred: npt.NDArray[np.int_], n: int
+) -> npt.NDArray[np.float_]:
     tn, fp, fn, tp = rolling_confusion(y_true, y_pred, n)
     return tp / (tp + 0.5 * (fp + fn))
 
 
 def load_config_eval(
-    config: dict,
+    config: Dict[str, Any],
     dataset: Dataset,
     model_name: str,
     prediction_metric: Metric,
-    y: np.ndarray,
-):
+    y: npt.NDArray[Any],
+) -> Dict[str, Any]:
     test_i = np.arange(len(y))[config.get("window_size") :]
-    batch_size = config.get("evaluation_params").get("batch_size")
-    length = len(test_i) - (len(test_i) % batch_size)
-    index_batches = np.split(test_i[:length], length / batch_size)
-    for run_config in config.get("runs"):
+    batch_size = config["evaluation_params"]["batch_size"]
+    batch_size_min = config["evaluation_params"].get("batch_size", 0)
+    if isinstance(batch_size, int):
+        length = len(test_i) - (len(test_i) % batch_size)
+        index_batches = np.split(test_i[:length], int(length / batch_size))
+    if isinstance(batch_size, str):
+        d = dataset.get_x_y_t()[2].iloc[test_i]
+        d = pd.DataFrame(d, columns=["DATE"])
+        d = d.groupby(pd.Grouper(key="DATE", axis=0, freq=batch_size)).size()
+        last_idx = config["window_size"]
+        index_batches = []
+        for e in d:
+            if e >= batch_size_min:
+                np.concatenate(np.arange(last_idx, last_idx + e))
+            last_idx += e
+
+    for run_config in config.get("runs", []):
         drift_data_path = (
             f"./data/drift-study/{dataset.name}/{model_name}/"
             f"{run_config.get('name')}.hdf5"
