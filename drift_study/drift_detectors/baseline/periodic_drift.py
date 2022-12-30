@@ -1,3 +1,8 @@
+from typing import Any, Dict
+
+import optuna
+
+
 class PeriodicDrift:
     def __init__(
         self,
@@ -23,5 +28,18 @@ class PeriodicDrift:
             return True, True, None
 
     @staticmethod
-    def needs_label():
+    def needs_label() -> bool:
         return False
+
+    @staticmethod
+    def define_trial_parameters(
+        trial: optuna.Trial, trial_params: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        params = {
+            "period": trial.suggest_int(
+                "period",
+                trial_params["period"]["min"],
+                trial_params["period"]["max"],
+            )
+        }
+        return params

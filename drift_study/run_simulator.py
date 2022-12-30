@@ -1,11 +1,13 @@
 import logging
 import os
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import configutils
 import numpy as np
 import pandas as pd
 from configutils.utils import merge_parameters
+from mlc.metrics.metric_factory import create_metric
+from mlc.metrics.metrics import PredClassificationMetric
 from tqdm import tqdm
 
 from drift_study.utils.delays import get_delays
@@ -38,7 +40,7 @@ def find_index_in_past(
         return np.argwhere(series > future_date)[0][0] - 1
 
 
-def run(config, run_i) -> None:
+def run(config, run_i) -> Tuple[int, float]:
 
     # CONFIG
     run_config = merge_parameters(
@@ -168,6 +170,17 @@ def run(config, run_i) -> None:
         model_name=model.name,
         run_name=run_config.get("name"),
     )
+
+    # Metrics
+    n_train = int(np.max(model_used) + 1)
+    prediction_metric = create_metric(config["evaluation_params"]["metric"])
+    if isinstance(prediction_metric, PredClassificationMetric):
+        y_scores = np.argmax(y_scores, axis=1)
+    metric = float(
+        prediction_metric.compute(y[window_size:], y_scores[window_size:])
+    )
+
+    return n_train, metric
 
 
 def run_many() -> None:

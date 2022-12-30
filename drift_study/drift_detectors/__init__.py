@@ -1,6 +1,14 @@
 from typing import List, Union
 
+from drift_study.drift_detectors.baseline.no_drift import NoDrift
+from drift_study.drift_detectors.baseline.periodic_drift import PeriodicDrift
 from drift_study.drift_detectors.river_drift.adwin_drift import AdwinErrorDrift
+from drift_study.drift_detectors.utils_detectors.metric_drift import (
+    MetricDrift,
+)
+from drift_study.drift_detectors.utils_detectors.n_batch_drift import (
+    NBatchDrift,
+)
 
 from .adversarial_drift import AdversarialDrift
 from .alibi_drift import detectors as alibi_detectors
@@ -9,11 +17,7 @@ from .aries_drift import AriesDrift
 from .bayesian_uncertainty.rf_uncertainty_drift import RfUncertaintyDrift
 from .evidently_drift import EvidentlyDrift
 from .frouros_drift import detectors as frouros_detectors
-from .metric_drift import MetricDrift
-from .n_batch_drift import NBatchDrift
-from .no_drift import NoDrift
 from .pca_cd import PcaCdDrift
-from .periodic_drift import PeriodicDrift
 from .river_drift import detectors as river_detectors
 
 drift_detectors = {

@@ -37,3 +37,18 @@ def get_drift_detector_from_conf(
             drift_detector=out_detector,
         )
     return out_detector
+
+
+def get_drift_detector_class_from_conf(detectors) -> List[Dict[str, Any]]:
+    detectors = detectors.copy()
+    out = []
+    for detector in detectors:
+        local_detector_class = get_drift_detectors(detector.get("name"))
+        out.append(
+            {
+                "detector": local_detector_class,
+                "params": detector.get("params"),
+            }
+        )
+
+    return out

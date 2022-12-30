@@ -1,3 +1,6 @@
+from typing import Any, Dict
+
+
 class NoDrift:
     def __init__(
         self,
@@ -16,5 +19,10 @@ class NoDrift:
         return False, False, None
 
     @staticmethod
-    def needs_label():
+    def needs_label() -> bool:
         return False
+
+    @staticmethod
+    def define_trial_parameters() -> Dict[str, Any]:
+        params = {}
+        return params
