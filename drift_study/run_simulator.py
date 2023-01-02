@@ -1,6 +1,8 @@
 import logging
 import os
-from typing import Dict, List, Tuple
+import warnings
+from multiprocessing import Lock
+from typing import Any, Dict, List, Optional, Tuple
 
 import configutils
 import numpy as np
@@ -8,6 +10,7 @@ import pandas as pd
 from configutils.utils import merge_parameters
 from mlc.metrics.metric_factory import create_metric
 from mlc.metrics.metrics import PredClassificationMetric
+from optuna.exceptions import ExperimentalWarning
 from tqdm import tqdm
 
 from drift_study.drift_detectors.drift_detector_factory import (
@@ -27,6 +30,10 @@ from drift_study.utils.io_utils import save_drift_run
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
 
+warnings.filterwarnings(
+    "ignore", category=ExperimentalWarning, module="optuna.*"
+)
+
 
 def find_index_in_past(
     current_index: int, series: pd.Series, delta: Dict[str, int], past: bool
@@ -40,7 +47,13 @@ def find_index_in_past(
         return np.argwhere(series > future_date)[0][0] - 1
 
 
-def run(config, run_i) -> Tuple[int, float]:
+def run(
+    config,
+    run_i,
+    lock_model_writing: Optional[Lock] = None,
+    list_model_writing: Optional[Dict[str, Any]] = None,
+    verbose=1,
+) -> Tuple[int, float]:
 
     # CONFIG
     run_config = merge_parameters(
@@ -92,10 +105,12 @@ def run(config, run_i) -> Tuple[int, float]:
         t,
         start_idx,
         end_idx,
+        lock_model_writing,
+        list_model_writing,
     )
 
     # Main loop
-    for x_idx in tqdm(np.arange(window_size, len(x))):
+    for x_idx in tqdm(np.arange(window_size, len(x)), disable=(verbose == 0)):
 
         # Find current model
         ml_model_idx, drift_model_idx = get_current_models(
@@ -154,6 +169,8 @@ def run(config, run_i) -> Tuple[int, float]:
                     t,
                     start_idx,
                     end_idx,
+                    lock_model_writing,
+                    list_model_writing,
                 )
 
     # Save
@@ -183,11 +200,14 @@ def run(config, run_i) -> Tuple[int, float]:
     return n_train, metric
 
 
-def run_many() -> None:
+def run_many(
+    lock_model_writing: Optional[Lock] = None,
+    list_model_writing: Optional[Dict[str, Any]] = None,
+) -> None:
     config_all = configutils.get_config()
 
     for i in range(len(config_all.get("runs"))):
-        run(config_all, i)
+        run(config_all, i, lock_model_writing, list_model_writing)
 
 
 if __name__ == "__main__":

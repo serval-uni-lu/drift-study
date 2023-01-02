@@ -1,6 +1,8 @@
 import logging
+import time
+from multiprocessing import Lock
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 import h5py
 import joblib
@@ -12,21 +14,69 @@ from mlc.models.model import Model
 logger = logging.getLogger(__name__)
 
 
+def attempt_read(path: str, model: Model) -> int:
+    try:
+        model.load(path)
+        logger.debug(f"Model {path} loaded.")
+        return 0
+    except ValueError:
+        logger.debug(f"Model {path} error while loading, attempt to fix.")
+        return -1
+
+
 def load_do_save_model(
     model: Model,
     path: str,
     x: Union[npt.NDArray, pd.DataFrame],
     y: Union[npt.NDArray, pd.Series],
+    lock_model_writing: Optional[Lock] = None,
+    list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> Model:
-    if Path(path).exists():
-        model.load(path)
-        logger.debug(f"Model {path} loaded.")
+
+    if lock_model_writing is None:
+        read = Path(path).exists()
+        write = not read
+        if read:
+            write = attempt_read(path, model) != 0
+        if write:
+            logger.debug(f"Fitting model {path}.")
+            model.fit(x, y)
+            Path(path).parent.mkdir(parents=True, exist_ok=True)
+            model.save(path)
+        return model
     else:
-        logger.debug(f"Fitting model {path}.")
-        model.fit(x, y)
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
-        model.save(path)
-    return model
+        write = False
+        read = False
+        while not (read or write):
+            with lock_model_writing:
+                if path not in list_model_writing:
+                    if Path(path).exists():
+                        # LOAD
+                        read = True
+                    else:
+                        # SAVE
+                        write = True
+                    list_model_writing[path] = True
+            if not (read or write):
+                logger.debug(f"Model {path} waiting...")
+                time.sleep(1)
+
+        if read:
+            if attempt_read(path, model) != 0:
+                write = True
+            else:
+                list_model_writing.pop(path)
+                return model
+
+        if write:
+            model.fit(x, y)
+            Path(path).parent.mkdir(parents=True, exist_ok=True)
+            model.save(path)
+            logger.debug(f"Model {path} fitted.")
+            list_model_writing.pop(path)
+            return model
+
+        raise NotImplementedError
 
 
 def save_models(models, model_path: str) -> None:

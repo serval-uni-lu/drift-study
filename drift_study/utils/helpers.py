@@ -1,6 +1,7 @@
 import logging
 import os
-from typing import Any, Dict, List, Tuple, Union
+from multiprocessing import Lock
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -9,6 +10,7 @@ from mlc.datasets.dataset_factory import get_dataset
 from mlc.models.model import Model
 from mlc.models.model_factory import get_model
 from mlc.models.pipeline import Pipeline
+from mlc.models.sk_models import SkModel
 from mlc.transformers.tabular_transformer import TabTransformer
 from numpy.typing import ArrayLike
 from sklearn.base import clone as sk_clone
@@ -155,6 +157,14 @@ def get_common_detectors_params(config: dict, metadata: pd.DataFrame):
     return {**config.get("common_detectors_params"), **auto_detector_params}
 
 
+def quite_model(model: Model):
+    l_model = model
+    if isinstance(l_model, Pipeline):
+        l_model = l_model[-1]
+    if isinstance(l_model, SkModel):
+        l_model.model.set_params(**{"verbose": 0})
+
+
 def add_model(
     models: List[DriftModel],
     model_path: str,
@@ -167,13 +177,18 @@ def add_model(
     t,
     start_idx,
     end_idx,
+    lock_model_writing: Optional[Lock] = None,
+    list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> None:
     model = load_do_save_model(
         model,
         model_path,
         x.iloc[start_idx:end_idx],
         y[start_idx:end_idx],
+        lock_model_writing,
+        list_model_writing,
     )
+    quite_model(model)
     if model.objective in ["regression"]:
         y_scores = model.predict(x.iloc[start_idx:end_idx])
     elif model.objective in ["binary", "classification"]:
