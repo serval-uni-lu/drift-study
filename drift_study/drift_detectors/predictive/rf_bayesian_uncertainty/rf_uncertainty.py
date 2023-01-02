@@ -11,10 +11,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
-from drift_study.drift_detectors.bayesian_uncertainty.constants import (
-    Uncertainty,
-)
-
+from .constants import Uncertainty
 from .uncertainty_utils import calculate_entropy_uncertainties
 
 

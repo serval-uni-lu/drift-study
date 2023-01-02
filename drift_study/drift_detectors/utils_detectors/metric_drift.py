@@ -41,6 +41,5 @@ class MetricDrift:
                 y_scores_l = np.argmax(y_scores_l)
         return self.metric.compute(y, y_scores_l)
 
-    @staticmethod
-    def needs_label():
+    def needs_label(self):
         return True

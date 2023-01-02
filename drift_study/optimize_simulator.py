@@ -9,7 +9,7 @@ from configutils.utils import merge_parameters
 from mlc.load_do_save import save_json
 
 from drift_study import run_simulator
-from drift_study.utils.drift_detector_factory import (
+from drift_study.drift_detectors.drift_detector_factory import (
     get_drift_detector_class_from_conf,
 )
 

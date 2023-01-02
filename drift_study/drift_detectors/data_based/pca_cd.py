@@ -1,15 +1,22 @@
+import abc
 import math
+from typing import Any, Dict, Optional, Tuple, Type, Union
 
 import numpy as np
+import numpy.typing as npt
+import optuna
 import pandas as pd
+from mlc.models.model import Model
 from river.drift import PageHinkley
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KernelDensity
 
+from drift_study.drift_detectors.drift_detector import DriftDetector
 
-class PcaCdDrift:
+
+class PcaCdDrift(DriftDetector):
     """Principal Component Analysis Change Detection (PCA-CD) is a drift
     detection algorithm which checks for change in the distribution of the
     given data using one of several divergence metrics calculated on the data's
@@ -42,14 +49,14 @@ class PcaCdDrift:
 
     def __init__(
         self,
-        window_size,
-        batch_size,
-        divergence_metric,
-        ev_threshold=0.99,
-        delta=0.005,
-        ph_t_ratio=0.001,
-        **kwargs,
-    ):
+        window_size: int,
+        batch_size: int,
+        divergence_metric: str = "kl",
+        ev_threshold: float = 0.99,
+        delta: float = 0.1,
+        ph_t_ratio: float = 0.001,
+        **kwargs: Dict[str, Any],
+    ) -> None:
         """
         Args:
             window_size (int): size of the reference window. Note that
@@ -75,11 +82,17 @@ class PcaCdDrift:
                   densities of windows. A discontinuous, less accurate estimate
                   that should only be used when efficiency is of concern.
 
-            sample_period (float, optional): how often to check for drift. This
-                is 100 samples or ``sample_period * window_size``, whichever is
-                smaller. Default .05, or 5% of the window size.
         """
 
+        super().__init__(
+            window_size=window_size,
+            batch_size=batch_size,
+            divergence_metric=divergence_metric,
+            ev_threshold=ev_threshold,
+            delta=delta,
+            ph_t_ratio=ph_t_ratio,
+            **kwargs,
+        )
         self.window_size = window_size
         self.batch_size = batch_size
         self.ph_t_ratio = ph_t_ratio
@@ -105,7 +118,14 @@ class PcaCdDrift:
         self._test_pca_projection = pd.DataFrame()
         self._density_reference = {}
 
-    def fit(self, x, **kwargs):
+    def fit(
+        self,
+        x: pd.DataFrame,
+        t: Union[pd.Series, npt.NDArray[np.int_]],
+        y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
+        y_scores: Union[npt.NDArray[np.float_]],
+        model: Optional[Model],
+    ) -> None:
 
         self._reference_window = x
         self._test_window = x
@@ -154,7 +174,13 @@ class PcaCdDrift:
                     self._reference_pca_projection.iloc[:, i]
                 )
 
-    def update(self, x, **kwargs):
+    def update(
+        self,
+        x: pd.DataFrame,
+        t: Union[pd.Series, npt.NDArray[np.int_]],
+        y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
+        y_scores: Union[npt.NDArray[np.float_]],
+    ) -> Tuple[bool, bool, pd.DataFrame]:
         x = pd.DataFrame(x)
         self._test_window = pd.concat([self._test_window, x])
         self._test_window = self._test_window.iloc[-self.window_size :]
@@ -369,6 +395,22 @@ class PcaCdDrift:
 
         return divergence
 
-    @staticmethod
-    def needs_label():
+    def needs_label(self) -> bool:
         return False
+
+    @staticmethod
+    @abc.abstractmethod
+    def define_trial_parameters(
+        trial: optuna.Trial, trial_params: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        return {
+            "divergence_metric": trial.suggest_categorical(
+                "divergence_metric", ["js", "mkl", "intersection"]
+            ),
+            "ev_threshold": trial.suggest_float("ev_threshold", 0.5, 1 - 1e-6),
+            "delta": trial.suggest_float("delta", 1e-4, 0.2),
+            "ph_t_ratio": trial.suggest_float("ph_t_ratio", 1e-4, 1e-1),
+        }
+
+
+detectors: Dict[str, Type[DriftDetector]] = {"pca_cd": PcaCdDrift}

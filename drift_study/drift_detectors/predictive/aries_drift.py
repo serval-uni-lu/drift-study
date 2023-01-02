@@ -1,42 +1,75 @@
 from dataclasses import dataclass
-from typing import Union
+from typing import Any, Dict, Optional, Tuple, Type, Union
 
 import numpy as np
+import numpy.typing as npt
+import optuna
 import pandas as pd
+from mlc.models.model import Model
+from mlc.models.pipeline import Pipeline
 from numpy.typing import ArrayLike
 from scipy import stats
 from sklearn.ensemble import RandomForestClassifier
 from torch import nn
 
+from drift_study.drift_detectors.drift_detector import (
+    DriftDetector,
+    NotFittedDetectorException,
+)
 
-class AriesDrift:
+
+class AriesDrift(DriftDetector):
     def __init__(
         self,
-        drift_detector,
-        acc,
-        section_num=50,
-        **kwargs,
-    ):
+        drift_detector: DriftDetector,
+        accuracy_type: int = 0,
+        section_num: int = 50,
+        **kwargs: Dict[str, Any],
+    ) -> None:
 
+        super().__init__(
+            drift_detector=drift_detector,
+            acc=accuracy_type,
+            section_num=section_num,
+            **kwargs,
+        )
         self.drift_detector = drift_detector
-        self.pred_hist = None
-        self.model = None
+        self.pred_hist: Optional[PredHist] = None
+        self.model: Optional[Model] = None
         self.base_acc = -1
-        self.acc = acc
+        self.accuracy_type = accuracy_type
         self.section_num = section_num
 
-    def fit(self, x, y, model, **kwargs):
+    def fit(
+        self,
+        x: pd.DataFrame,
+        t: Union[pd.Series, npt.NDArray[np.int_]],
+        y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
+        y_scores: Union[npt.NDArray[np.float_]],
+        model: Optional[Model],
+    ) -> None:
         self.model = model
+        if not isinstance(self.model, Pipeline):
+            raise NotImplementedError
         if isinstance(self.model[-1].model, RandomForestClassifier):
             self.section_num = self.model[-1].model.n_estimators
         self.pred_hist = build_hist(
             self.model, x, y, section_num=self.section_num
         )
         self.base_acc = (self.model.predict(x) == y).mean()
-        self.drift_detector.fit()
+        self.drift_detector.fit(x=x, t=t, y=y, y_scores=y_scores, model=model)
 
-    def update(self, x, **kwargs):
+    def update(
+        self,
+        x: pd.DataFrame,
+        t: Union[pd.Series, npt.NDArray[np.int_]],
+        y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
+        y_scores: Union[npt.NDArray[np.float_]],
+    ) -> Tuple[bool, bool, pd.DataFrame]:
         x = pd.DataFrame(x)
+
+        if self.pred_hist is None:
+            raise NotFittedDetectorException
 
         accs = deep_et_estimation(
             x,
@@ -45,7 +78,7 @@ class AriesDrift:
             base_acc=self.base_acc,
             section_num=self.section_num,
         )
-        estimated_acc = accs[self.acc]
+        estimated_acc = accs[self.accuracy_type]
 
         simulate = np.concatenate(
             [
@@ -53,32 +86,47 @@ class AriesDrift:
                 np.ones(int(np.ceil(estimated_acc * len(x)))),
             ]
         )[: len(x)]
+        new_y = np.ones(len(simulate))
+        new_x = pd.DataFrame.from_dict({"simulated_error": simulate})
+        new_y_scores = simulate
         np.random.shuffle(simulate)
-        is_drift, is_warning, metrics = self.drift_detector.update(simulate)
+        is_drift, is_warning, metrics = self.drift_detector.update(
+            new_x, t, new_y, new_y_scores
+        )
         for i, e in enumerate(accs):
             metrics[f"aries_acc_{i}"] = [e]
 
         return is_drift, is_warning, metrics
 
+    def needs_label(self) -> bool:
+        return True
+
     @staticmethod
-    def needs_label():
-        return False
+    def define_trial_parameters(
+        trial: optuna.Trial, trial_params: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        return {
+            "accuracy_type": trial.suggest_categorical(
+                "accuracy_type", [0, 1, 2]
+            ),
+            "section_num": trial.suggest_int("section_num", 10, 100),
+        }
 
 
 @dataclass
 class PredHist:
-    mode: ArrayLike
-    size: ArrayLike
+    mode: npt.NDArray[np.int_]
+    size: npt.NDArray[np.int_]
     proba: Union[None, ArrayLike]
 
 
 def deep_et_estimation(
-    x,
-    model,
+    x: pd.DataFrame,
+    model: Model,
     ori_hist: PredHist,
     base_acc: float,
     section_num: int = 50,
-):
+) -> Tuple[float, float, float]:
 
     new_hist = build_hist(model, x, section_num=section_num)
 
@@ -104,18 +152,20 @@ def deep_et_estimation(
     return estimated_acc, acc1, acc2
 
 
-def predict_n_times(model, x, n_times):
+def predict_n_times(
+    model: Model, x: pd.DataFrame, n_times: int
+) -> npt.NDArray[np.int_]:
     model[-1].train()
     x_l = pd.concat([x] * n_times, ignore_index=True)
     prediction = model.predict(x_l)
     prediction = prediction.reshape(
-        n_times, int(prediction.shape[0] / n_times), *prediction.shape[1:]
+        (n_times, int(prediction.shape[0] / n_times), *prediction.shape[1:])
     )
     model[-1].eval()
     return prediction
 
 
-def compute_mode(model, x, section_num) -> np.ndarray:
+def compute_mode(model, x, section_num) -> npt.NDArray[np.int_]:
     if isinstance(model[-1].model, nn.Module):
         # Make many prediction
         t_predictions_list = predict_n_times(model, x, section_num)
@@ -141,7 +191,9 @@ def compute_mode(model, x, section_num) -> np.ndarray:
         raise NotImplementedError
 
 
-def build_hist(model, x, y=None, section_num=50) -> PredHist:
+def build_hist(
+    model: Model, x: pd.DataFrame, y=None, section_num=50
+) -> PredHist:
 
     # Decide whether to predict the probability of a region
     # based on true accuracy.
@@ -177,13 +229,16 @@ def build_hist(model, x, y=None, section_num=50) -> PredHist:
                 )
                 hist_correct.append(len(current_correct_idx))
 
-    hist_mode = np.asarray(hist_mode)
-    hist_size = np.asarray(hist_size)
+    np_hist_mode = np.array(hist_mode)
+    np_hist_size = np.array(hist_size)
     if build_proba:
-        hist_correct = np.asarray(hist_correct)
-        hist_proba_correct = hist_correct / hist_size
+        np_hist_correct = np.array(hist_correct)
+        np_hist_proba_correct = np_hist_correct / np_hist_size
     else:
-        hist_proba_correct = None
-    pred_hist = PredHist(hist_mode, hist_size, hist_proba_correct)
+        np_hist_proba_correct = None
+    pred_hist = PredHist(np_hist_mode, np_hist_size, np_hist_proba_correct)
 
     return pred_hist
+
+
+detectors: Dict[str, Type[DriftDetector]] = {"aries": AriesDrift}

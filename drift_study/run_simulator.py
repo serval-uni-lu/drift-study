@@ -10,10 +10,10 @@ from mlc.metrics.metric_factory import create_metric
 from mlc.metrics.metrics import PredClassificationMetric
 from tqdm import tqdm
 
-from drift_study.utils.delays import get_delays
-from drift_study.utils.drift_detector_factory import (
+from drift_study.drift_detectors.drift_detector_factory import (
     get_drift_detector_from_conf,
 )
+from drift_study.utils.delays import get_delays
 from drift_study.utils.drift_model import DriftModel
 from drift_study.utils.helpers import (
     add_model,

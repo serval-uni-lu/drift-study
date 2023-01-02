@@ -8,9 +8,7 @@ from typing import Dict, List
 
 import numpy as np
 
-from drift_study.drift_detectors.bayesian_uncertainty.constants import (
-    Uncertainty,
-)
+from .constants import Uncertainty
 
 
 def calculate_entropy_uncertainties(

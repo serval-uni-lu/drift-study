@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Type, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -9,11 +9,11 @@ from mlc.models.model import Model
 from drift_study.drift_detectors.drift_detector import DriftDetector
 
 
-class PeriodicDrift(DriftDetector):
-    def __init__(self, period: int, **kwargs: Dict[str, Any]) -> None:
-        super().__init__(period=period, **kwargs)
-        self.period = period
-        self.counter = 0
+class NoDetection(DriftDetector):
+    def __init__(self, **kwargs: Dict[str, Any]) -> None:
+        # No drift does not require parameters
+        # Used to be compliant with others drift detectors
+        super().__init__(**kwargs)
 
     def fit(
         self,
@@ -23,7 +23,9 @@ class PeriodicDrift(DriftDetector):
         y_scores: Union[npt.NDArray[np.float_]],
         model: Optional[Model],
     ) -> None:
-        self.counter = 0
+        # No drift does not require fitting
+        # Used to be compliant with others drift detectors
+        pass
 
     def update(
         self,
@@ -32,16 +34,7 @@ class PeriodicDrift(DriftDetector):
         y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
         y_scores: Union[npt.NDArray[np.float_]],
     ) -> Tuple[bool, bool, pd.DataFrame]:
-        if len(x.shape) == 1:
-            self.counter += 1
-        elif len(x.shape) == 2:
-            self.counter += x.shape[0]
-
-        if self.counter < self.period:
-            return False, False, pd.DataFrame()
-        else:
-
-            return True, True, pd.DataFrame()
+        return False, False, pd.DataFrame()
 
     def needs_label(self) -> bool:
         return False
@@ -50,14 +43,9 @@ class PeriodicDrift(DriftDetector):
     def define_trial_parameters(
         trial: optuna.Trial, trial_params: Dict[str, Any]
     ) -> Dict[str, Any]:
-        params = {
-            "period": trial.suggest_int(
-                "period",
-                trial_params["period"]["min"],
-                trial_params["period"]["max"],
-            )
-        }
-        return params
+        return {}
 
 
-detectors = {"periodic_drift": PeriodicDrift}
+detectors: Dict[str, Type[DriftDetector]] = {
+    "no_detection": NoDetection,
+}
