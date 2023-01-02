@@ -6,10 +6,10 @@ authors = ["Thibault Simonetto <thibault.simonetto.001@student.uni.lu>"]
 
 [tool.poetry.dependencies]
 python = "3.8.10"
-scikit-learn = "^1.1.0"
+scikit-learn = "1.1.0"
 tqdm = "^4.64.0"
 h5py = "^3.6.0"
-river = "^0.10.1"
+river = "^0.14.0"
 evidently = "^0.1.50-alpha.0"
 serval-config-utils = "^0.1.4"
 serval-ml-commons = {path = "../mlc/", develop = true }
@@ -44,13 +44,6 @@ secondary = true
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-line_length = 79
-
 [tool.black]
 line-length = 79
 target-version = ['py38']
@@ -74,3 +67,11 @@ exclude = '''
                      # the root of the project
 )
 '''
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 79
