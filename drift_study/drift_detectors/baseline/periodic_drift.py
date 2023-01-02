@@ -60,4 +60,4 @@ class PeriodicDrift(DriftDetector):
         return params
 
 
-detectors = {"periodic_drift": PeriodicDrift}
+detectors = {"periodic": PeriodicDrift}

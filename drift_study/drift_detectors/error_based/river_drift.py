@@ -49,8 +49,9 @@ class RiverDrift(DriftDetector, ABC):
         self.drift_detector = self.internal_detector_cls(**self.internal_args)
 
     def _update_one(self, metric: Union[float, int]):
-        in_drift, in_warning = self.drift_detector.update(metric)
-        return in_drift, in_warning, pd.DataFrame()
+        self.drift_detector.update(metric)
+        in_drift = self.drift_detector.drift_detected
+        return in_drift, False, pd.DataFrame()
 
     def update(
         self,
@@ -83,7 +84,7 @@ class AdwinDrift(RiverDrift):
         max_buckets: int = 5,
         min_window_length: int = 5,
         grace_period: int = 10,
-        metric=None,
+        metric_conf=None,
         **kwargs: Dict[str, Any],
     ) -> None:
         internal_args = {
@@ -93,9 +94,9 @@ class AdwinDrift(RiverDrift):
             "min_window_length": min_window_length,
             "grace_period": grace_period,
         }
-        if metric is None:
-            metric = {"name": "class_error"}
-        super().__init__(drift.ADWIN, metric, internal_args, **kwargs)
+        if metric_conf is None:
+            metric_conf = {"name": "class_error"}
+        super().__init__(drift.ADWIN, metric_conf, internal_args, **kwargs)
 
     @staticmethod
     def define_trial_parameters(
