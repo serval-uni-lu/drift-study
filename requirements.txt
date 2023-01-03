@@ -56,7 +56,6 @@ serval-ml-commons @ file:///C:/Users/thibault.simonetto/repo/mlc ; python_full_v
 setuptools-scm==7.1.0 ; python_full_version == "3.8.10"
 setuptools==65.6.3 ; python_full_version == "3.8.10"
 six==1.16.0 ; python_full_version == "3.8.10"
-sklearn==0.0.post1 ; python_full_version == "3.8.10"
 statsmodels==0.13.5 ; python_full_version == "3.8.10"
 tables==3.8.0 ; python_full_version == "3.8.10"
 tenacity==8.1.0 ; python_full_version == "3.8.10"
