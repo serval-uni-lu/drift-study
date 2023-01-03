@@ -2,7 +2,8 @@
 window_size: 5000
 performance:
   predict_forward: 5000
-  n_jobs: 14
+  n_jobs: 10
+  n_jobs_optimiser: -40
 experience:
   random_state: 42
 evaluation_params:
@@ -15,12 +16,14 @@ evaluation_params:
 dataset:
   name: electricity
 common_detectors_params:
-  p_value: 0.01
-  period: 1000
-  ev_threshold: 0.99
   batch_size: 1000
 common_runs_params:
   delays:
     label: 10days
     drift: 0
     retraining: 1W
+trial_params:
+  n_trials: 100
+  period:
+    min: 1000
+    max: 20000
