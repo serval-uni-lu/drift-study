@@ -25,7 +25,7 @@ UNCERTAINTY_TYPE = {"total": 0, "epistemic": 1, "aleatoric": 2}
 class RfUncertaintyDrift(DriftDetector):
     def __init__(
         self,
-        drift_detector: Type[DriftDetector],
+        drift_detector: DriftDetector,
         uncertainty_type: str,
         **kwargs: Dict[str, Any],
     ) -> None:

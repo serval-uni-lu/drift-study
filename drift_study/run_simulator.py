@@ -138,10 +138,10 @@ def run(
             is_drift_warnings[x_idx],
             metric,
         ) = drift_detector.update(
-            x=x.iloc[x_idx],
-            t=t[x_idx],
-            y=y[x_idx],
-            y_scores=y_scores[x_idx],
+            x=x.iloc[x_idx : x_idx + 1],
+            t=t[x_idx : x_idx + 1],
+            y=y[x_idx : x_idx + 1],
+            y_scores=y_scores[x_idx : x_idx + 1],
         )
         metrics.append(metric)
         # Do not retrain if we are not using the latest drift model available

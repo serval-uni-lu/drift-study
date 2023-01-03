@@ -1,4 +1,3 @@
-import abc
 import math
 from typing import Any, Dict, Optional, Tuple, Type, Union
 
@@ -261,7 +260,7 @@ class PcaCdDrift(DriftDetector):
         self._drift_detection_monitor.update(change_score)
 
         return (
-            self._drift_detection_monitor.change_detected,
+            self._drift_detection_monitor.drift_detected,
             False,
             pd.DataFrame({"change_score": [change_score]}),
         )
@@ -399,7 +398,6 @@ class PcaCdDrift(DriftDetector):
         return False
 
     @staticmethod
-    @abc.abstractmethod
     def define_trial_parameters(
         trial: optuna.Trial, trial_params: Dict[str, Any]
     ) -> Dict[str, Any]:

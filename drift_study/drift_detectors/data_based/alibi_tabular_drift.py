@@ -105,5 +105,5 @@ class TabularAlibiDrift(DriftDetector):
 
 
 detectors: Dict[str, Type[DriftDetector]] = {
-    "tabular_alibi_drift": TabularAlibiDrift,
+    "tabular_alibi": TabularAlibiDrift,
 }

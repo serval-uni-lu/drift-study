@@ -122,8 +122,11 @@ def run(
     if os.path.exists(sampler_path):
         sampler = joblib.load(sampler_path)
     else:
-        sampler = TPESampler(consider_prior=True, multivariate=True, seed=42)
-        joblib.dump(sampler, sampler_path)
+        sampler = TPESampler(n_startup_trials=5, seed=42)
+        joblib.dump(
+            sampler,
+            sampler_path,
+        )
 
     study = optuna.create_study(
         study_name=study_name,
