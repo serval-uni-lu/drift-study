@@ -163,9 +163,12 @@ class EddmDrift(RiverDrift):
     def define_trial_parameters(
         trial: optuna.Trial, trial_params: Dict[str, Any]
     ) -> Dict[str, Any]:
+        beta = trial.suggest_float("beta", 0, 1)
+        alpha = beta
         return {
             "warm_start": trial.suggest_int("warm_start", 1, 100),
-            "beta": trial.suggest_float("beta", 0, 1),
+            "beta": beta,
+            "alpha": alpha,
         }
 
 
@@ -221,7 +224,7 @@ class HdddmWDrift(RiverDrift):
     ) -> Dict[str, Any]:
         return {
             "drift_confidence": trial.suggest_float("drift_confidence", 0, 1),
-            "lambda_val": trial.suggest_float("lambda_val", 0, 1e1),
+            "lambda_val": trial.suggest_float("lambda_val", 0, 1),
             "two_sided_test": bool(trial.suggest_int("two_sided_test", 0, 1)),
         }
 
