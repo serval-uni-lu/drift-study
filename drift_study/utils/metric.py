@@ -2,8 +2,8 @@ from typing import Union
 
 import numpy as np
 import numpy.typing as npt
+from mlc.metrics.metric import Metric
 from mlc.metrics.metrics import PredClassificationMetric
-from prometheus_client import Metric
 
 
 def compute_metric(
