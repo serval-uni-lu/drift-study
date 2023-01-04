@@ -158,7 +158,7 @@ def run(
                 logger.debug(f"start_index {start_idx}, end_index {end_idx}.")
 
                 model_path = (
-                    f"./{model_root_dir}/{dataset.name}/"
+                    f"{model_root_dir}/{dataset.name}/"
                     f"{model.name}_{start_idx}_{end_idx}.joblib"
                 )
                 add_model(
