@@ -19,7 +19,7 @@ def attempt_read(path: str, model: Model) -> int:
         model.load(path)
         logger.debug(f"Model {path} loaded.")
         return 0
-    except ValueError:
+    except (ValueError, EOFError):
         logger.debug(f"Model {path} error while loading, attempt to fix.")
         return -1
 
