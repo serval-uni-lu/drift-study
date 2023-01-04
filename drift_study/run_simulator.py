@@ -60,6 +60,9 @@ def run(
         config.get("common_runs_params"), config.get("runs")[run_i]
     )
     logger.info(f"Running config {run_config.get('name')}")
+    model_root_dir = config.get(
+        "models_dir", os.environ.get("MODELS_DIR", "./models")
+    )
 
     # INITIALIZE PARAMETERS
     window_size = config.get("window_size")
@@ -90,7 +93,8 @@ def run(
 
     # TRAIN FIRST MODEL
     model_path = (
-        f"./models/{dataset.name}/{model.name}_{0}_{window_size}.joblib"
+        f"{model_root_dir}/{dataset.name}/"
+        f"{model.name}_{0}_{window_size}.joblib"
     )
     start_idx, end_idx = 0, window_size
     add_model(
@@ -154,7 +158,7 @@ def run(
                 logger.debug(f"start_index {start_idx}, end_index {end_idx}.")
 
                 model_path = (
-                    f"./models/{dataset.name}/"
+                    f"./{model_root_dir}/{dataset.name}/"
                     f"{model.name}_{start_idx}_{end_idx}.joblib"
                 )
                 add_model(
