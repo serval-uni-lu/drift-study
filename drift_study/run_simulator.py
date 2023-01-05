@@ -190,6 +190,7 @@ def run(
         dataset_name=dataset.name,
         model_name=model.name,
         run_name=run_config.get("name"),
+        sub_dir_path=config["sub_dir_path"],
     )
 
     # Metrics

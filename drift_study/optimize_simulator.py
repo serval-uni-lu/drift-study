@@ -52,11 +52,15 @@ def manual_save_run(
     ml_metric: float,
 ):
     out = {"config": config, "n_train": n_train, "ml_metric": ml_metric}
+
+    model_name = run_config["model"]["name"]
+    dataset_name = config["dataset"]["name"]
+    sub_dir_path = config["sub_dir_path"]
+
     out_path = (
-        f"./data/optuna/results/"
-        f"{config['dataset']['name']}/"
-        f"{run_config['model']['name']}/"
-        f"{run_config['name']}.json"
+        f"./data/optimizer_results/"
+        f"{dataset_name}/{model_name}/"
+        f"{sub_dir_path}/{run_config['name']}.json"
     )
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     save_json(out, out_path)
@@ -107,7 +111,15 @@ def run(
     )
 
     study_name = run_config["name"]
-    studies_path = f"./data/optuna/study_{study_name}.db"
+    model_name = run_config["model"]["name"]
+    dataset_name = config["dataset"]["name"]
+    sub_dir_path = config["sub_dir_path"]
+
+    studies_dir = (
+        f"./data/simulator/" f"{dataset_name}/{model_name}/" f"{sub_dir_path}/"
+    )
+
+    studies_path = f"{studies_dir}/study_{study_name}.db"
     Path(studies_path).parent.mkdir(parents=True, exist_ok=True)
 
     failed_trial_callback = RetryFailedTrialCallback(max_retry=None)
@@ -118,7 +130,7 @@ def run(
         failed_trial_callback=failed_trial_callback,
     )
 
-    sampler_path = f"./data/optuna/study_{study_name}.sampler"
+    sampler_path = f"{studies_dir}/study_{study_name}.sampler"
     if os.path.exists(sampler_path):
         sampler = joblib.load(sampler_path)
     else:

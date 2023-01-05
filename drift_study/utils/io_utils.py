@@ -2,7 +2,7 @@ import logging
 import time
 from multiprocessing import Lock
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import h5py
 import joblib
@@ -10,6 +10,8 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from mlc.models.model import Model
+
+from drift_study.utils.drift_model import DriftModel
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +96,13 @@ def save_arrays(
 
 
 def save_drift_run(
-    numpy_to_save, models, metrics, dataset_name, model_name, run_name
+    numpy_to_save: Dict[str, Any],
+    models: List[DriftModel],
+    metrics: List[pd.DataFrame],
+    dataset_name: str,
+    model_name: str,
+    run_name: str,
+    sub_dir_path: str,
 ):
     model_start_indexes = np.array([model.start_idx for model in models])
     model_end_indexes = np.array([model.end_idx for model in models])
@@ -108,8 +116,9 @@ def save_drift_run(
         metrics = pd.DataFrame()
 
     drift_data_path = (
-        f"./data/drift-study/{dataset_name}/{model_name}/{run_name}.hdf5"
+        f"./data/simulator/"
+        f"{dataset_name}/{model_name}/"
+        f"{sub_dir_path}/{run_name}"
     )
-
-    save_arrays(numpy_to_save, drift_data_path)
+    save_arrays(numpy_to_save, f"{drift_data_path}.hdf5")
     metrics.to_hdf(f"{drift_data_path}_metrics.hdf5", "metrics")
