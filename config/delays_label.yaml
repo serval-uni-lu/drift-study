@@ -3,4 +3,4 @@ common_runs_params:
   delays:
     drift: 0
     retraining: 0
-sub_dir_path: no_delays
+sub_dir_path: label_delays

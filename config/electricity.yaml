@@ -2,8 +2,8 @@
 window_size: 5000
 performance:
   predict_forward: 5000
-  n_jobs: 10
-  n_jobs_optimiser: -40
+  n_jobs: 2
+  n_jobs_optimiser: 5
 experience:
   random_state: 42
 evaluation_params:
