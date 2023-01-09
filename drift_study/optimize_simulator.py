@@ -26,6 +26,15 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
 
 
+def term_handler(signum, frame):
+    print("Graceful stop.")
+    sys.exit(0)
+
+
+signal.signal(signal.SIGTERM, term_handler)
+signal.signal(signal.SIGUSR1, term_handler)
+
+
 def update_params(
     trial: optuna.Trial,
     config: Dict[str, Any],
@@ -196,12 +205,6 @@ def run_many() -> None:
             )
 
 
-def term_handler(signum, frame):
-    print("Graceful stop.")
-    sys.exit(0)
-
-
 if __name__ == "__main__":
     optuna.logging.set_verbosity(optuna.logging.ERROR)
-    signal.signal(signal.SIGTERM, term_handler)
     run_many()
