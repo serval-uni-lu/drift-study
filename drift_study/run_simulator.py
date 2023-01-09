@@ -75,18 +75,21 @@ def run(
         get_common_detectors_params(config, dataset.get_metadata(only_x=True)),
     )
     delays = get_delays(run_config, drift_detector)
+    last_idx = config["evaluation_params"].get("last_idx", -1)
+    if last_idx == -1:
+        last_idx = len(x)
 
     # PREPARE DATASTRUCTURES
     models: List[DriftModel] = []
-    model_used = np.full(len(x), -1)
+    model_used = np.full(last_idx, -1)
     if config["evaluation_params"]["n_score"] == 1:
-        y_scores = np.full((len(x)), np.nan)
+        y_scores = np.full(last_idx, np.nan)
     else:
         y_scores = np.full(
-            (len(x), config["evaluation_params"]["n_score"]), np.nan
+            (last_idx, config["evaluation_params"]["n_score"]), np.nan
         )
-    is_drifts = np.full(len(x), np.nan)
-    is_drift_warnings = np.full(len(x), np.nan)
+    is_drifts = np.full(last_idx, np.nan)
+    is_drift_warnings = np.full(last_idx, np.nan)
     last_ml_model_used = 0
     last_drift_model_used = 0
     metrics = []
@@ -114,7 +117,9 @@ def run(
     )
 
     # Main loop
-    for x_idx in tqdm(np.arange(window_size, len(x)), disable=(verbose == 0)):
+    for x_idx in tqdm(
+        np.arange(window_size, last_idx), disable=(verbose == 0)
+    ):
 
         # Find current model
         ml_model_idx, drift_model_idx = get_current_models(
