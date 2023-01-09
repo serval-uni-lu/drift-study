@@ -1,5 +1,7 @@
 import logging
 import os
+import signal
+import sys
 from multiprocessing import Lock, Manager
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -194,6 +196,12 @@ def run_many() -> None:
             )
 
 
+def term_handler(signum, frame):
+    print("Graceful stop.")
+    sys.exit(0)
+
+
 if __name__ == "__main__":
     optuna.logging.set_verbosity(optuna.logging.ERROR)
+    signal.signal(signal.SIGTERM, term_handler)
     run_many()
