@@ -80,11 +80,6 @@ runs:
     detectors:
       - name: n_batch
       - name: pca_cd
-  - name: pca_cd_js
-    type: data
-    detectors:
-      - name: n_batch
-      - name: pca_cd
   - name: tabular_alibi
     type: data
     detectors:
