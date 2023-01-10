@@ -204,7 +204,9 @@ def run(
     if isinstance(prediction_metric, PredClassificationMetric):
         y_scores = np.argmax(y_scores, axis=1)
     metric = float(
-        prediction_metric.compute(y[window_size:], y_scores[window_size:])
+        prediction_metric.compute(
+            y[window_size:last_idx], y_scores[window_size:last_idx]
+        )
     )
 
     return n_train, metric
