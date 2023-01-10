@@ -86,6 +86,7 @@ def get_current_model(
             break
 
     model_idx = model_idx + idx_to_add
+    model_idx = max(0, model_idx)
     return model_idx
 
 
