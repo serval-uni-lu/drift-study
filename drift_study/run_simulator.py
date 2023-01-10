@@ -139,6 +139,7 @@ def run(
             y_scores,
             x,
             predict_forward,
+            last_idx,
         )
 
         # Detect drift
