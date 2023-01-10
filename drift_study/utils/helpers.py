@@ -111,20 +111,20 @@ def compute_y_scores(
     y_scores: np.ndarray,
     x: Union[np.ndarray, pd.DataFrame],
     predict_forward: int,
+    last_idx: int,
 ):
     if model_used[current_index] < current_model_i:
         logger.debug(f"Seeing forward at index {current_index}")
-        x_to_pred = x[current_index : current_index + predict_forward]
+        end_idx = min(current_index + predict_forward, last_idx)
+        x_to_pred = x[current_index:end_idx]
         if model.objective in ["regression"]:
             y_pred = model.predict(x_to_pred)
         elif model.objective in ["binary", "classification"]:
             y_pred = model.predict_proba(x_to_pred)
         else:
             raise NotImplementedError
-        y_scores[current_index : current_index + predict_forward] = y_pred
-        model_used[
-            current_index : current_index + predict_forward
-        ] = current_model_i
+        y_scores[current_index:end_idx] = y_pred
+        model_used[current_index:end_idx] = current_model_i
     return y_scores, model_used
 
 
