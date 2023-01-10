@@ -16,7 +16,7 @@ evaluation_params:
 dataset:
   name: lcld_201317_ds_time
 common_detectors_params:
-  batch_size: 1000
+  batch_size: 5000
 common_runs_params:
   delays:
     label: 10days
