@@ -5,6 +5,7 @@ from pathlib import Path
 import configutils
 import matplotlib
 import numpy as np
+from configutils.utils import merge_parameters
 from matplotlib import pyplot as plt
 from mlc.datasets.dataset_factory import get_dataset
 from mlc.metrics.metric_factory import create_metric
@@ -26,10 +27,14 @@ matplotlib.rc("font", **font)
 def run():
     config = configutils.get_config()
     print(config)
+
+    for i in range(len(config.get("runs"))):
+        config.get("runs")[i] = merge_parameters(
+            config.get("common_runs_params"), config.get("runs")[i]
+        )
     ref_configs, eval_configs = get_ref_eval_config(
         config, config.get("evaluation_params").get("reference_methods")
     )
-
     dataset = get_dataset(config.get("dataset"))
     model_name = config.get("runs")[0].get("model").get("name")
     logger.info(f"Starting dataset {dataset.name}, model {model_name}")

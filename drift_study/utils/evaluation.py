@@ -91,10 +91,11 @@ def load_config_eval(
                 np.concatenate(np.arange(last_idx, last_idx + e))
             last_idx += e
 
+    sub_dir_path = config["sub_dir_path"]
     for run_config in config.get("runs", []):
         drift_data_path = (
-            f"./data/drift-study/{dataset.name}/{model_name}/"
-            f"{run_config.get('name')}.hdf5"
+            f"./data/simulator/{dataset.name}/{model_name}/"
+            f"{sub_dir_path}/{run_config.get('name')}.hdf5"
         )
         with h5py.File(drift_data_path, "r") as f:
             y_scores = f["y_scores"][()]

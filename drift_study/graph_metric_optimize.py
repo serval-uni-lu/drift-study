@@ -2,17 +2,25 @@ import glob
 from typing import Any, Dict
 
 import configutils
+import numpy as np
 import pandas as pd
+import plotly.express as px
 from joblib import Parallel, delayed
 from mlc.load_do_save import load_json
 from tqdm import tqdm
 
+from drift_study.utils.pareto import calc_pareto_rank
+
 
 def filter_conf(conf_results: Dict[str, Any]) -> Dict[str, Any]:
+    detector_name = "_".join(
+        [e["name"] for e in conf_results["config"]["runs"][0]["detectors"]]
+    )
     out = {
         "n_train": conf_results["n_train"],
         "ml_metric": conf_results["ml_metric"],
-        "run_name": conf_results["config"]["runs"][0]["name"],
+        "detector_type": conf_results["config"]["runs"][0]["type"],
+        "detector_name": detector_name,
         "params": conf_results["config"]["runs"][0]["detectors"][-1].get(
             "params", "No params provided"
         ),
@@ -33,7 +41,23 @@ def run() -> None:
         for path in tqdm(list_files, total=len(list_files))
     )
     df = pd.DataFrame(conf_results)
-    print(df)
+
+    # Add rank
+    pareto_rank = calc_pareto_rank(
+        np.array([df["n_train"], df["ml_metric"]]).T, np.array([1, -1])
+    )
+    df["pareto_rank"] = pareto_rank
+    df = df[df["pareto_rank"] <= 20]
+    fig = px.scatter(
+        df,
+        x="n_train",
+        y="ml_metric",
+        color="pareto_rank",
+        symbol="detector_type",
+        hover_data=["detector_name"],
+    )
+    print(df["pareto_rank"].max())
+    fig.show()
 
 
 if __name__ == "__main__":

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import numpy.typing as npt
 
@@ -19,8 +21,15 @@ def is_pareto_efficient_simple(costs: npt.NDArray[np.float_]):
     return is_efficient
 
 
-def calc_pareto_rank(costs: npt.NDArray[np.float_]) -> npt.NDArray[np.int_]:
+def calc_pareto_rank(
+    costs: npt.NDArray[np.float_],
+    costs_direction: Optional[npt.NDArray[np.int_]],
+) -> npt.NDArray[np.int_]:
 
+    if costs_direction is None:
+        costs_direction = np.ones(costs.shape[1])
+
+    costs = costs * costs_direction
     costs, inverse, count = np.unique(
         costs, return_inverse=True, return_counts=True, axis=0
     )

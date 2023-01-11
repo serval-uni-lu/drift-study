@@ -1,7 +1,5 @@
 import logging
 import os
-import signal
-import sys
 from multiprocessing import Lock, Manager
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -24,15 +22,6 @@ from drift_study.drift_detectors.drift_detector_factory import (
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
-
-
-def term_handler(signum, frame):
-    print("Graceful stop.")
-    sys.exit(0)
-
-
-signal.signal(signal.SIGTERM, term_handler)
-signal.signal(signal.SIGUSR1, term_handler)
 
 
 def update_params(
