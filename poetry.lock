@@ -2316,7 +2316,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.8.10"
-content-hash = "33f40fa32c7debb0dd0e82a936a05a5822caf830cecc8d04d51da3d9a8cfd23b"
+content-hash = "efbf01349d27d36e14e89affd60a5b3e4698979bdb92b652fb6cfbeb25a5edcf"
 
 [metadata.files]
 alibi-detect = [
