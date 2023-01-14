@@ -13,15 +13,11 @@ from mlc.metrics.metrics import PredClassificationMetric
 from optuna.exceptions import ExperimentalWarning
 from tqdm import tqdm
 
-from drift_study.drift_detectors.drift_detector_factory import (
-    get_drift_detector_from_conf,
-)
 from drift_study.utils.delays import get_delays
 from drift_study.utils.drift_model import DriftModel
 from drift_study.utils.helpers import (
     add_model,
     compute_y_scores,
-    get_common_detectors_params,
     get_current_models,
     initialize,
 )
@@ -69,12 +65,11 @@ def run(
     predict_forward = config.get("performance").get("predict_forward")
 
     # LOAD AND CREATE OBJECTS
-    dataset, model, x, y, t = initialize(config, run_config)
-    drift_detector = get_drift_detector_from_conf(
-        run_config.get("detectors"),
-        get_common_detectors_params(config, dataset.get_metadata(only_x=True)),
+    dataset, f_new_model, f_new_detector, x, y, t = initialize(
+        config, run_config
     )
-    delays = get_delays(run_config, drift_detector)
+
+    delays = get_delays(run_config, f_new_detector())
     last_idx = config["evaluation_params"].get("last_idx", -1)
     if last_idx == -1:
         last_idx = len(x)
@@ -93,18 +88,19 @@ def run(
     last_ml_model_used = 0
     last_drift_model_used = 0
     metrics = []
+    model_name = f_new_model().name
 
     # TRAIN FIRST MODEL
     model_path = (
         f"{model_root_dir}/{dataset.name}/"
-        f"{model.name}_{0}_{window_size}.joblib"
+        f"{model_name}_{0}_{window_size}.joblib"
     )
     start_idx, end_idx = 0, window_size
     add_model(
         models,
         model_path,
-        model,
-        drift_detector,
+        f_new_model,
+        f_new_detector,
         0,
         delays,
         x,
@@ -165,13 +161,13 @@ def run(
 
                 model_path = (
                     f"{model_root_dir}/{dataset.name}/"
-                    f"{model.name}_{start_idx}_{end_idx}.joblib"
+                    f"{model_name}_{start_idx}_{end_idx}.joblib"
                 )
                 add_model(
                     models,
                     model_path,
-                    model,
-                    drift_detector,
+                    f_new_model,
+                    f_new_detector,
                     x_idx,
                     delays,
                     x,
@@ -182,6 +178,11 @@ def run(
                     lock_model_writing,
                     list_model_writing,
                 )
+                if len(models) > 1:
+                    assert (
+                        models[-1].drift_detector != models[-2].drift_detector
+                    )
+                    assert models[-1].ml_model != models[-2].ml_model
 
     # Save
     save_drift_run(
@@ -194,7 +195,7 @@ def run(
         models=models,
         metrics=metrics,
         dataset_name=dataset.name,
-        model_name=model.name,
+        model_name=model_name,
         run_name=run_config.get("name"),
         sub_dir_path=config["sub_dir_path"],
     )

@@ -1,7 +1,7 @@
 import logging
 import os
 from multiprocessing import Lock
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -13,8 +13,11 @@ from mlc.models.pipeline import Pipeline
 from mlc.models.sk_models import SkModel
 from mlc.transformers.tabular_transformer import TabTransformer
 from numpy.typing import ArrayLike
-from sklearn.base import clone as sk_clone
 
+from drift_study.drift_detectors import DriftDetector
+from drift_study.drift_detectors.drift_detector_factory import (
+    get_drift_detector_from_conf,
+)
 from drift_study.utils.delays import Delays
 from drift_study.utils.drift_model import DriftModel
 from drift_study.utils.io_utils import load_do_save_model
@@ -26,26 +29,60 @@ logger = logging.getLogger(__name__)
 def initialize(
     config: Dict[str, Any],
     run_config: Dict[str, Any],
-) -> Tuple[Dataset, Model, ArrayLike, ArrayLike, ArrayLike]:
+) -> Tuple[
+    Dataset,
+    Callable[[], Model],
+    Callable[[], DriftDetector],
+    ArrayLike,
+    ArrayLike,
+    ArrayLike,
+]:
     logger.debug(f"Loading dataset {config.get('dataset', {}).get('name')}")
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
 
     metadata = dataset.get_metadata(only_x=True)
-    model = get_model_arch(
-        config, run_config, dataset.get_metadata(only_x=True)
-    )
-    model = Pipeline(
-        steps=[
-            TabTransformer(metadata=metadata, scale=True, one_hot_encode=True),
-            model,
-        ]
-    )
-
-    return dataset, model, x, y, t
+    f_new_model = get_f_new_model(config, run_config, metadata)
+    f_new_detector = get_f_new_detector(config, run_config, metadata)
+    return dataset, f_new_model, f_new_detector, x, y, t
 
 
-def get_model_arch(
+def get_f_new_detector(
+    config: Dict[str, Any],
+    run_config: Dict[str, Any],
+    metadata_x: pd.DataFrame,
+) -> Callable[[], DriftDetector]:
+    def f_new_detector() -> DriftDetector:
+        drift_detector = get_drift_detector_from_conf(
+            run_config.get("detectors"),
+            get_common_detectors_params(config, metadata_x),
+        )
+        return drift_detector
+
+    return f_new_detector
+
+
+def get_f_new_model(
+    config: Dict[str, Any],
+    run_config: Dict[str, Any],
+    metadata_x: pd.DataFrame,
+) -> Callable[[], Model]:
+    def new_model() -> Model:
+        model = get_model_l(config, run_config, metadata_x)
+        model = Pipeline(
+            steps=[
+                TabTransformer(
+                    metadata=metadata_x, scale=True, one_hot_encode=True
+                ),
+                model,
+            ]
+        )
+        return model
+
+    return new_model
+
+
+def get_model_l(
     config: Dict[str, Any], run_config: Dict[str, Any], metadata: pd.DataFrame
 ) -> Model:
 
@@ -96,11 +133,13 @@ def get_current_models(
     last_ml_model_used=None,
     last_drift_model_used=None,
 ) -> Tuple[int, int]:
-
-    return (
+    ml_model_idx, drift_model_idx = (
         get_current_model(models, t, "ml", last_ml_model_used),
         get_current_model(models, t, "drift", last_drift_model_used),
     )
+    if models[drift_model_idx].drift_detector.needs_model():
+        assert ml_model_idx == drift_model_idx
+    return ml_model_idx, drift_model_idx
 
 
 def compute_y_scores(
@@ -126,10 +165,6 @@ def compute_y_scores(
         y_scores[current_index:end_idx] = y_pred
         model_used[current_index:end_idx] = current_model_i
     return y_scores, model_used
-
-
-def clone_estimator(estimator) -> Pipeline:
-    return sk_clone(estimator)
 
 
 def get_ref_eval_config(configs: dict, ref_config_names: List[str]):
@@ -169,8 +204,8 @@ def quite_model(model: Model):
 def add_model(
     models: List[DriftModel],
     model_path: str,
-    model,
-    drift_detector,
+    f_new_model: Callable[[], Model],
+    f_new_detector: Callable[[], DriftDetector],
     x_idx,
     delays: Delays,
     x,
@@ -181,6 +216,7 @@ def add_model(
     lock_model_writing: Optional[Lock] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> None:
+    model = f_new_model()
     model = load_do_save_model(
         model,
         model_path,
@@ -196,6 +232,8 @@ def add_model(
         y_scores = model.predict_proba(x.iloc[start_idx:end_idx])
     else:
         raise NotImplementedError
+
+    drift_detector = f_new_detector()
     drift_detector.fit(
         x=x.iloc[start_idx:end_idx],
         t=t[start_idx:end_idx],
