@@ -18,6 +18,7 @@ from drift_study.utils.drift_model import DriftModel
 from drift_study.utils.helpers import (
     add_model,
     compute_y_scores,
+    free_mem_models,
     get_current_models,
     initialize,
 )
@@ -121,7 +122,10 @@ def run(
         ml_model_idx, drift_model_idx = get_current_models(
             models, t[x_idx], last_ml_model_used, last_drift_model_used
         )
-        last_ml_model_used, drift_model_idx = ml_model_idx, drift_model_idx
+        last_ml_model_used, last_drift_model_used = (
+            ml_model_idx,
+            drift_model_idx,
+        )
         # logger.debug(ml_model_idx)
         model = models[ml_model_idx].ml_model
         drift_detector = models[drift_model_idx].drift_detector
@@ -183,6 +187,9 @@ def run(
                         models[-1].drift_detector != models[-2].drift_detector
                     )
                     assert models[-1].ml_model != models[-2].ml_model
+
+                # Avoid memory full
+                free_mem_models(models, ml_model_idx, drift_model_idx)
 
     # Save
     save_drift_run(

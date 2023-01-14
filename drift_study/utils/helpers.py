@@ -252,3 +252,13 @@ def add_model(
             end_idx,
         )
     )
+
+
+def free_mem_models(
+    models: List[DriftModel], ml_model_idx: int, drift_model_idx: int
+) -> None:
+    for i in range(len(models)):
+        if i < ml_model_idx:
+            models[i].ml_model = None
+        if i < drift_model_idx:
+            models[i].drift_detector = None
