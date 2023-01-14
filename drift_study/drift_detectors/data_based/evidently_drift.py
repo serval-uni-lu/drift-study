@@ -113,7 +113,7 @@ class EvidentlyDrift(DriftDetector):
                 pd.DataFrame(report["data_drift"]["data"]["metrics"].copy()),
             )
 
-    def needs_label(self) -> bool:
+    def needs_model(self) -> bool:
         return False
 
     @staticmethod

@@ -100,7 +100,7 @@ class TabularAlibiDrift(DriftDetector):
             ),
         }
 
-    def needs_label(self) -> bool:
+    def needs_model(self) -> bool:
         return False
 
 

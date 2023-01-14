@@ -43,7 +43,7 @@ class PeriodicDrift(DriftDetector):
 
             return True, True, pd.DataFrame()
 
-    def needs_label(self) -> bool:
+    def needs_model(self) -> bool:
         return False
 
     @staticmethod

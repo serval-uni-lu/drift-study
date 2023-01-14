@@ -394,7 +394,7 @@ class PcaCdDrift(DriftDetector):
 
         return divergence
 
-    def needs_label(self) -> bool:
+    def needs_model(self) -> bool:
         return False
 
     @staticmethod

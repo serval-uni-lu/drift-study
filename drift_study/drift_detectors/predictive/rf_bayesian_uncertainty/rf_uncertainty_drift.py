@@ -112,7 +112,7 @@ class RfUncertaintyDrift(DriftDetector):
         metrics[f"{self.uncertainty_type}_uncertainty"] = uncertainties
         return is_drift, is_warning, metrics
 
-    def needs_label(self) -> bool:
+    def needs_model(self) -> bool:
         return True
 
     @staticmethod

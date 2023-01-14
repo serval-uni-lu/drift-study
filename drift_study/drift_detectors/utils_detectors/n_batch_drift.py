@@ -61,8 +61,8 @@ class NBatchDrift(DriftDetector):
 
         return False, False, pd.DataFrame()
 
-    def needs_label(self) -> bool:
-        return self.drift_detector.needs_label()
+    def needs_model(self) -> bool:
+        return self.drift_detector.needs_model()
 
     @staticmethod
     def define_trial_parameters(

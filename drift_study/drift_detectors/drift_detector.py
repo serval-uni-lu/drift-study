@@ -54,5 +54,5 @@ class DriftDetector(ABC):
         pass
 
     @abc.abstractmethod
-    def needs_label(self) -> bool:
+    def needs_model(self) -> bool:
         pass

@@ -14,7 +14,7 @@ def get_delays(run_config: dict, drift_detector) -> Delays:
     delays = run_config.get("delays")
     label_delay = pd.Timedelta(delays.get("label"))
     drift_detection_delay = pd.Timedelta(delays.get("drift"))
-    if drift_detector.needs_label():
+    if drift_detector.needs_model():
         drift_detection_delay = drift_detection_delay + label_delay
     retraining_delay = pd.Timedelta(
         max(label_delay, drift_detection_delay)

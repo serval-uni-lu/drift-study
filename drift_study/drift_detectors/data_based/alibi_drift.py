@@ -80,7 +80,7 @@ class AlibiDrift(DriftDetector, ABC):
                 data[e] = [out["data"][e]]
             return is_drift, is_warning, pd.DataFrame.from_dict(data)
 
-    def needs_label(self) -> bool:
+    def needs_model(self) -> bool:
         return False
 
 

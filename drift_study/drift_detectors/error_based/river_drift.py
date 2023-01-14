@@ -72,7 +72,7 @@ class RiverDrift(DriftDetector, ABC):
                 was_warning = was_warning or in_warning
             return was_drift, was_warning, pd.DataFrame()
 
-    def needs_label(self) -> bool:
+    def needs_model(self) -> bool:
         return True
 
 

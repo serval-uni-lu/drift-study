@@ -36,7 +36,7 @@ class NoDetection(DriftDetector):
     ) -> Tuple[bool, bool, pd.DataFrame]:
         return False, False, pd.DataFrame()
 
-    def needs_label(self) -> bool:
+    def needs_model(self) -> bool:
         return False
 
     @staticmethod
