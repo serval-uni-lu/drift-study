@@ -126,6 +126,7 @@ def filter_config_to_run(
     configs_to_run = [optimize_configs[i] for i in configs_to_run_idx]
     for i in range(len(configs_to_run)):
         config_l = configs_to_run[i]
+        print(config_l["n_train"])
         config_l = config_l["config"]
         config_l["evaluation_params"]["last_idx"] = -1
         config_l["sub_dir_path"] = config["sub_dir_path"]
