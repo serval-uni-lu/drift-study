@@ -107,6 +107,12 @@ def filter_config_to_run(
         else:
             idx_no_run = configs_metrics[configs_group[group]][:, 0] <= 1
             pareto_rank[idx_no_run] = np.iinfo(np.int32).max
+            idx_no_run = (
+                configs_metrics[configs_group[group]][:, 0]
+                <= config["max_retrain"]
+            )
+            pareto_rank[idx_no_run] = np.iinfo(np.int32).max
+
         logger.debug(
             f"Group {group}: "
             f"{np.sum(pareto_rank <= int(config['max_pareto']))}"
