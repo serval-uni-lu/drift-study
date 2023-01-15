@@ -88,8 +88,8 @@ def group_by_idx(str_list: List[str]) -> Dict[str, npt.NDArray[np.int_]]:
 
 
 def filter_config_to_run(
-    config: Dict[str, Any], optimize_configs: List[Dict[str:Any]]
-) -> List[Dict[str:Any]]:
+    config: Dict[str, Any], optimize_configs: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
     configs_run_name = [get_run_name(e) for e in optimize_configs]
     configs_metrics = np.array([get_metrics(e) for e in optimize_configs])
 
