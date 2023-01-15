@@ -59,7 +59,9 @@ def load_config_from_dir(input_dir: str) -> List[Dict[str, Any]]:
         path for path in os.listdir(input_dir) if path.endswith(".json")
     ]
 
-    optimizer_results = [load_json(path) for path in json_files]
+    optimizer_results = [
+        load_json(f"{input_dir}/{path}") for path in json_files
+    ]
 
     return optimizer_results
 
