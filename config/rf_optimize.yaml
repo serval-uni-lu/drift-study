@@ -68,7 +68,7 @@ runs:
       - name: page_hinkley
         params:
           metric_conf:
-          name: proba_error
+            name: proba_error
 # --- DATA
   - name: data_evidently
     type: data
@@ -98,3 +98,5 @@ runs:
       - name: n_batch
       - name: rf_uncertainty
       - name: adwin
+        params:
+          metric_conf: y_scores
