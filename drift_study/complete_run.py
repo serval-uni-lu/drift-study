@@ -104,6 +104,9 @@ def filter_config_to_run(
         )
         if group == "no_detection":
             pareto_rank = np.array([1] + [np.inf] * (len(pareto_rank) - 1))
+        else:
+            idx_no_run = configs_metrics[configs_group[group]][:, 0] <= 1
+            pareto_rank[idx_no_run] = np.inf
         logger.debug(
             f"Group {group}: "
             f"{np.sum(pareto_rank <= int(config['max_pareto']))}"
