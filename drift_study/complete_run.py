@@ -99,24 +99,35 @@ def filter_config_to_run(
     configs_rank_in_group = np.full(len(optimize_configs), -1)
 
     for group in configs_group.keys():
-        pareto_rank = calc_pareto_rank(
-            configs_metrics[configs_group[group]], np.array([1, -1])
-        )
         if group == "no_detection":
-            pareto_rank = np.array([1] + [np.inf] * (len(pareto_rank) - 1))
-        else:
-            idx_no_run = configs_metrics[configs_group[group]][:, 0] <= 1
-            pareto_rank[idx_no_run] = np.iinfo(np.int32).max
-            idx_no_run = (
-                configs_metrics[configs_group[group]][:, 0]
-                >= config["max_retrain"]
+            pareto_rank = np.array(
+                [1]
+                + [np.iinfo(np.int32).max]
+                * (len(configs_rank_in_group[configs_group[group]]) - 1)
             )
-            pareto_rank[idx_no_run] = np.iinfo(np.int32).max
-
-        logger.debug(
-            f"Group {group}: "
-            f"{np.sum(pareto_rank <= int(config['max_pareto']))}"
-        )
+        else:
+            idx_to_run = np.where(
+                np.logical_and(
+                    (configs_metrics[configs_group[group]][:, 0] > 1),
+                    (
+                        configs_metrics[configs_group[group]][:, 0]
+                        <= config["max_retrain"]
+                    ),
+                )
+            )[0]
+            pareto_rank = np.full(
+                len(configs_rank_in_group[configs_group[group]]),
+                np.iinfo(np.int32).max,
+            )
+            if len(idx_to_run) > 0:
+                pareto_rank[idx_to_run] = calc_pareto_rank(
+                    configs_metrics[configs_group[group]][idx_to_run],
+                    np.array([1, -1]),
+                )
+            logger.debug(
+                f"Group {group}: "
+                f"{np.sum(pareto_rank <= int(config['max_pareto']))}"
+            )
         configs_rank_in_group[configs_group[group]] = pareto_rank
 
     configs_to_run_idx = np.arange(len(optimize_configs))
