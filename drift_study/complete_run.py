@@ -109,7 +109,7 @@ def filter_config_to_run(
             pareto_rank[idx_no_run] = np.iinfo(np.int32).max
             idx_no_run = (
                 configs_metrics[configs_group[group]][:, 0]
-                <= config["max_retrain"]
+                >= config["max_retrain"]
             )
             pareto_rank[idx_no_run] = np.iinfo(np.int32).max
 
