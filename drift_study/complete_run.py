@@ -99,6 +99,7 @@ def filter_config_to_run(
     configs_rank_in_group = np.full(len(optimize_configs), -1)
 
     for group in configs_group.keys():
+        n_train = configs_metrics[configs_group[group]][:, 0]
         if group == "no_detection":
             pareto_rank = np.array(
                 [1]
@@ -108,11 +109,8 @@ def filter_config_to_run(
         else:
             idx_to_run = np.where(
                 np.logical_and(
-                    (configs_metrics[configs_group[group]][:, 0] > 1),
-                    (
-                        configs_metrics[configs_group[group]][:, 0]
-                        <= config["max_retrain"]
-                    ),
+                    (n_train > 1),
+                    (n_train <= config["max_retrain"]),
                 )
             )[0]
             pareto_rank = np.full(
@@ -124,10 +122,13 @@ def filter_config_to_run(
                     configs_metrics[configs_group[group]][idx_to_run],
                     np.array([1, -1]),
                 )
-            logger.debug(
-                f"Group {group}: "
-                f"{np.sum(pareto_rank <= int(config['max_pareto']))}"
-            )
+        logger.debug(
+            f"Group {group} range: " f"[{np.min(n_train)}, {np.max(n_train)}]"
+        )
+        logger.debug(
+            f"Group {group}: "
+            f"{np.sum(pareto_rank <= int(config['max_pareto']))}"
+        )
         configs_rank_in_group[configs_group[group]] = pareto_rank
 
     configs_to_run_idx = np.arange(len(optimize_configs))
@@ -137,7 +138,6 @@ def filter_config_to_run(
     configs_to_run = [optimize_configs[i] for i in configs_to_run_idx]
     for i in range(len(configs_to_run)):
         config_l = configs_to_run[i]
-        print(config_l["n_train"])
         config_l = config_l["config"]
         config_l["evaluation_params"]["last_idx"] = -1
         config_l["sub_dir_path"] = config["sub_dir_path"]
