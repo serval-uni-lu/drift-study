@@ -104,10 +104,11 @@ def filter_config_to_run(
         )
         configs_rank_in_group[configs_group[group]] = pareto_rank
 
-    configs_to_run = optimize_configs[
-        configs_rank_in_group <= config["max_pareto"]
+    configs_to_run_idx = np.arange(len(optimize_configs))
+    configs_to_run_idx = configs_to_run_idx[
+        configs_rank_in_group <= int(config["max_pareto"])
     ]
-
+    configs_to_run = [optimize_configs[i] for i in configs_to_run_idx]
     for i in range(len(configs_to_run)):
         config_l = configs_to_run[i]
         config_l = config_l["config"]
@@ -143,7 +144,9 @@ def run() -> None:
     configs_to_run = filter_config_to_run(
         config, copy.deepcopy(optimize_configs)
     )
-    logger.info(f"That would run {len(configs_to_run)}")
+    logger.info(
+        f"That would run {len(configs_to_run)} out of {len(optimize_configs)}"
+    )
     if config["do_run"]:
         run_many(config, configs_to_run)
 
