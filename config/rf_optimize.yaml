@@ -99,4 +99,5 @@ runs:
       - name: rf_uncertainty
       - name: adwin
         params:
-          metric_conf: y_scores
+          metric_conf:
+            name: y_scores
