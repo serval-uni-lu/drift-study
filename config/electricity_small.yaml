@@ -1,3 +1,4 @@
 ---
 evaluation_params:
   last_idx: 15000
+  n_early_stopping: 20

@@ -2,7 +2,7 @@ import logging
 import os
 import warnings
 from multiprocessing import Lock
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import configutils
 import numpy as np
@@ -50,8 +50,7 @@ def run(
     lock_model_writing: Optional[Lock] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
     verbose=1,
-) -> Tuple[int, float]:
-
+) -> Tuple[int, Union[float, List[float]]]:
     # CONFIG
     run_config = merge_parameters(
         config.get("common_runs_params"), config.get("runs")[run_i]
@@ -64,6 +63,10 @@ def run(
     # INITIALIZE PARAMETERS
     window_size = config.get("window_size")
     predict_forward = config.get("performance").get("predict_forward")
+    n_early_stopping = config.get("evaluation_params", {}).get(
+        "n_early_stopping", 0
+    )
+    early_stopped = False
 
     # LOAD AND CREATE OBJECTS
     dataset, f_new_model, f_new_detector, x, y, t = initialize(
@@ -141,55 +144,64 @@ def run(
             predict_forward,
             last_idx,
         )
-
-        # Detect drift
-        (
-            is_drifts[x_idx],
-            is_drift_warnings[x_idx],
-            metric,
-        ) = drift_detector.update(
-            x=x.iloc[x_idx : x_idx + 1],
-            t=t[x_idx : x_idx + 1],
-            y=y[x_idx : x_idx + 1],
-            y_scores=y_scores[x_idx : x_idx + 1],
-        )
-        metrics.append(metric)
-        # Do not retrain if we are not using the latest drift model available
-        # Due to delay
-        if drift_model_idx == len(models) - 1:
-            if is_drifts[x_idx]:
-                logger.debug(f"Drift at index {x_idx}")
-                start_idx = (x_idx + 1) - window_size
-                end_idx = x_idx + 1
-                logger.debug(f"start_index {start_idx}, end_index {end_idx}.")
-
-                model_path = (
-                    f"{model_root_dir}/{dataset.name}/"
-                    f"{model_name}_{start_idx}_{end_idx}.joblib"
-                )
-                add_model(
-                    models,
-                    model_path,
-                    f_new_model,
-                    f_new_detector,
-                    x_idx,
-                    delays,
-                    x,
-                    y,
-                    t,
-                    start_idx,
-                    end_idx,
-                    lock_model_writing,
-                    list_model_writing,
-                )
-                if len(models) > 1:
-                    assert (
-                        models[-1].drift_detector != models[-2].drift_detector
+        if not early_stopped:
+            # Detect drift
+            (
+                is_drifts[x_idx],
+                is_drift_warnings[x_idx],
+                metric,
+            ) = drift_detector.update(
+                x=x.iloc[x_idx : x_idx + 1],
+                t=t[x_idx : x_idx + 1],
+                y=y[x_idx : x_idx + 1],
+                y_scores=y_scores[x_idx : x_idx + 1],
+            )
+            metrics.append(metric)
+            # Do not retrain if we are
+            # not using the latest drift model available
+            # Due to delay
+            if drift_model_idx == len(models) - 1:
+                if is_drifts[x_idx]:
+                    logger.debug(f"Drift at index {x_idx}")
+                    start_idx = (x_idx + 1) - window_size
+                    end_idx = x_idx + 1
+                    logger.debug(
+                        f"start_index {start_idx}, end_index {end_idx}."
                     )
-                    assert models[-1].ml_model != models[-2].ml_model
 
-                # Avoid memory full
-                free_mem_models(models, ml_model_idx, drift_model_idx)
+                    model_path = (
+                        f"{model_root_dir}/{dataset.name}/"
+                        f"{model_name}_{start_idx}_{end_idx}.joblib"
+                    )
+                    add_model(
+                        models,
+                        model_path,
+                        f_new_model,
+                        f_new_detector,
+                        x_idx,
+                        delays,
+                        x,
+                        y,
+                        t,
+                        start_idx,
+                        end_idx,
+                        lock_model_writing,
+                        list_model_writing,
+                    )
+                    if len(models) > 1:
+                        assert (
+                            models[-1].drift_detector
+                            != models[-2].drift_detector
+                        )
+                        assert models[-1].ml_model != models[-2].ml_model
+
+                    # Avoid memory full
+                    free_mem_models(models, ml_model_idx, drift_model_idx)
+                    # Early stop
+                    if (0 <= n_early_stopping) and (
+                        n_early_stopping <= len(models)
+                    ):
+                        early_stopped = True
 
     # Save
     save_drift_run(
@@ -212,11 +224,28 @@ def run(
     prediction_metric = create_metric(config["evaluation_params"]["metric"])
     if isinstance(prediction_metric, PredClassificationMetric):
         y_scores = np.argmax(y_scores, axis=1)
-    metric = float(
-        prediction_metric.compute(
-            y[window_size:last_idx], y_scores[window_size:last_idx]
+
+    val_test_idx = config["evaluation_params"].get("val_test_idx")
+    if val_test_idx is None:
+        metric = float(
+            prediction_metric.compute(
+                y[window_size:last_idx], y_scores[window_size:last_idx]
+            )
         )
-    )
+    else:
+        metric_idxs = [
+            (window_size, last_idx),
+            (window_size, val_test_idx),
+            (val_test_idx, last_idx),
+        ]
+        metric = [
+            float(
+                prediction_metric.compute(
+                    y[m_idx_start:m_idx_end], y_scores[m_idx_start:m_idx_end]
+                )
+            )
+            for m_idx_start, m_idx_end in metric_idxs
+        ]
 
     return n_train, metric
 
