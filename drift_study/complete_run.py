@@ -139,7 +139,11 @@ def filter_config_to_run(
     for i in range(len(configs_to_run)):
         config_l = configs_to_run[i]
         config_l = config_l["config"]
+        config_l["evaluation_params"]["val_test_idx"] = config_l[
+            "evaluation_params"
+        ]["last_idx"]
         config_l["evaluation_params"]["last_idx"] = -1
+        config_l["evaluation_params"]["n_early_stopping"] = -1
         config_l["sub_dir_path"] = config["sub_dir_path"]
         configs_to_run[i] = config_l
 
