@@ -2,14 +2,12 @@ from typing import Dict, List
 
 import numpy as np
 
-from .constants import Uncertainty
-
 
 def calculate_entropy_uncertainties(
     labels: list,
     list_end_leafs: np.ndarray,
     leafs_split: List[Dict[int, List[int]]],
-) -> Uncertainty:
+):
 
     max_leaf_n = max([max([*e.keys()]) for e in leafs_split]) + 1
     np_leafs_split = np.full(

@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
-from .constants import Uncertainty
 from .uncertainty_utils import calculate_entropy_uncertainties
 
 
@@ -26,9 +25,7 @@ class RandomForestClassifierWithUncertainty:
         # summarize the features used in the trees:
         # self.used_features = self._output_used_features(X)
 
-    def predict_with_uncertainty(
-        self, x_test
-    ) -> (np.ndarray, List[Uncertainty]):
+    def predict_with_uncertainty(self, x_test) -> (np.ndarray, np.ndarray):
         predictions = self.rf.predict(x_test)
         end_leafs = self.rf.apply(x_test)
         uncertainties = self._extract_uncertainty_of_prediction(
@@ -38,7 +35,7 @@ class RandomForestClassifierWithUncertainty:
 
     def predict_proba_with_uncertainty(
         self, x_test
-    ) -> (np.ndarray, List[Uncertainty]):
+    ) -> (np.ndarray, np.ndarray):
         predictions = self.predict_proba_1d(x_test)
         end_leafs = self.rf.apply(x_test)
         uncertainties = self._extract_uncertainty_of_prediction(
@@ -141,7 +138,7 @@ class RandomForestClassifierWithUncertainty:
 
     def _extract_uncertainty_of_prediction(
         self, end_leafs, method="entropy"
-    ) -> List[Uncertainty]:
+    ) -> np.ndarray:
         """
         Using the method specified calculate the uncertainty of a prediction
         that was made
