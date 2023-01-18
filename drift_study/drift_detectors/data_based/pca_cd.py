@@ -403,7 +403,7 @@ class PcaCdDrift(DriftDetector):
     ) -> Dict[str, Any]:
         return {
             "divergence_metric": trial.suggest_categorical(
-                "divergence_metric", ["js", "mkl", "intersection"]
+                "divergence_metric", ["mkl", "intersection"]
             ),
             "ev_threshold": trial.suggest_float("ev_threshold", 0.5, 1 - 1e-6),
             "delta": trial.suggest_float("delta", 1e-4, 0.2),
