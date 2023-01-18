@@ -71,9 +71,7 @@ class RfUncertaintyDrift(DriftDetector):
         ) = self.rf_uncertainty.predict_proba_with_uncertainty(
             self.model.transform(x)
         )
-        uncertainties = [
-            e[UNCERTAINTY_TYPE[self.uncertainty_type]] for e in uncertainties
-        ]
+        uncertainties = uncertainties[UNCERTAINTY_TYPE[self.uncertainty_type]]
         x_new = pd.DataFrame.from_dict({"uncertainty": uncertainties})
         y_scores_new = np.array(uncertainties)
         self.drift_detector.fit(
@@ -100,9 +98,7 @@ class RfUncertaintyDrift(DriftDetector):
             self.model.transform(x)
         )
 
-        uncertainties = [
-            e[UNCERTAINTY_TYPE[self.uncertainty_type]] for e in uncertainties
-        ]
+        uncertainties = [UNCERTAINTY_TYPE[self.uncertainty_type]]
         x_new = pd.DataFrame.from_dict({"uncertainty": uncertainties})
         y_scores_new = np.array(uncertainties)
 

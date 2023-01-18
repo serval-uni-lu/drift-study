@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Feb 2022
-@author: Dina Berenbaum
-"""
-
 from typing import Dict, List
 
 import numpy as np
@@ -13,79 +7,33 @@ from .constants import Uncertainty
 
 def calculate_entropy_uncertainties(
     labels: list,
-    end_leafs: np.ndarray,
+    list_end_leafs: np.ndarray,
     leafs_split: List[Dict[int, List[int]]],
 ) -> Uncertainty:
-    """
-    Based on the paper Shaker MH, Hüllermeier E. Aleatoric and epistemic
-    uncertainty with random forests. In International Symposium on
-    Intelligent Data Analysis 2020 Apr 27 (pp. 444-456). Springer, Cham. (
-    https://arxiv.org/pdf/2001.00893.pdf) Given a single sample x,
-    we calculate three types of uncertainties: 1. total 2. aleatoric (
-    statistical) 3. epistemic (information related) 1. This is the **total
-    uncertainty estimation using entropy**. For discrete labels this is H[p(y
-    | x)]=−∑y∈Y p(y | x) log2 p(y | x), An approximaton for ensemble
-    techniques (and what we calculate here) is: −∑y∈Y (1/M * ∑i∈M p(y | hi,
-    x) log2 (1/M * ∑i∈M p(y | hi, x)) 2. The aleatoric uncertainty can be
-    estimated by: −(1/M * ∑i∈M ∑y∈Yp(y | hi, x) log2 p(y | hi, x) 3. The
-    epistemic uncertainty, which is the subtraction of total − aleatoric
-    :param labels: a list with all the possible labels
-    :param end_leafs: a
-    list with all the leafs our sample ends up in, one per each tree in the
-    ensemble.
-    :param leafs_split: a summary of training samples ended up in
-    each leaf and their split between classes. This is a list of dictionaries
-    the length of all trees. Each dictionary points from leaf number to a
-    list [n_neg, n_pos] such that n_neg is the number of negative samples in
-    this leaf and n_pos is the number of positive samples in this leaf. Σ (
-    n_neg+n_pos) in each dict should equal to X_train.shape[0].
-    :return: A
-    named tuple with the three uncertainties calculated
-    """
+
+    max_leaf_n = max([max([*e.keys()]) for e in leafs_split]) + 1
+    np_leafs_split = np.full(
+        ((len(leafs_split)), max_leaf_n, len(labels)), np.nan
+    )
+    for i, e in enumerate(leafs_split):
+        np_leafs_split[i, [*e.keys()]] = np.array([*e.values()])
+
     n_labels = len(labels)
-    tot_u = 0  # total uncertainty
-    al_u = 0  # aleatoric uncertainty
-    for label in labels:  # go over the labels
-        tot_p = 0  # total uncertainty
-        tot_p_log_p = 0  # helper for aleatoric uncertainty
-        for tree_leafs_split, end_leaf in zip(
-            leafs_split, end_leafs
-        ):  # go over all the hypotheses (trees)
-            # We first want to calculate p(y | hi, x) for each tree ('hi'),
-            # based on the leaf where each sample ends up. In random forest
-            # this is the (n_(i,j)(y) + 1) / (n_(i,j) + |Y|), where n_(i,
-            # j) are the number of samples in tree i, leaf j and n_(i,
-            # j)(y) are the number of samples in tree i, leaf j with label y
-            p = _calculate_class_conditional_probabilities(
-                label, n_labels, end_leaf, tree_leafs_split
-            )
-            tot_p += p
-            tot_p_log_p += p * np.log2(p)
 
-        # Total uncertainty for label i:
-        mean_tot_p = tot_p / len(end_leafs)  # get the average over all trees
-        log_mean_tot_p = np.log2(mean_tot_p)
-        tot_u -= mean_tot_p * log_mean_tot_p
+    n_y = np_leafs_split[np.arange(len(np_leafs_split)), list_end_leafs]
+    n_y_s = np.sum(n_y, axis=2).reshape(-1, len(np_leafs_split), 1)
 
-        # Aleatoric uncertainty for label i:
-        mean_tot_p_log_p = tot_p_log_p / len(
-            end_leafs
-        )  # get the average over all trees
-        al_u -= mean_tot_p_log_p
-    return Uncertainty(tot_u, al_u, tot_u - al_u)
+    class_conditional_probabilities = (n_y + 1) / (n_y_s + n_labels)
+    p = class_conditional_probabilities
+    p_log_p = p * np.log2(p)
+    # tot_p = np.sum(p, axis=1)
+    # tot_p_log_p = np.sum(p_log_p, axis=1)
 
+    mean_tot_p = np.mean(p, axis=1)
+    mean_tot_p_log_p = np.mean(p_log_p, axis=1) / len(leafs_split)
 
-def _calculate_class_conditional_probabilities(
-    label, n_labels, end_leaf, tree_leafs_split
-) -> float:
-    """
-    We calculate p(y | hi, x) for a given label y and a specific model(tree).
-    :param label: label number∈[0,1,2,...], corresponds to the index in
-    leaf_split to recover the number of training sample in a leaf with this
-    label
-    :param n_labels: total number of possible labels (i.e. for binary
-    this would be 2)
-    """
-    n_y = tree_leafs_split[end_leaf][label]
-    n = sum(tree_leafs_split[end_leaf])
-    return (n_y + 1) / (n + n_labels)
+    log_mean_tot_p = np.log2(mean_tot_p)
+    tot_u_new = np.sum(-mean_tot_p * log_mean_tot_p, axis=1)
+    al_u_new = np.sum(-mean_tot_p_log_p, axis=1)
+
+    return tot_u_new, tot_u_new - al_u_new, al_u_new

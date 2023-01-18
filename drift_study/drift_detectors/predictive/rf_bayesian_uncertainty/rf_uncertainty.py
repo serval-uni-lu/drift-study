@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-
-"""
-Created on Feb 2022
-@author: Dina Berenbaum
-"""
 from collections import OrderedDict
 from typing import Dict, List
 
@@ -156,12 +150,9 @@ class RandomForestClassifierWithUncertainty:
         """
         uncertainty = []
         if method == "entropy":
-            for row in end_leafs:  # each row is the result for one sample
-                uncertainty.append(
-                    calculate_entropy_uncertainties(
-                        self._labels, row, self.leafs_content
-                    )
-                )
+            uncertainty = calculate_entropy_uncertainties(
+                self._labels, end_leafs, self.leafs_content
+            )
         else:
             raise NotImplementedError
         return uncertainty
