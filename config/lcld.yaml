@@ -3,7 +3,8 @@ window_size: 100000
 performance:
   predict_forward: 50000
   n_jobs: 10
-  n_jobs_optimiser: -40
+  n_jobs_optimiser: 17
+  inner_max_num_threads: 10
 experience:
   random_state: 42
 evaluation_params:
@@ -21,7 +22,7 @@ common_runs_params:
   delays:
     label: 10days
     drift: 0
-    retraining: 1W
+    retraining: 1M
 trial_params:
   n_trials: 100
   period:

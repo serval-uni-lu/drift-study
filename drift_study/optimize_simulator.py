@@ -8,7 +8,7 @@ import configutils
 import joblib
 import optuna
 from configutils.utils import merge_parameters
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, parallel_backend
 from mlc.load_do_save import save_json
 from optuna._callbacks import MaxTrialsCallback, RetryFailedTrialCallback
 from optuna.samplers import TPESampler
@@ -177,6 +177,9 @@ def run_many() -> None:
     config_all = configutils.get_config()
 
     n_jobs_optimiser = config_all["performance"].get("n_jobs_optimiser", 1)
+    inner_max_num_threads = config_all["performance"].get(
+        "inner_max_num_threads", 1
+    )
 
     if n_jobs_optimiser == 1:
         logger.info("Running in sequence.")
@@ -187,11 +190,13 @@ def run_many() -> None:
         with Manager() as manager:
             lock = manager.Lock()
             dico = manager.dict()
-
-            Parallel(n_jobs=n_jobs_optimiser)(
-                delayed(run)(config_all, i, lock, dico)
-                for i in trange(len(config_all.get("runs")), position=0)
-            )
+            with parallel_backend(
+                "loky", inner_max_num_threads=inner_max_num_threads
+            ):
+                Parallel(n_jobs=n_jobs_optimiser,)(
+                    delayed(run)(config_all, i, lock, dico)
+                    for i in trange(len(config_all.get("runs")), position=0)
+                )
 
 
 if __name__ == "__main__":
