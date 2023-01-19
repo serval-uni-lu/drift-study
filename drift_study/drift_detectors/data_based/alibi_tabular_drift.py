@@ -95,9 +95,6 @@ class TabularAlibiDrift(DriftDetector):
             "correction": trial.suggest_categorical(
                 "correction", ["bonferroni", "fdr"]
             ),
-            "alternative": trial.suggest_categorical(
-                "alternative", ["two-sided", "less", "greater"]
-            ),
         }
 
     def needs_model(self) -> bool:
