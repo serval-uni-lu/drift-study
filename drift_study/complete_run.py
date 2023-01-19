@@ -100,6 +100,7 @@ def filter_config_to_run(
 
     for group in configs_group.keys():
         n_train = configs_metrics[configs_group[group]][:, 0]
+        range_before = [np.min(n_train), np.max(n_train)]
         if group == "no_detection":
             pareto_rank = np.array(
                 [1]
@@ -122,12 +123,11 @@ def filter_config_to_run(
                     configs_metrics[configs_group[group]][idx_to_run],
                     np.array([1, -1]),
                 )
+        range_after = [np.min(n_train), np.max(n_train)]
+        nb_train = np.sum(pareto_rank <= int(config["max_pareto"]))
         logger.debug(
-            f"Group {group} range: " f"[{np.min(n_train)}, {np.max(n_train)}]"
-        )
-        logger.debug(
-            f"Group {group}: "
-            f"{np.sum(pareto_rank <= int(config['max_pareto']))}"
+            f"Group {group} range: "
+            f"{range_before} => {range_after} = {nb_train}"
         )
         configs_rank_in_group[configs_group[group]] = pareto_rank
 
