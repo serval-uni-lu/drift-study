@@ -133,7 +133,7 @@ class PcaCdDrift(DriftDetector):
         self.num_pcs = len(self._pca.components_)
 
         self._drift_detection_monitor = PageHinkley(
-            delta=self.delta, threshold=self.ph_threshold, min_instances=0
+            delta=self.delta, threshold=self.ph_threshold, min_instances=10
         )
 
         # Project ref window onto PCs

@@ -104,12 +104,7 @@ class AdwinDrift(RiverDrift):
     ) -> Dict[str, Any]:
         return {
             "delta": trial.suggest_float("delta", 1e-6, 1 - 1e-6),
-            "clock": trial.suggest_int("clock", 1, 1024),
-            "max_buckets": trial.suggest_int("max_buckets", 1, 100),
-            "min_window_length": trial.suggest_int(
-                "min_window_length", 1, 100
-            ),
-            "grace_period": trial.suggest_int("grace_period", 1, 100),
+            "grace_period": trial.suggest_int("grace_period", 10, 1000),
         }
 
 
@@ -135,9 +130,9 @@ class DdmDrift(RiverDrift):
         trial: optuna.Trial, trial_params: Dict[str, Any]
     ) -> Dict[str, Any]:
         return {
-            "warm_start": trial.suggest_int("warm_start", 1, 100),
+            "warm_start": trial.suggest_int("warm_start", 30, 1000),
             "drift_threshold": trial.suggest_float(
-                "warning_threshold", 2e-1, 2e1
+                "drift_threshold", 3e-1, 3e1
             ),
         }
 
@@ -166,7 +161,7 @@ class EddmDrift(RiverDrift):
         beta = trial.suggest_float("beta", 0, 1)
         alpha = beta
         return {
-            "warm_start": trial.suggest_int("warm_start", 1, 100),
+            "warm_start": trial.suggest_int("warm_start", 30, 1000),
             "beta": beta,
             "alpha": alpha,
         }
@@ -195,7 +190,6 @@ class HdddmADrift(RiverDrift):
     ) -> Dict[str, Any]:
         return {
             "drift_confidence": trial.suggest_float("drift_confidence", 0, 1),
-            "two_sided_test": bool(trial.suggest_int("two_sided_test", 0, 1)),
         }
 
 
@@ -225,7 +219,6 @@ class HdddmWDrift(RiverDrift):
         return {
             "drift_confidence": trial.suggest_float("drift_confidence", 0, 1),
             "lambda_val": trial.suggest_float("lambda_val", 0, 1),
-            "two_sided_test": bool(trial.suggest_int("two_sided_test", 0, 1)),
         }
 
 
@@ -233,7 +226,7 @@ class KswinDrift(RiverDrift):
     def __init__(
         self,
         alpha: float = 0.005,
-        window_size: int = 100,
+        ks_window_size: int = 100,
         stat_size: int = 30,
         metric_conf=None,
         seed: int = 42,
@@ -241,7 +234,7 @@ class KswinDrift(RiverDrift):
     ):
         internal_args = {
             "alpha": alpha,
-            "window_size": window_size,
+            "window_size": ks_window_size,
             "stat_size": stat_size,
             "seed": seed,
         }
@@ -255,7 +248,8 @@ class KswinDrift(RiverDrift):
     ) -> Dict[str, Any]:
         return {
             "alpha": trial.suggest_float("alpha", 1e-6, 2e-2),
-            "stat_size": trial.suggest_int("stat_size", 10, int(1e3)),
+            "stat_size": trial.suggest_int("stat_size", 15, int(1e3)),
+            "ks_window_size": trial.suggest_int("stat_size", 50, int(1e3)),
         }
 
 
@@ -288,11 +282,10 @@ class PageHinkleyDrift(RiverDrift):
         trial: optuna.Trial, trial_params: Dict[str, Any]
     ) -> Dict[str, Any]:
         return {
-            "min_instances": trial.suggest_int("min_instances", 1, int(1e3)),
+            "min_instances": trial.suggest_int("min_instances", 30, int(1e3)),
             "delta": trial.suggest_float("delta", 1e-6, 1e-2),
             "threshold": trial.suggest_float("threshold", 1, 5e2),
-            "alpha": trial.suggest_float("alpha", 1e-2, 1 - 1e-9),
-            "mode": trial.suggest_categorical("mode", ["up", "down", "both"]),
+            "alpha": trial.suggest_float("alpha", 1 - 1e-1, 1 - 1e-9),
         }
 
 

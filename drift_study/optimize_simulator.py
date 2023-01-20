@@ -134,7 +134,7 @@ def run(
     if os.path.exists(sampler_path):
         sampler = joblib.load(sampler_path)
     else:
-        sampler = TPESampler(n_startup_trials=5, seed=42)
+        sampler = TPESampler(n_startup_trials=5, seed=42, multivariate=True)
         joblib.dump(
             sampler,
             sampler_path,

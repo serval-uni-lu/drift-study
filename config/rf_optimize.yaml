@@ -75,16 +75,19 @@ runs:
     detectors:
       - name: n_batch
       - name: evidently
-  - name: pca_cd
-    type: data
-    detectors:
-      - name: n_batch
-      - name: pca_cd
+
   - name: tabular_alibi
     type: data
     detectors:
       - name: n_batch
       - name: tabular_alibi
+  - name: pca_cd
+    type: data
+    detectors:
+      - name: n_batch
+        params:
+          batch_size: 50
+      - name: pca_cd
 ## ------------ PREDICTIVE
   - name: aries_all
     type: predictive
