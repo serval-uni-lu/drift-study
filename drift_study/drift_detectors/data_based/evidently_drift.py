@@ -6,9 +6,8 @@ import numpy.typing as npt
 import optuna
 import pandas as pd
 from evidently import ColumnMapping
-from evidently.model_profile import Profile
-from evidently.model_profile.sections import DataDriftProfileSection
-from evidently.options import DataDriftOptions
+from evidently.metric_preset import DataDriftPreset
+from evidently.report import Report
 from mlc.models.model import Model
 
 from drift_study.drift_detectors.drift_detector import (
@@ -25,7 +24,8 @@ class EvidentlyDrift(DriftDetector):
         window_size: int,
         numerical_features: List[str] = None,
         categorical_features: List[str] = None,
-        threshold: float = 0.05,
+        num_threshold: float = 0.05,
+        cat_threshold: float = 0.05,
         drift_share: float = 0.5,
         fit_first_update: bool = False,
         **kwargs: Dict[str, Any],
@@ -34,7 +34,8 @@ class EvidentlyDrift(DriftDetector):
             window_size=window_size,
             numerical_features=numerical_features,
             categorical_features=categorical_features,
-            threshold=threshold,
+            num_threshold=num_threshold,
+            cat_threshold=cat_threshold,
             drift_share=drift_share,
             **kwargs,
         )
@@ -42,8 +43,10 @@ class EvidentlyDrift(DriftDetector):
         self.numerical_features = numerical_features
         self.categorical_features = categorical_features
         self.drift_share = drift_share
+        self.num_threshold = num_threshold
+        self.cat_threshold = cat_threshold
 
-        self.drift_detector: Optional[Profile] = None
+        self.drift_detector: Optional[Report] = None
         self.column_mapping = ColumnMapping()
 
         self.x_ref = pd.DataFrame()
@@ -60,11 +63,14 @@ class EvidentlyDrift(DriftDetector):
         model: Optional[Model],
     ) -> None:
 
-        options = [DataDriftOptions(drift_share=self.drift_share)]
-        self.drift_detector = Profile(
-            sections=[DataDriftProfileSection()], options=options
+        metric = DataDriftPreset(
+            drift_share=self.drift_share,
+            num_stattest="wasserstein",
+            num_stattest_threshold=self.num_threshold,
+            cat_stattest="jensenshannon",
+            cat_stattest_threshold=self.cat_threshold,
         )
-
+        self.drift_detector = Report(metrics=[metric])
         self.column_mapping = ColumnMapping()
         self.column_mapping.numerical_features = self.numerical_features
         self.column_mapping.categorical_features = self.categorical_features
@@ -94,23 +100,23 @@ class EvidentlyDrift(DriftDetector):
                 ]
             )[-self.window_size :]
 
-            self.drift_detector.calculate(
-                self.x_ref,
-                self.x_last,
+            self.drift_detector.run(
+                reference_data=self.x_ref,
+                current_data=self.x_last,
                 column_mapping=self.column_mapping,
             )
-            report = self.drift_detector.object()
-            in_drift = report["data_drift"]["data"]["metrics"]["dataset_drift"]
+            report = self.drift_detector.as_dict()
+
+            in_drift = report["metrics"][0]["result"]["dataset_drift"]
             in_warning = (
-                report["data_drift"]["data"]["metrics"]["n_drifted_features"]
-                > 0
+                report["metrics"][0]["result"]["number_of_drifted_columns"] > 0
             )
 
             self.is_first_update = False
             return (
                 in_drift,
                 in_warning,
-                pd.DataFrame(report["data_drift"]["data"]["metrics"].copy()),
+                pd.DataFrame(),
             )
 
     def needs_model(self) -> bool:
@@ -121,7 +127,12 @@ class EvidentlyDrift(DriftDetector):
         trial: optuna.Trial, trial_params: Dict[str, Any]
     ) -> Dict[str, Any]:
         return {
-            "threshold": trial.suggest_float("p_val", 1e-4, 0.1),
+            "cat_threshold": trial.suggest_float(
+                "categorical_threshold", 1e-6, 0.5
+            ),
+            "num_threshold": trial.suggest_float(
+                "numerical_threshold", 1e-6, 0.5
+            ),
             "drift_share": trial.suggest_float("drift_share", 1e-6, 1),
         }
 

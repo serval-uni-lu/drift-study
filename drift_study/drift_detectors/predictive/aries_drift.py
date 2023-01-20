@@ -105,10 +105,9 @@ class AriesDrift(DriftDetector):
     def define_trial_parameters(
         trial: optuna.Trial, trial_params: Dict[str, Any]
     ) -> Dict[str, Any]:
+        if trial_params["model_type"] == "random_forest":
+            return {}
         return {
-            "accuracy_type": trial.suggest_categorical(
-                "accuracy_type", [0, 1, 2]
-            ),
             "section_num": trial.suggest_int("section_num", 10, 100),
         }
 
