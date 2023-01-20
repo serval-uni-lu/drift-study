@@ -10,10 +10,10 @@ import optuna
 from configutils.utils import merge_parameters
 from joblib import Parallel, delayed, parallel_backend
 from mlc.load_do_save import save_json
+from optuna import Study
 from optuna._callbacks import MaxTrialsCallback, RetryFailedTrialCallback
 from optuna.samplers import TPESampler
-from optuna.trial import TrialState
-from tqdm import tqdm, trange
+from optuna.trial import FrozenTrial, TrialState
 
 from drift_study import run_simulator
 from drift_study.drift_detectors.drift_detector_factory import (
@@ -148,29 +148,32 @@ def run(
         load_if_exists=True,
     )
     n_to_finish = config["trial_params"]["n_trials"]
-    with tqdm(total=n_to_finish, position=run_i + 1) as pbar:
-        pbar.set_description(f"Processing {study_name}")
-        n_completed = len(study.get_trials(states=(TrialState.COMPLETE,)))
-        pbar.update(n_completed)
-        if n_completed < n_to_finish:
-            study.optimize(
-                lambda trial_l: execute_one_trial(
-                    trial_l,
-                    config,
-                    run_config,
-                    list_drift_detector,
-                    lock_model_writing,
-                    list_model_writing,
+    n_completed = len(study.get_trials(states=(TrialState.COMPLETE,)))
+    print(f"Completed {study_name}: {n_completed}")
+
+    def logger_done_callback(study_l: Study, frozen_trial: FrozenTrial):
+        n_done = len(study_l.get_trials(states=(TrialState.COMPLETE,)))
+        print(f"Completed {study_name}: {n_done}")
+
+    if n_completed < n_to_finish:
+        study.optimize(
+            lambda trial_l: execute_one_trial(
+                trial_l,
+                config,
+                run_config,
+                list_drift_detector,
+                lock_model_writing,
+                list_model_writing,
+            ),
+            callbacks=[
+                MaxTrialsCallback(
+                    config["trial_params"]["n_trials"],
+                    states=(TrialState.COMPLETE,),
                 ),
-                callbacks=[
-                    MaxTrialsCallback(
-                        config["trial_params"]["n_trials"],
-                        states=(TrialState.COMPLETE,),
-                    ),
-                    lambda *_: joblib.dump(sampler, sampler_path),
-                    lambda *_: pbar.update(1),
-                ],
-            )
+                lambda *_: joblib.dump(sampler, sampler_path),
+                logger_done_callback,
+            ],
+        )
 
 
 def run_many() -> None:
@@ -195,7 +198,7 @@ def run_many() -> None:
             ):
                 Parallel(n_jobs=n_jobs_optimiser,)(
                     delayed(run)(config_all, i, lock, dico)
-                    for i in trange(len(config_all.get("runs")), position=0)
+                    for i in range(len(config_all.get("runs")), position=0)
                 )
 
 
