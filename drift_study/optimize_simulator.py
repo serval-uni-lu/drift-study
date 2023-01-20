@@ -198,7 +198,7 @@ def run_many() -> None:
             ):
                 Parallel(n_jobs=n_jobs_optimiser,)(
                     delayed(run)(config_all, i, lock, dico)
-                    for i in range(len(config_all.get("runs")), position=0)
+                    for i in range(len(config_all.get("runs")))
                 )
 
 
