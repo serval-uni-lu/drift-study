@@ -246,10 +246,12 @@ class KswinDrift(RiverDrift):
     def define_trial_parameters(
         trial: optuna.Trial, trial_params: Dict[str, Any]
     ) -> Dict[str, Any]:
+        ks_window_size = trial.suggest_int("ks_window_size", 50, int(1e3))
+        stat_size = int(ks_window_size / 3)
         return {
             "alpha": trial.suggest_float("alpha", 1e-6, 2e-2),
-            "stat_size": trial.suggest_int("stat_size", 15, int(1e3)),
-            "ks_window_size": trial.suggest_int("stat_size", 50, int(1e3)),
+            "stat_size": stat_size,
+            "ks_window_size": ks_window_size,
         }
 
 
