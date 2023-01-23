@@ -28,3 +28,4 @@ trial_params:
   period:
     min: 5000
     max: 500000
+  model_type: random_forest
