@@ -6,11 +6,11 @@ authors = ["Thibault Simonetto <thibault.simonetto.001@student.uni.lu>"]
 
 [tool.poetry.dependencies]
 python = "3.8.10"
-scikit-learn = "1.1.0"
+scikit-learn = "1.1.3"
 tqdm = "^4.64.0"
 h5py = "^3.6.0"
 river = "^0.14.0"
-evidently = "^0.1.50-alpha.0"
+evidently = "0.2.1"
 serval-config-utils = "^0.1.4"
 serval-ml-commons = {path = "../mlc/", develop = true }
 frouros = "^0.1.0"
