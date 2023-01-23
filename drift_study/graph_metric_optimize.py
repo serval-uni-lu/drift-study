@@ -1,4 +1,5 @@
 import glob
+from pathlib import Path
 from typing import Any, Dict
 
 import configutils
@@ -16,9 +17,13 @@ def filter_conf(conf_results: Dict[str, Any]) -> Dict[str, Any]:
     detector_name = "_".join(
         [e["name"] for e in conf_results["config"]["runs"][0]["detectors"]]
     )
+    if isinstance(conf_results["ml_metric"], list):
+        ml_metric = conf_results["ml_metric"][2]
+    else:
+        ml_metric = conf_results["ml_metric"]
     out = {
         "n_train": conf_results["n_train"],
-        "ml_metric": conf_results["ml_metric"],
+        "ml_metric": ml_metric,
         "detector_type": conf_results["config"]["runs"][0]["type"],
         "detector_name": detector_name,
         "params": conf_results["config"]["runs"][0]["detectors"][-1].get(
@@ -33,6 +38,7 @@ def run() -> None:
     print(config)
 
     input_dir = config["input_dir"]
+    output_file = config.get("output_file", None)
     n_jobs = config.get("n_jobs", 1)
 
     list_files = glob.glob(f"{input_dir}/*.json")
@@ -57,7 +63,10 @@ def run() -> None:
         hover_data=["detector_name"],
     )
     print(df["pareto_rank"].max())
-    fig.show()
+    if output_file is not None:
+        Path(output_file).parent.mkdir(parents=True, exist_ok=True)
+        fig.write_html(output_file)
+    # fig.show()
 
 
 if __name__ == "__main__":
