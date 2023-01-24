@@ -77,14 +77,18 @@ def load_config_eval(
     test_i = np.arange(len(y))[config.get("window_size") :]
     batch_size = config["evaluation_params"]["batch_size"]
     batch_size_min = config["evaluation_params"].get("batch_size", 0)
+    last_idx = config["evaluation_params"].get("last_idx", -1)
+    if last_idx > -1:
+        test_i = test_i[: last_idx - config.get("window_size")]
     if isinstance(batch_size, int):
         length = len(test_i) - (len(test_i) % batch_size)
         index_batches = np.split(test_i[:length], int(length / batch_size))
     if isinstance(batch_size, str):
+
         d = dataset.get_x_y_t()[2].iloc[test_i]
         d = pd.DataFrame(d, columns=["DATE"])
         d = d.groupby(pd.Grouper(key="DATE", axis=0, freq=batch_size)).size()
-        last_idx = config["window_size"]
+
         index_batches = []
         for e in d:
             if e >= batch_size_min:
