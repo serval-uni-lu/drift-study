@@ -1,0 +1,55 @@
+---
+window_size: 20000
+performance:
+  predict_forward: 5000
+  n_jobs: 2
+  n_jobs_optimiser: 5
+experience:
+  random_state: 42
+evaluation_params:
+  reference_methods:
+    - no_detection
+  batch_size: 1000
+  rolling: False
+  significance: 0.0
+  metric:
+    name: accuracy
+  n_score: 41
+dataset:
+  name: huffpost
+  data:
+    source:
+      file:
+        path: ./data/mlc/huffpost/huffpost.csv
+  metadata:
+    source:
+      file:
+        path: ./data/mlc/huffpost/huffpost_metadata.csv
+  tasks:
+    - name: category
+      task_type: classification,
+      evaluation_metric: accuracy,
+  sorter:
+    date: date
+common_detectors_params:
+  batch_size: 1000
+common_runs_params:
+  delays:
+    label: 6M
+    drift: 0
+    retraining: 4W
+  model:
+    source: drift_study.model_arch.arxiv_models
+    name: arxiv_bert
+trial_params:
+  n_trials: 100
+  period:
+    min: 1000
+    max: 20000
+runs:
+# ------------ NO Drift
+  - name: no_detection
+    type: baseline
+    detectors:
+      - name: no_detection
+sub_dir_path: testing
