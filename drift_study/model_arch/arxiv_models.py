@@ -3,7 +3,8 @@ from typing import Any, Optional, Union
 import numpy as np
 import numpy.typing as npt
 from mlc.models.torch_models import BaseModelTorch
-from wildtime.networks.article import ArticleNetwork
+
+from drift_study.model_arch.arxiv_networks import ArticleNetwork
 
 
 class ArxivModel(BaseModelTorch):
