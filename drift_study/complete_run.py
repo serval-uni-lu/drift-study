@@ -124,10 +124,11 @@ def filter_config_to_run(
                     np.array([1, -1]),
                 )
         range_after = [np.min(n_train), np.max(n_train)]
+        nb_train_before = len(pareto_rank)
         nb_train = np.sum(pareto_rank <= int(config["max_pareto"]))
         logger.debug(
             f"Group {group} range: "
-            f"{range_before} => {range_after} = {nb_train}"
+            f"{nb_train_before}: {range_before} => {range_after}: {nb_train}"
         )
         configs_rank_in_group[configs_group[group]] = pareto_rank
 
