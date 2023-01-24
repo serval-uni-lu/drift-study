@@ -25,6 +25,7 @@ class ArxivModel(BaseModelTorch):
             epochs,
             early_stopping_rounds,
             learning_rate,
+            val_batch_size=512,
             class_weight=None,
             # force_device="cpu",
             is_text=True,
