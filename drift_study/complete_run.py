@@ -146,6 +146,14 @@ def filter_config_to_run(
         config_l["evaluation_params"]["last_idx"] = -1
         config_l["evaluation_params"]["n_early_stopping"] = -1
         config_l["sub_dir_path"] = config["sub_dir_path"]
+
+        retraining_delay = config.get("retraining_delay")
+        if retraining_delay is not None:
+            config_l["common_runs_params"]["delays"][
+                "retraining"
+            ] = retraining_delay
+            config_l["runs"][0]["delays"]["retraining"] = retraining_delay
+
         configs_to_run[i] = config_l
 
     return configs_to_run
