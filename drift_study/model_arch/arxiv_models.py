@@ -10,10 +10,10 @@ from drift_study.model_arch.arxiv_networks import ArticleNetwork
 class ArxivModel(BaseModelTorch):
     def __init__(
         self,
-        batch_size: int = 512,
-        epochs: int = 10,
-        early_stopping_rounds: int = 2,
-        learning_rate: float = 0.001,
+        batch_size: int = 32,
+        epochs: int = 1,
+        early_stopping_rounds: int = 0,
+        learning_rate: float = 2e-5,
         **kwargs: Any,
     ) -> None:
         name = "arxiv_bert"
@@ -25,16 +25,17 @@ class ArxivModel(BaseModelTorch):
             epochs,
             early_stopping_rounds,
             learning_rate,
-            val_batch_size=512,
+            val_batch_size=32,
             class_weight=None,
             # force_device="cpu",
             is_text=True,
+            weight_decay=1e-2,
             **kwargs,
         )
 
-        self.model = ArticleNetwork(num_classes=172)
+        self.model = ArticleNetwork(num_classes=41)
         for p in self.model.model[0].parameters():
-            p.requires_grad = False
+            p.requires_grad = True
         self.to_device()
 
     def fit(
