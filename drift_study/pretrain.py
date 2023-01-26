@@ -46,7 +46,7 @@ def run(
             f.create_dataset(
                 "y_preds",
                 shape=y_preds_shape,
-                dtype=np.float_.dtype,
+                dtype=np.float_,
                 chunks=(chunks, *y_preds_shape[1:]),
                 fillvalue=np.nan,
                 # compression="gzip",
@@ -54,7 +54,7 @@ def run(
             f.create_dataset(
                 "y_preds_dropout",
                 shape=y_preds_dropout_shape,
-                dtype=np.float_.dtype,
+                dtype=np.float_,
                 chunks=(chunks, *y_preds_dropout_shape[1:]),
                 fillvalue=np.nan,
                 # compression="gzip",
