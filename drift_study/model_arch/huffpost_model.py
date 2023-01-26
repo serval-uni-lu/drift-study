@@ -16,7 +16,7 @@ class HuffpostModel(BaseModelTorch):
         learning_rate: float = 2e-5,
         **kwargs: Any,
     ) -> None:
-        name = "arxiv_bert"
+        name = "huffpost_bert"
         objective = "classification"
         super().__init__(
             name,
