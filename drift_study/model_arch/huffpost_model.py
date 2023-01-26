@@ -4,10 +4,10 @@ import numpy as np
 import numpy.typing as npt
 from mlc.models.torch_models import BaseModelTorch
 
-from drift_study.model_arch.arxiv_networks import ArticleNetwork
+from drift_study.model_arch.article_networks import ArticleNetwork
 
 
-class ArxivModel(BaseModelTorch):
+class HuffpostModel(BaseModelTorch):
     def __init__(
         self,
         batch_size: int = 32,
@@ -27,7 +27,6 @@ class ArxivModel(BaseModelTorch):
             learning_rate,
             val_batch_size=32,
             class_weight=None,
-            # force_device="cpu",
             is_text=True,
             weight_decay=1e-2,
             **kwargs,
@@ -61,5 +60,5 @@ class ArxivModel(BaseModelTorch):
 
 
 models = [
-    ("arxiv_bert", ArxivModel),
+    ("huffpost_bert", HuffpostModel),
 ]

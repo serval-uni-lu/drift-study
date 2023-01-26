@@ -1,0 +1,24 @@
+---
+window_size: 20000
+evaluation_params:
+  n_score: 41
+dataset:
+  name: huffpost
+  data:
+    source:
+      file:
+        path: ./data/mlc/huffpost/huffpost.csv
+  metadata:
+    source:
+      file:
+        path: ./data/mlc/huffpost/huffpost_metadata.csv
+  tasks:
+    - name: category
+      task_type: classification,
+      evaluation_metric: accuracy,
+  sorter:
+    date: date
+batch_size: 1000
+model:
+  source: drift_study.model_arch.huffpost_model
+  name: huffpost_bert
