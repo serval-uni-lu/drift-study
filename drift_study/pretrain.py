@@ -83,6 +83,7 @@ def run(
             for dropout_idx in range(n_predict):
                 y_pred = model.predict_proba(x)
                 f["y_preds_dropout"][model_idx, :, dropout_idx, :] = y_pred
+                logger.info(f"Prediction {dropout_idx} done.")
             model[1].eval()
         logger.info(f"Model {model_idx} done.")
 

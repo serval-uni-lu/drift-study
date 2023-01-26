@@ -25,7 +25,7 @@ class HuffpostModel(BaseModelTorch):
             epochs,
             early_stopping_rounds,
             learning_rate,
-            val_batch_size=32,
+            val_batch_size=512,
             class_weight=None,
             is_text=True,
             weight_decay=1e-2,
