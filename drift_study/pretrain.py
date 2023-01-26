@@ -54,7 +54,7 @@ def run(
             f.create_dataset(
                 "y_preds_dropout",
                 shape=y_preds_dropout_shape,
-                dtype=x.to_numpy().dtype,
+                dtype=np.float_.dtype,
                 chunks=(chunks, *y_preds_dropout_shape[1:]),
                 fillvalue=np.nan,
                 # compression="gzip",
