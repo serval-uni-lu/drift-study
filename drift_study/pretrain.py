@@ -82,9 +82,7 @@ def run(
             model[1].train()
             for dropout_idx in range(n_predict):
                 y_pred = model.predict_proba(x)
-                f["y_preds_dropout_shape"][
-                    model_idx, :, dropout_idx, :
-                ] = y_pred
+                f["y_preds_dropout"][model_idx, :, dropout_idx, :] = y_pred
             model[1].eval()
         logger.info(f"Model {model_idx} done.")
 
