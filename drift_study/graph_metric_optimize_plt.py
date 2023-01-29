@@ -1,4 +1,5 @@
 import glob
+from pathlib import Path
 from typing import Any, Dict
 
 import configutils
@@ -67,49 +68,38 @@ def run() -> None:
 
     df = beautify_dataframe(df.copy())
 
-    # fig = px.scatter(
-    #     df,
-    #     x="n_train",
-    #     y="ml_metric",
-    #     color="pareto_rank",
-    #     symbol="detector_type",
-    #     hover_data=["detector_name"],
-    # )
+    plot_engine = config.get("plot_engine", "sns")
 
-    # sns.set_theme()
-    # sns.set_context("paper", font_scale=1.25, rc={"figure.figsize": (12, 8)})
-    # ax = sns.scatterplot(
-    #     data=df, x="n_train", y="ml_metric", hue="Type", style="Type"
-    # )
-    # ax.set(xlabel="# Train", ylabel=conf_results[0]["metric_name"].upper())
-    # plt.show()
-    #
-    # df.plot(x="n_train", y="ml_metric", kind="scatter")
+    Path(output_file).parent.mkdir(parents=True, exist_ok=True)
+    if plot_engine == "sns":
 
-    scatterplot(
-        df,
-        output_file,
-        x="n_train",
-        y="ml_metric",
-        y_label=conf_results[0]["metric_name"].upper(),
-        hue="Type",
-        x_label="\\# Train",
-        fig_size=(6, 4),
-        legend_pos="best",
-        markers=["o", "s", "^", "x"],
-    )
+        scatterplot(
+            df,
+            output_file,
+            x="n_train",
+            y="ml_metric",
+            y_label=conf_results[0]["metric_name"].upper(),
+            hue="Type",
+            x_label="\\# Train",
+            fig_size=(6, 4),
+            legend_pos="best",
+            markers=["o", "s", "^", "x"],
+        )
+    elif plot_engine == "plotly":
+        import plotly.express as px
 
-    # sns.scatterplot(
-    #     data=df,
-    #     x="n_train",
-    #     y="ml_metric",
-    #     style="detector_type"
-    # )
-    # print(df["pareto_rank"].max())
-    # if output_file is not None:
-    #     Path(output_file).parent.mkdir(parents=True, exist_ok=True)
-    #     fig.write_html(output_file)
-    # fig.show()
+        fig = px.scatter(
+            df,
+            x="n_train",
+            y="ml_metric",
+            color="pareto_rank",
+            symbol="detector_type",
+            hover_data=["detector_name"],
+        )
+        fig.write_html(output_file)
+
+    else:
+        raise NotImplementedError
 
 
 if __name__ == "__main__":
