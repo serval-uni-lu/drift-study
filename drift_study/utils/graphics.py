@@ -255,7 +255,7 @@ def scatterplot(
     x_label="",
     fig_size=(32, 4),
     legend_pos="best",
-    markers="x",
+    markers=None,
     **kwargs,
 ):
     # fig = plt.figure(figsize=fig_size)
@@ -275,6 +275,7 @@ def scatterplot(
         markers=markers,
         height=fig_size[1],
         aspect=fig_size[0] / fig_size[1],
+        # scatter_kws=dict(edgecolor="none"),
         **kwargs,
     )
     _setup_legend(data, legend_pos, hue)

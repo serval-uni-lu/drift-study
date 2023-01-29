@@ -53,7 +53,7 @@ def run() -> None:
         np.array([df["n_train"], df["ml_metric"]]).T, np.array([1, -1])
     )
     df["pareto_rank"] = pareto_rank
-    df = df[df["pareto_rank"] <= 20]
+    # df = df[df["pareto_rank"] <= 20]
     fig = px.scatter(
         df,
         x="n_train",
