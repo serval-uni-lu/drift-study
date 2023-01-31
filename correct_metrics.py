@@ -40,7 +40,7 @@ def run(
         ]
         assert n_trains[0] >= n_trains[1]
         assert n_trains[0] >= n_trains[2]
-        assert n_trains[0] == config["n_train"]
+        assert n_trains[0] == conf["n_train"]
         config["n_train"] = n_trains
 
         out_path = (
