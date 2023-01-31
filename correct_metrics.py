@@ -41,13 +41,13 @@ def run(
         assert n_trains[0] >= n_trains[1]
         assert n_trains[0] >= n_trains[2]
         assert n_trains[0] == conf["n_train"]
-        config["n_train"] = n_trains
+        conf["n_train"] = n_trains
 
         out_path = (
             f"./data/complete_run_corrected/{input_dir}/{conf_name}.json"
         )
         check_parent_path(out_path)
-        save_json(config, out_path)
+        save_json(conf, out_path)
 
 
 def run_many():
