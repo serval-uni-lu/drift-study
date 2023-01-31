@@ -1,12 +1,13 @@
 ---
 window_size: 20000
 performance:
-  predict_forward: 5000
+  predict_forward: 10000
   n_jobs: 2
   n_jobs_optimiser: 5
 experience:
   random_state: 42
 evaluation_params:
+  last_idx: 40000
   reference_methods:
     - no_detection
   batch_size: 1000
@@ -52,4 +53,4 @@ runs:
     type: baseline
     detectors:
       - name: no_detection
-sub_dir_path: testing
+sub_dir_path: test
