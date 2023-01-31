@@ -36,10 +36,8 @@ def filter_conf(conf_results: Dict[str, Any]) -> Dict[str, Any]:
     )
     if metric_name is not None:
         detector_name = f"{detector_name}_{metric_name}"
-    if isinstance(conf_results["ml_metric"], list):
-        ml_metric = conf_results["ml_metric"][2]
-    else:
-        ml_metric = conf_results["ml_metric"]
+    ml_metric = conf_results["ml_metric"][2]
+    n_train = conf_results["n_train"][2]
 
     metric_name = (
         conf_results["config"]
@@ -48,7 +46,7 @@ def filter_conf(conf_results: Dict[str, Any]) -> Dict[str, Any]:
         .get("name", "")
     )
     out = {
-        "n_train": conf_results["n_train"],
+        "n_train": n_train,
         "ml_metric": ml_metric,
         "detector_type": conf_results["config"]["runs"][0]["type"],
         "detector_name": detector_name,

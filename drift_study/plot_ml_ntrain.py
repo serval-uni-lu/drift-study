@@ -1,47 +1,20 @@
-import glob
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import configutils
 import numpy as np
 import pandas as pd
-from joblib import Parallel, delayed
-from mlc.load_do_save import load_json
-from tqdm import tqdm
 
-from drift_study.utils.graphics import scatterplot
-from drift_study.utils.naming import beautify_dataframe
+from drift_study.reports.graphics import scatterplot
+from drift_study.reports.naming import beautify_dataframe
+from drift_study.reports.result_processor import filter_conf, load_confs
 from drift_study.utils.pareto import calc_pareto_rank
 
 
-def filter_conf(conf_results: Dict[str, Any]) -> Dict[str, Any]:
-    detector_name = "_".join(
-        [e["name"] for e in conf_results["config"]["runs"][0]["detectors"]]
-    )
-    metric_name = (
-        conf_results["config"]["runs"][0]["detectors"][-1]
-        .get("params", {})
-        .get("metric_conf", {})
-        .get("name")
-    )
-    if metric_name is not None:
-        detector_name = f"{detector_name}_{metric_name}"
-    if isinstance(conf_results["ml_metric"], list):
-        ml_metric = conf_results["ml_metric"][2]
-    else:
-        ml_metric = conf_results["ml_metric"]
-    out = {
-        "n_train": conf_results["n_train"],
-        "ml_metric": ml_metric,
-        "detector_type": conf_results["config"]["runs"][0]["type"],
-        "detector_name": detector_name,
-        "params": conf_results["config"]["runs"][0]["detectors"][-1].get(
-            "params", "No params provided"
-        ),
-        "metric_name": conf_results["config"]["evaluation_params"]["metric"][
-            "name"
-        ],
-    }
+def filter_extreme(
+    confs: List[Dict[str, Any]], extreme_value: int
+) -> List[Dict[str, Any]]:
+    out = [conf for conf in confs if conf["n_train"] <= extreme_value]
     return out
 
 
@@ -51,13 +24,15 @@ def run() -> None:
 
     input_dir = config["input_dir"]
     output_file = config.get("output_file", None)
-    n_jobs = config.get("n_jobs", 1)
+    plot_engine = config.get("plot_engine", "sns")
 
-    list_files = glob.glob(f"{input_dir}/*.json")
-    conf_results = Parallel(n_jobs=n_jobs)(
-        delayed(lambda x: filter_conf(load_json(x)))(path)
-        for path in tqdm(list_files, total=len(list_files))
-    )
+    conf_results = load_confs(input_dir)
+    conf_results = [filter_conf(e) for e in conf_results]
+
+    max_n_train = config.get("max_n_train", -1)
+    if max_n_train > 0:
+        if plot_engine == "sns":
+            conf_results = filter_extreme(conf_results, max_n_train)
     df = pd.DataFrame(conf_results)
 
     # Add rank
@@ -67,8 +42,6 @@ def run() -> None:
     df["pareto_rank"] = pareto_rank
 
     df = beautify_dataframe(df.copy())
-
-    plot_engine = config.get("plot_engine", "sns")
 
     Path(output_file).parent.mkdir(parents=True, exist_ok=True)
     if plot_engine == "sns":
