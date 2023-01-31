@@ -13,7 +13,7 @@ register_matplotlib_converters()
 
 # global options
 FIGURE_FOLDER = ""
-EXTENSION = ".pdf"
+EXTENSION = ""
 FONT_SCALE = 1.1
 DPI = 300
 PALETTE = "colorblind"

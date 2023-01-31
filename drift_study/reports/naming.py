@@ -28,7 +28,9 @@ detector_types = {
 }
 
 
-def beautify_dataframe(df: pd.DataFrame, add_missing=False) -> pd.DataFrame:
+def beautify_dataframe(
+    df: pd.DataFrame, add_missing: bool = False
+) -> pd.DataFrame:
 
     df["is_pareto"] = df["pareto_rank"] == 1
     df["size"] = df.groupby(["detector_name"])["detector_name"].transform(
