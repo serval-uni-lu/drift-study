@@ -122,3 +122,7 @@ def save_drift_run(
     )
     save_arrays(numpy_to_save, f"{drift_data_path}.hdf5")
     metrics.to_hdf(f"{drift_data_path}_metrics.hdf5", "metrics")
+
+
+def check_parent_path(path: str) -> None:
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
