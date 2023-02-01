@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 import pandas as pd
 
+from drift_study.drift_detectors import DriftDetector
+
 
 @dataclass
 class Delays:
@@ -10,7 +12,7 @@ class Delays:
     ml_model: pd.Timedelta
 
 
-def get_delays(run_config: dict, drift_detector) -> Delays:
+def get_delays(run_config: dict, drift_detector: DriftDetector) -> Delays:
     delays = run_config.get("delays")
     label_delay = pd.Timedelta(delays.get("label"))
     retraining_delay = pd.Timedelta(delays.get("retraining"))

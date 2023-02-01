@@ -4,7 +4,9 @@ import numpy as np
 import numpy.typing as npt
 
 
-def is_pareto_efficient_simple(costs: npt.NDArray[np.float_]):
+def is_pareto_efficient_simple(
+    costs: npt.NDArray[np.float_],
+) -> npt.NDArray[np.bool_]:
     """
     Find the pareto-efficient points
     :param costs: An (n_points, n_costs) array
@@ -23,7 +25,7 @@ def is_pareto_efficient_simple(costs: npt.NDArray[np.float_]):
 
 def calc_pareto_rank(
     costs: npt.NDArray[np.float_],
-    costs_direction: Optional[npt.NDArray[np.int_]],
+    costs_direction: Optional[npt.NDArray[np.float_]],
 ) -> npt.NDArray[np.int_]:
 
     if costs_direction is None:

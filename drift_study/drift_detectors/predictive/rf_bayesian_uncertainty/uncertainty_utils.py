@@ -1,11 +1,12 @@
 from typing import Dict, List
 
 import numpy as np
+import numpy.typing as npt
 
 
 def calculate_entropy_uncertainties(
-    labels: list,
-    list_end_leafs: np.ndarray,
+    labels: List[int],
+    list_end_leafs: npt.NDArray[np.int_],
     leafs_split: List[Dict[int, List[int]]],
 ):
 

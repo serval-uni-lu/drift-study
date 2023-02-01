@@ -26,7 +26,7 @@ def load_confs(input_path: str) -> List[Dict[str, Any]]:
 
 
 def run(
-    input_dir,
+    input_dir: str,
 ) -> None:
     config = configutils.get_config()
     print(config)
@@ -40,7 +40,7 @@ def run(
     save_json(conf_results, out)
 
 
-def merge_date(input_dir):
+def merge_date(input_dir: str):
 
     original = load_confs(f"./rf_complete/{input_dir}")
     dates = load_confs(f"./dates/{input_dir}")
@@ -54,7 +54,7 @@ def merge_date(input_dir):
     save_json(original, out)
 
 
-def run_many():
+def run_many() -> None:
 
     DELAYS = [
         "all_delays",
