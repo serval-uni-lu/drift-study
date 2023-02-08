@@ -98,7 +98,7 @@ class RfUncertaintyDrift(DriftDetector):
             self.model.transform(x)
         )
 
-        uncertainties = [UNCERTAINTY_TYPE[self.uncertainty_type]]
+        uncertainties = uncertainties[UNCERTAINTY_TYPE[self.uncertainty_type]]
         x_new = pd.DataFrame.from_dict({"uncertainty": uncertainties})
         y_scores_new = np.array(uncertainties)
 
