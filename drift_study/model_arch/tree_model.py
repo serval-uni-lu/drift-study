@@ -1,4 +1,4 @@
-from math import ceil, sqrt
+from math import sqrt
 from typing import Any, Dict
 
 import optuna
@@ -71,7 +71,9 @@ class Rf(SkModel):
             "max_depth": 50,
             "min_samples_split": 2,
             "min_samples_leaf": 1,
-            "max_features": ceil(sqrt(trial_params["n_features"])),
+            "max_features": (
+                sqrt(trial_params["n_features"]) / trial_params["n_features"]
+            ),
         }
 
         return params
