@@ -1,0 +1,62 @@
+---
+performance:
+  predict_forward: 50000
+  n_jobs: 64
+  n_jobs_optimiser: 17
+  inner_max_num_threads: 10
+experience:
+  random_state: 42
+evaluation_params:
+  end_train_idx: 100000
+  batch_size: 10000
+  rolling: False
+  significance: 0.0
+  metric:
+    name: mcc
+  n_score: 2
+  train_with_all: False
+dataset:
+  name: lcld_201317_ds_time
+common_detectors_params:
+  batch_size: 10000
+  period: 10000
+common_runs_params:
+  delays:
+    label: 0
+    drift: 0
+    retraining: 0
+runs:
+# ------------ NO Drift
+  # - name: no_detection
+  #   type: baseline
+  #   detectors:
+  #     - name: no_detection
+  #   model:
+  #     source: drift_study.model_arch.tree_model
+  #     name: rf_lcld
+  #   train_all_data: False
+  # - name: no_detection_opt
+  #   type: baseline
+  #   detectors:
+  #     - name: no_detection
+  #   model:
+  #     source: drift_study.model_arch.tree_model
+  #     name: rf_opt_mcc
+  #   train_all_data: False
+# ------------ Periodic
+  - name: periodic
+    type: baseline
+    detectors:
+      - name: periodic
+    model:
+      source: drift_study.model_arch.tree_model
+      name: rf_lcld
+    train_all_data: False
+  - name: periodic_all
+    type: baseline
+    detectors:
+      - name: periodic
+    model:
+      source: drift_study.model_arch.tree_model
+      name: rf_lcld
+    train_all_data: True

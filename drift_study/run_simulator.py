@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import configutils
 import numpy as np
 from configutils.utils import merge_parameters
+from joblib import Parallel, delayed
 from mlc.metrics.metric_factory import create_metric
 from mlc.metrics.metrics import PredClassificationMetric
 from optuna.exceptions import ExperimentalWarning
@@ -48,7 +49,8 @@ def run(
     )
 
     # INITIALIZE PARAMETERS
-    window_size = config.get("window_size")
+    train_all_data = run_config["train_all_data"]
+    end_train_idx = config["evaluation_params"]["end_train_idx"]
     predict_forward = config.get("performance").get("predict_forward")
     n_early_stopping = config.get("evaluation_params", {}).get(
         "n_early_stopping", 0
@@ -84,9 +86,9 @@ def run(
     # TRAIN FIRST MODEL
     model_path = (
         f"{model_root_dir}/{dataset.name}/"
-        f"{model_name}_{0}_{window_size}.joblib"
+        f"{model_name}_{0}_{end_train_idx}.joblib"
     )
-    start_idx, end_idx = 0, window_size
+    start_idx, end_idx = 0, end_train_idx
     add_model(
         models,
         model_path,
@@ -105,7 +107,7 @@ def run(
 
     # Main loop
     for x_idx in tqdm(
-        np.arange(window_size, last_idx), disable=(verbose == 0)
+        np.arange(end_train_idx, last_idx), disable=(verbose == 0)
     ):
 
         # Find current model
@@ -150,7 +152,10 @@ def run(
             if drift_model_idx == len(models) - 1:
                 if is_drifts[x_idx]:
                     logger.debug(f"Drift at index {x_idx}")
-                    start_idx = (x_idx + 1) - window_size
+                    if train_all_data:
+                        start_idx = 0
+                    else:
+                        start_idx = (x_idx + 1) - end_train_idx
                     end_idx = x_idx + 1
                     logger.debug(
                         f"start_index {start_idx}, end_index {end_idx}."
@@ -185,7 +190,7 @@ def run(
                     # Avoid memory full
                     free_mem_models(models, ml_model_idx, drift_model_idx)
                     # Early stop
-                    if (0 <= n_early_stopping) and (
+                    if (0 < n_early_stopping) and (
                         n_early_stopping <= len(models)
                     ):
                         early_stopped = True
@@ -214,22 +219,19 @@ def run(
 
     val_test_idx = config["evaluation_params"].get("val_test_idx")
     if val_test_idx is None:
-        metric = float(
-            prediction_metric.compute(
-                y[window_size:last_idx], y_scores[window_size:last_idx]
-            )
+        metric = prediction_metric.compute(
+            y[end_train_idx:last_idx], y_scores[end_train_idx:last_idx]
         )
+
     else:
         metric_idxs = [
-            (window_size, last_idx),
-            (window_size, val_test_idx),
+            (end_train_idx, last_idx),
+            (end_train_idx, val_test_idx),
             (val_test_idx, last_idx),
         ]
         metric = [
-            float(
-                prediction_metric.compute(
-                    y[m_idx_start:m_idx_end], y_scores[m_idx_start:m_idx_end]
-                )
+            prediction_metric.compute(
+                y[m_idx_start:m_idx_end], y_scores[m_idx_start:m_idx_end]
             )
             for m_idx_start, m_idx_end in metric_idxs
         ]
@@ -243,8 +245,10 @@ def run_many(
 ) -> None:
     config_all = configutils.get_config()
 
-    for i in range(len(config_all.get("runs"))):
-        run(config_all, i, lock_model_writing, list_model_writing)
+    Parallel(n_jobs=2)(
+        delayed(run)(config_all, i, lock_model_writing, list_model_writing)
+        for i in range(len(config_all.get("runs")))
+    )
 
 
 if __name__ == "__main__":

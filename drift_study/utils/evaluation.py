@@ -74,7 +74,7 @@ def load_config_eval(
     prediction_metric: Metric,
     y: npt.NDArray[Any],
 ) -> Dict[str, Any]:
-    test_i = np.arange(len(y))[config.get("window_size") :]
+    test_i = np.arange(len(y))[config["evaluation_params"]["end_train_idx"] :]
     batch_size = config["evaluation_params"]["batch_size"]
     batch_size_min = config["evaluation_params"].get("batch_size", 0)
     last_idx = config["evaluation_params"].get("last_idx", -1)
@@ -134,5 +134,6 @@ def load_config_eval(
                 for index_batch in index_batches
             ]
         )
+        run_config["batch_start_idx"] = np.array([e[0] for e in index_batches])
 
     return config
