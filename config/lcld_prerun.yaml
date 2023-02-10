@@ -27,14 +27,14 @@ common_runs_params:
     retraining: 0
 runs:
 # ------------ NO Drift
-  # - name: no_detection
-  #   type: baseline
-  #   detectors:
-  #     - name: no_detection
-  #   model:
-  #     source: drift_study.model_arch.tree_model
-  #     name: rf_lcld
-  #   train_all_data: False
+  - name: no_detection
+    type: baseline
+    detectors:
+      - name: no_detection
+    model:
+      source: drift_study.model_arch.tree_model
+      name: rf_lcld
+    train_all_data: False
   # - name: no_detection_opt
   #   type: baseline
   #   detectors:
@@ -44,19 +44,19 @@ runs:
   #     name: rf_opt_mcc
   #   train_all_data: False
 # ------------ Periodic
-  - name: periodic
-    type: baseline
-    detectors:
-      - name: periodic
-    model:
-      source: drift_study.model_arch.tree_model
-      name: rf_lcld
-    train_all_data: False
-  - name: periodic_all
-    type: baseline
-    detectors:
-      - name: periodic
-    model:
-      source: drift_study.model_arch.tree_model
-      name: rf_lcld
-    train_all_data: True
+  # - name: periodic
+  #   type: baseline
+  #   detectors:
+  #     - name: periodic
+  #   model:
+  #     source: drift_study.model_arch.tree_model
+  #     name: rf_lcld
+  #   train_all_data: False
+  # - name: periodic_all
+  #   type: baseline
+  #   detectors:
+  #     - name: periodic
+  #   model:
+  #     source: drift_study.model_arch.tree_model
+  #     name: rf_lcld
+  #   train_all_data: True
