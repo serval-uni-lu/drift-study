@@ -70,7 +70,6 @@ def rolling_f1(
 def load_config_eval(
     config: Dict[str, Any],
     dataset: Dataset,
-    model_name: str,
     prediction_metric: Metric,
     y: npt.NDArray[Any],
 ) -> Dict[str, Any]:
@@ -97,6 +96,7 @@ def load_config_eval(
 
     sub_dir_path = config["sub_dir_path"]
     for run_config in config.get("runs", []):
+        model_name = run_config.get("model").get("name")
         drift_data_path = (
             f"./data/simulator/{dataset.name}/{model_name}/"
             f"{sub_dir_path}/{run_config.get('name')}.hdf5"

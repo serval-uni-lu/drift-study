@@ -24,14 +24,11 @@ def run() -> None:
             config.get("runs")[i].copy(),
         )
 
-    model_name = config.get("runs")[0].get("model").get("name")
-    logger.info(f"Starting dataset {dataset.name}, model {model_name}")
+    logger.info(f"Starting dataset {dataset.name}")
     x, y, t = dataset.get_x_y_t()
 
     prediction_metric = create_metric(config["evaluation_params"]["metric"])
-    config = load_config_eval(
-        config, dataset, model_name, prediction_metric, y
-    )
+    config = load_config_eval(config, dataset, prediction_metric, y)
 
     for_df = {"run_name": [], "x_batch": [], "metric": []}
     for e in config["runs"]:
