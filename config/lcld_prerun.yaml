@@ -41,7 +41,7 @@ runs:
       - name: no_detection
     model:
       source: drift_study.model_arch.tree_model
-      name: rf_opt_mcc
+      name: opt_rf_classifier
     train_all_data: False
 # ------------ Periodic
   - name: periodic

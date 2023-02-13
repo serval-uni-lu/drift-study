@@ -84,7 +84,7 @@ models = [
     ("rf_lcld", RfLcld),
     ("rf_classifier", Rf),
     (
-        "rf_opt_mcc",
+        "opt_rf_classifier",
         lambda **kwargs: TimeOptimizer(
             model=Rf(),
             metric=create_metric({"name": "mcc"}),
