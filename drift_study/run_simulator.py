@@ -245,7 +245,7 @@ def run_many(
 ) -> None:
     config_all = configutils.get_config()
 
-    Parallel(n_jobs=2)(
+    Parallel(n_jobs=1)(
         delayed(run)(config_all, i, lock_model_writing, list_model_writing)
         for i in range(len(config_all.get("runs")))
     )
