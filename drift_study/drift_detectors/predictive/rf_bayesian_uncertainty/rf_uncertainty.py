@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -25,7 +25,9 @@ class RandomForestClassifierWithUncertainty:
         # summarize the features used in the trees:
         # self.used_features = self._output_used_features(X)
 
-    def predict_with_uncertainty(self, x_test) -> (np.ndarray, np.ndarray):
+    def predict_with_uncertainty(
+        self, x_test
+    ) -> Tuple[np.ndarray, np.ndarray]:
         predictions = self.rf.predict(x_test)
         end_leafs = self.rf.apply(x_test)
         uncertainties = self._extract_uncertainty_of_prediction(
@@ -35,7 +37,7 @@ class RandomForestClassifierWithUncertainty:
 
     def predict_proba_with_uncertainty(
         self, x_test
-    ) -> (np.ndarray, np.ndarray):
+    ) -> Tuple[np.ndarray, np.ndarray]:
         predictions = self.predict_proba_1d(x_test)
         end_leafs = self.rf.apply(x_test)
         uncertainties = self._extract_uncertainty_of_prediction(
