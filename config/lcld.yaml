@@ -1,13 +1,13 @@
 ---
-window_size: 100000
 performance:
   predict_forward: 50000
-  n_jobs: 10
-  n_jobs_optimiser: 17
+  n_jobs: 20
+  n_jobs_optimiser: 1
   inner_max_num_threads: 10
 experience:
   random_state: 42
 evaluation_params:
+  end_train_idx: 100000
   batch_size: 25000
   rolling: False
   significance: 0.0
@@ -19,6 +19,7 @@ dataset:
 common_detectors_params:
   batch_size: 5000
 common_runs_params:
+  train_all_data: False
   delays:
     label: 10days
     drift: 0

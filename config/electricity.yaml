@@ -1,5 +1,4 @@
 ---
-window_size: 5000
 performance:
   predict_forward: 5000
   n_jobs: 10
@@ -8,6 +7,7 @@ performance:
 experience:
   random_state: 42
 evaluation_params:
+  end_train_idx: 5000
   batch_size: 1000
   rolling: False
   significance: 0.0
@@ -19,6 +19,7 @@ dataset:
 common_detectors_params:
   batch_size: 1000
 common_runs_params:
+  train_all_data: False
   delays:
     label: 10days
     drift: 0
