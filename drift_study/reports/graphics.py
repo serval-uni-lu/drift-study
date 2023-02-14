@@ -11,7 +11,7 @@ rc("text", usetex=True)
 
 register_matplotlib_converters()
 
-# global options
+# - global options
 FIGURE_FOLDER = ""
 EXTENSION = ""
 FONT_SCALE = 1.1
@@ -258,7 +258,7 @@ def scatterplot(
     markers=None,
     **kwargs,
 ):
-    # fig = plt.figure(figsize=fig_size)
+    # - fig = plt.figure(figsize=fig_size)
     sns.set(style="white", color_codes=True, font_scale=FONT_SCALE)
 
     palette = _color_palette(data, hue)
