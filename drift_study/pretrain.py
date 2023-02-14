@@ -36,7 +36,7 @@ def run(
     )
     chunks = 1
 
-    n_predict = 50
+    n_predict = 1
     n_class = config["evaluation_params"]["n_score"]
     y_preds_shape = (n_model, len(x), n_class)
     y_preds_dropout_shape = (n_model, len(x), n_predict, n_class)
@@ -60,7 +60,7 @@ def run(
                 # compression="gzip",
             )
 
-    for model_idx in range(n_model):
+    for model_idx in range(n_model)[:1]:
 
         start_idx = model_idx * batch_size
         end_idx = start_idx + window_size
@@ -70,19 +70,28 @@ def run(
             f"{model_name}_{start_idx}_{end_idx}.joblib"
         )
         model = f_new_model()
+        print(model[1].get_model_size())
+
         load_do_save_model(
             model,
             model_path,
             x.iloc[start_idx:end_idx],
             y[start_idx:end_idx],
         )
+        # quantized_model = torch.quantization.quantize_dynamic(
+        #     model[1].model, {torch.nn.Linear}, dtype=torch.qint8
+        # )
+        # model[1].model = quantized_model
+        # model[1].device = "cpu"
+        # model[1].to_device()
+
         with h5py.File(y_preds_path, "r+") as f:
-            y_pred = model.predict_proba(x)
-            f["y_preds"][model_idx] = y_pred
+            y_pred = model.predict_proba(x.iloc[:5000])
+            f["y_preds"][model_idx, :5000] = y_pred
             model[1].train()
             for dropout_idx in range(n_predict):
-                y_pred = model.predict_proba(x)
-                f["y_preds_dropout"][model_idx, :, dropout_idx, :] = y_pred
+                y_pred = model.predict_proba(x.iloc[:5000])
+                f["y_preds_dropout"][model_idx, :5000, dropout_idx] = y_pred
                 logger.info(f"Prediction {dropout_idx} done.")
             model[1].eval()
         logger.info(f"Model {model_idx} done.")

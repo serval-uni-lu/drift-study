@@ -1,5 +1,5 @@
 ---
-window_size: 20000
+window_size: 2000
 evaluation_params:
   n_score: 41
 dataset:
@@ -18,7 +18,7 @@ dataset:
       evaluation_metric: accuracy,
   sorter:
     date: date
-batch_size: 1000
+batch_size: 5000
 model:
   source: drift_study.model_arch.huffpost_model
   name: huffpost_bert

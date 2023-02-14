@@ -53,10 +53,10 @@ class HuffpostModel(BaseModelTorch):
         super().fit(x, y, x_val, y_val, reset_weight)
 
     def predict_helper(
-        self, x: npt.NDArray[np.float_]
+        self, x: npt.NDArray[np.float_], load_all_gpu: bool = True
     ) -> npt.NDArray[np.float_]:
         x = x.reshape((x.shape[0], -1, 2))
-        return super().predict_helper(x)
+        return super().predict_helper(x, load_all_gpu)
 
 
 models = [

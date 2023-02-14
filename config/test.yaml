@@ -1,0 +1,40 @@
+---
+runs:
+#  - name: data_evidently
+#    type: data
+#    detectors:
+#      - name: n_batch
+#      - name: evidently
+#        params:
+#          num_threshold: 0.2222
+#          cat_threshold: 0.33
+#          drift_share: 0.444
+#  - name: rf_uncertainty
+#    type: predictive
+#    detectors:
+#      - name: n_batch
+#      - name: rf_uncertainty
+#        params:
+#          uncertainty_type: epistemic
+#      - name: adwin
+#        params:
+#          metric_conf:
+#            name: y_scores
+  - name: periodic
+    type: baseline
+    detectors:
+      - name: periodic
+        params:
+          period: 1000
+#  - name: adwin_proba
+#    type: error
+#    detectors:
+#      - name: adwin
+#        params:
+#          metric_conf:
+#            name: proba_error
+evaluation_params:
+  last_idx: 300000
+  n_early_stopping: 80
+trial_params:
+  n_trials: 1
