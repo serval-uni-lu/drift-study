@@ -24,6 +24,7 @@ def sample_date(
     sampler = RandomUnderSampler(
         sampling_strategy=sampling_strategy, random_state=42
     )
-    idx_new, _ = sampler.fit_resample(idx, y)
+    idx_new, _ = sampler.fit_resample(idx.reshape(-1, 1), y)
+    idx_new = idx_new.flatten()
 
     return x.iloc[idx_new], y[idx_new], t[idx_new]
