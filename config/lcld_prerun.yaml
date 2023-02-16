@@ -28,55 +28,95 @@ common_runs_params:
     retraining: 0
 runs:
 # ------------ NO Drift
-  - name: no_detection
+#   - name: no_detection
+#     type: baseline
+#     detectors:
+#       - name: no_detection
+#     model:
+#       source: drift_study.model_arch.tree_model
+#       name: rf_lcld
+#     train_all_data: False
+#   - name: no_detection_opt
+#     type: baseline
+#     detectors:
+#       - name: no_detection
+#     model:
+#       source: drift_study.model_arch.tree_model
+#       name: opt_rf_classifier
+#     train_all_data: False
+# # ------------ Periodic
+#   - name: periodic
+#     type: baseline
+#     detectors:
+#       - name: periodic
+#     model:
+#       source: drift_study.model_arch.tree_model
+#       name: rf_lcld
+#     train_all_data: False
+#   - name: periodic_all
+#     type: baseline
+#     detectors:
+#       - name: periodic
+#     model:
+#       source: drift_study.model_arch.tree_model
+#       name: rf_lcld
+#     train_all_data: True
+  # - name: at_600_opt
+  #   type: baseline
+  #   detectors:
+  #     - name: periodic
+  #       params:
+  #         period: 500000
+  #   model:
+  #     source: drift_study.model_arch.tree_model
+  #     name: opt_rf_classifier
+  #   train_all_data: False
+  # - name: at_600_all_opt
+  #   type: baseline
+  #   detectors:
+  #     - name: periodic
+  #       params:
+  #         period: 500000
+  #   model:
+  #     source: drift_study.model_arch.tree_model
+  #     name: opt_rf_classifier
+  #   train_all_data: True
+  - name: at_720_opt
     type: baseline
     detectors:
-      - name: no_detection
-    model:
-      source: drift_study.model_arch.tree_model
-      name: rf_lcld
-    train_all_data: False
-  - name: no_detection_opt
-    type: baseline
-    detectors:
-      - name: no_detection
+      - name: periodic
+        params:
+          period: 620000
     model:
       source: drift_study.model_arch.tree_model
       name: opt_rf_classifier
     train_all_data: False
-# ------------ Periodic
-  - name: periodic
+  - name: at_720_all_opt
     type: baseline
     detectors:
       - name: periodic
+        params:
+          period: 620000
     model:
       source: drift_study.model_arch.tree_model
-      name: rf_lcld
-    train_all_data: False
-  - name: periodic_all
-    type: baseline
-    detectors:
-      - name: periodic
-    model:
-      source: drift_study.model_arch.tree_model
-      name: rf_lcld
+      name: opt_rf_classifier
     train_all_data: True
-  - name: at_600_opt
+  - name: at_940_opt
     type: baseline
     detectors:
       - name: periodic
         params:
-          period: 500000
+          period: 840000
     model:
       source: drift_study.model_arch.tree_model
       name: opt_rf_classifier
     train_all_data: False
-  - name: at_600_all_opt
+  - name: at_940_all_opt
     type: baseline
     detectors:
       - name: periodic
         params:
-          period: 500000
+          period: 840000
     model:
       source: drift_study.model_arch.tree_model
       name: opt_rf_classifier
