@@ -79,8 +79,8 @@ class TimeOptimizer(Model):
     ) -> float:
         model_params = self.model.define_trial_parameters(trial, trial_params)
         tscv = TimeSeriesSplit(n_splits=self.n_splits)
-        with parallel_backend("loky", n_jobs=3):
-            metrics = Parallel(n_jobs=2)(
+        with parallel_backend("loky", n_jobs=3, inner_max_num_threads=128):
+            metrics = Parallel(n_jobs=3)(
                 delayed(self._objective_one)(
                     self.model.__class__(n_jobs=self.n_jobs, **model_params),
                     x[train_index],

@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import configutils
 import numpy as np
 from configutils.utils import merge_parameters
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, parallel_backend
 from mlc.metrics.metric_factory import create_metric
 from mlc.metrics.metrics import PredClassificationMetric
 from optuna.exceptions import ExperimentalWarning
@@ -245,10 +245,11 @@ def run_many(
 ) -> None:
     config_all = configutils.get_config()
 
-    Parallel(n_jobs=1)(
-        delayed(run)(config_all, i, lock_model_writing, list_model_writing)
-        for i in range(len(config_all.get("runs")))
-    )
+    with parallel_backend("loky", n_jobs=3, inner_max_num_threads=128):
+        Parallel(n_jobs=3)(
+            delayed(run)(config_all, i, lock_model_writing, list_model_writing)
+            for i in range(len(config_all.get("runs")))
+        )
 
 
 if __name__ == "__main__":

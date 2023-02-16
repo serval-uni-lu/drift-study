@@ -1,7 +1,7 @@
 ---
 performance:
   predict_forward: 50000
-  n_jobs: 64
+  n_jobs: 20
   n_jobs_optimiser: 17
   inner_max_num_threads: 10
 experience:
