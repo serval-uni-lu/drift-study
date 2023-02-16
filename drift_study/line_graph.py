@@ -1,14 +1,15 @@
 import logging
 import os
+from pathlib import Path
 
 import configutils
 import pandas as pd
 from configutils.utils import merge_parameters
-from mlc.datasets.dataset_factory import get_dataset
 from mlc.metrics.metric_factory import create_metric
 
 from drift_study.reports.graphics import lineplot
 from drift_study.utils.evaluation import load_config_eval
+from drift_study.utils.helpers import initialize
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
@@ -17,15 +18,14 @@ logger = logging.getLogger(__name__)
 def run() -> None:
     config = configutils.get_config()
 
-    dataset = get_dataset(config.get("dataset"))
     for i in range(len(config.get("runs"))):
         config.get("runs")[i] = merge_parameters(
             config.get("common_runs_params").copy(),
             config.get("runs")[i].copy(),
         )
 
+    dataset, _, _, _, y, _ = initialize(config, config["runs"][0])
     logger.info(f"Starting dataset {dataset.name}")
-    x, y, t = dataset.get_x_y_t()
 
     prediction_metric = create_metric(config["evaluation_params"]["metric"])
     config = load_config_eval(config, dataset, prediction_metric, y)
@@ -39,6 +39,7 @@ def run() -> None:
     df = pd.DataFrame.from_dict(for_df)
     output_file = config.get("output_file", None)
 
+    Path(output_file).parent.mkdir(parents=True, exist_ok=True)
     plot_engine = config.get("plot_engine", "sns")
     if plot_engine == "sns":
         lineplot(
