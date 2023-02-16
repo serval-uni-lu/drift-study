@@ -20,7 +20,7 @@ def sample_date(
         return x, y, t
 
     sampling_strategy = minority_share / (1 - minority_share)
-    idx = np.arrange(len(x))
+    idx = np.arange(len(x))
     sampler = RandomUnderSampler(
         sampling_strategy=sampling_strategy, random_state=42
     )
