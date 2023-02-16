@@ -18,12 +18,20 @@ from drift_study.drift_detectors import DriftDetector
 from drift_study.drift_detectors.drift_detector_factory import (
     get_drift_detector_from_conf,
 )
+from drift_study.utils.date_sampler import sample_date
 from drift_study.utils.delays import Delays
 from drift_study.utils.drift_model import DriftModel
 from drift_study.utils.io_utils import load_do_save_model
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
+
+
+def update_dataset_name(
+    dataset: Dataset, minority_share: Optional[float]
+) -> None:
+    if minority_share is not None:
+        dataset.name = f"{dataset.name}_{str(minority_share)}"
 
 
 def initialize(
@@ -40,6 +48,8 @@ def initialize(
     logger.debug(f"Loading dataset {config.get('dataset', {}).get('name')}")
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
+    x, y, t = sample_date(x, y, t, run_config.get("sampling_minority_share"))
+    update_dataset_name(run_config.get("sampling_minority_share"))
 
     metadata = dataset.get_metadata(only_x=True)
     f_new_model = get_f_new_model(config, run_config, metadata)

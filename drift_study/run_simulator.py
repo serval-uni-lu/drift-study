@@ -62,6 +62,8 @@ def run(
         config, run_config
     )
 
+    print(f"N inputs {len(y)}, with distribution {y.mean()}.")
+
     delays = get_delays(run_config, f_new_detector())
     last_idx = config["evaluation_params"].get("last_idx", -1)
     if last_idx == -1:
@@ -245,8 +247,8 @@ def run_many(
 ) -> None:
     config_all = configutils.get_config()
 
-    with parallel_backend("loky", n_jobs=3, inner_max_num_threads=128):
-        Parallel(n_jobs=3)(
+    with parallel_backend("loky", n_jobs=4, inner_max_num_threads=128):
+        Parallel(n_jobs=4)(
             delayed(run)(config_all, i, lock_model_writing, list_model_writing)
             for i in range(len(config_all.get("runs")))
         )
