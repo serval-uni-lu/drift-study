@@ -15,7 +15,7 @@ for metric in mcc accuracy
 do
     for batch_size in 10000 20000
     do
-        "python -m drift_study.line_graph -c config/$dataset.yaml -p sub_dir_path=prerun -p output_file=./reports/prerun/$dataset/prerun_$metric_$batch_size.html -p plot_engine=plotly"
+        eval "python -m drift_study.line_graph -c config/$dataset.yaml -p sub_dir_path=prerun -p output_file=./reports/prerun/$dataset/prerun_$metric_$batch_size.html -p plot_engine=plotly"
     done
 done
 
@@ -25,6 +25,6 @@ for metric in mcc accuracy
 do
     for batch_size in 1000
     do
-        "python -m drift_study.line_graph -c config/$dataset.yaml -p sub_dir_path=prerun -p output_file=./reports/prerun/$dataset/prerun_$metric_$batch_size.html -p plot_engine=plotly"
+        eval "python -m drift_study.line_graph -c config/$dataset.yaml -p sub_dir_path=prerun -p output_file=./reports/prerun/$dataset/prerun_$metric_$batch_size.html -p plot_engine=plotly"
     done
 done
