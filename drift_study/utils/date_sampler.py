@@ -25,6 +25,10 @@ def sample_date(
         sampling_strategy=sampling_strategy, random_state=42
     )
     idx_new, _ = sampler.fit_resample(idx.reshape(-1, 1), y)
-    idx_new = idx_new.flatten()
+    idx_new = np.sort(idx_new.flatten())
 
-    return x.iloc[idx_new], y[idx_new], t[idx_new]
+    return (
+        x.iloc[idx_new].reset_index(drop=True),
+        y[idx_new],
+        t[idx_new].reset_index(drop=True),
+    )
