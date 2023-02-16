@@ -1,19 +1,20 @@
 from typing import Optional, Tuple, Union
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 from imblearn.under_sampling import RandomUnderSampler
 
 
 def sample_date(
     x: pd.DataFrame,
-    y: np.NDArray[Union[np.int_, np.float_]],
-    t: Union[pd.Series, np.NDArray[np.int_]],
+    y: npt.NDArray[Union[np.int_, np.float_]],
+    t: Union[pd.Series, npt.NDArray[np.int_]],
     minority_share: Optional[float],
 ) -> Tuple[
     pd.DataFrame,
-    np.NDArray[Union[np.int_, np.float_]],
-    Union[pd.Series, np.NDArray[np.int_]],
+    npt.NDArray[Union[np.int_, np.float_]],
+    Union[pd.Series, npt.NDArray[np.int_]],
 ]:
     if minority_share is None:
         return x, y, t
