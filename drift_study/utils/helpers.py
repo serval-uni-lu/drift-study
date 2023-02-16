@@ -49,7 +49,7 @@ def initialize(
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
     x, y, t = sample_date(x, y, t, run_config.get("sampling_minority_share"))
-    update_dataset_name(run_config.get("sampling_minority_share"))
+    update_dataset_name(dataset, run_config.get("sampling_minority_share"))
 
     metadata = dataset.get_metadata(only_x=True)
     f_new_model = get_f_new_model(config, run_config, metadata)
