@@ -1,7 +1,7 @@
 import logging
 import os
 import warnings
-from multiprocessing import Lock
+from multiprocessing import Lock, Manager
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import configutils
@@ -50,7 +50,7 @@ def run(
 
     # INITIALIZE PARAMETERS
     train_all_data = run_config["train_all_data"]
-    end_train_idx = config["evaluation_params"]["end_train_idx"]
+    end_train_idx = run_config["end_train_idx"]
     predict_forward = config.get("performance").get("predict_forward")
     n_early_stopping = config.get("evaluation_params", {}).get(
         "n_early_stopping", 0
@@ -247,11 +247,23 @@ def run_many(
 ) -> None:
     config_all = configutils.get_config()
 
-    with parallel_backend("loky", n_jobs=4, inner_max_num_threads=128):
-        Parallel(n_jobs=4)(
-            delayed(run)(config_all, i, lock_model_writing, list_model_writing)
-            for i in range(len(config_all.get("runs")))
-        )
+    if lock_model_writing is None:
+        with Manager() as manager:
+            lock = manager.Lock()
+            dico = manager.dict()
+            with parallel_backend("loky", n_jobs=16, inner_max_num_threads=8):
+                Parallel(n_jobs=16)(
+                    delayed(run)(config_all, i, lock, dico)
+                    for i in range(len(config_all.get("runs")))
+                )
+    else:
+        with parallel_backend("loky", n_jobs=16, inner_max_num_threads=8):
+            Parallel(n_jobs=16)(
+                delayed(run)(
+                    config_all, i, lock_model_writing, list_model_writing
+                )
+                for i in range(len(config_all.get("runs")))
+            )
 
 
 if __name__ == "__main__":
