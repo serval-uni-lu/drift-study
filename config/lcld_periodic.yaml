@@ -149,9 +149,9 @@ runs:
       period: 5000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_5000_rf_lcld_opt_50000_4W
+  name: periodic_5000_rf_lcld_new_50000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -164,9 +164,9 @@ runs:
       period: 5000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_5000_rf_lcld_opt_50000_0
+  name: periodic_5000_rf_lcld_new_50000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -179,9 +179,9 @@ runs:
       period: 5000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_5000_rf_lcld_opt_100000_4W
+  name: periodic_5000_rf_lcld_new_100000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -194,9 +194,9 @@ runs:
       period: 5000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_5000_rf_lcld_opt_100000_0
+  name: periodic_5000_rf_lcld_new_100000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -209,9 +209,9 @@ runs:
       period: 5000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_5000_rf_lcld_opt_200000_4W
+  name: periodic_5000_rf_lcld_new_200000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -224,9 +224,9 @@ runs:
       period: 5000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_5000_rf_lcld_opt_200000_0
+  name: periodic_5000_rf_lcld_new_200000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -239,9 +239,9 @@ runs:
       period: 5000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_5000_rf_lcld_opt_500000_4W
+  name: periodic_5000_rf_lcld_new_500000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -254,9 +254,9 @@ runs:
       period: 5000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_5000_rf_lcld_opt_500000_0
+  name: periodic_5000_rf_lcld_new_500000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -389,9 +389,9 @@ runs:
       period: 10000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_10000_rf_lcld_opt_50000_4W
+  name: periodic_10000_rf_lcld_new_50000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -404,9 +404,9 @@ runs:
       period: 10000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_10000_rf_lcld_opt_50000_0
+  name: periodic_10000_rf_lcld_new_50000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -419,9 +419,9 @@ runs:
       period: 10000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_10000_rf_lcld_opt_100000_4W
+  name: periodic_10000_rf_lcld_new_100000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -434,9 +434,9 @@ runs:
       period: 10000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_10000_rf_lcld_opt_100000_0
+  name: periodic_10000_rf_lcld_new_100000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -449,9 +449,9 @@ runs:
       period: 10000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_10000_rf_lcld_opt_200000_4W
+  name: periodic_10000_rf_lcld_new_200000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -464,9 +464,9 @@ runs:
       period: 10000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_10000_rf_lcld_opt_200000_0
+  name: periodic_10000_rf_lcld_new_200000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -479,9 +479,9 @@ runs:
       period: 10000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_10000_rf_lcld_opt_500000_4W
+  name: periodic_10000_rf_lcld_new_500000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -494,9 +494,9 @@ runs:
       period: 10000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_10000_rf_lcld_opt_500000_0
+  name: periodic_10000_rf_lcld_new_500000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -629,9 +629,9 @@ runs:
       period: 20000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_20000_rf_lcld_opt_50000_4W
+  name: periodic_20000_rf_lcld_new_50000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -644,9 +644,9 @@ runs:
       period: 20000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_20000_rf_lcld_opt_50000_0
+  name: periodic_20000_rf_lcld_new_50000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -659,9 +659,9 @@ runs:
       period: 20000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_20000_rf_lcld_opt_100000_4W
+  name: periodic_20000_rf_lcld_new_100000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -674,9 +674,9 @@ runs:
       period: 20000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_20000_rf_lcld_opt_100000_0
+  name: periodic_20000_rf_lcld_new_100000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -689,9 +689,9 @@ runs:
       period: 20000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_20000_rf_lcld_opt_200000_4W
+  name: periodic_20000_rf_lcld_new_200000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -704,9 +704,9 @@ runs:
       period: 20000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_20000_rf_lcld_opt_200000_0
+  name: periodic_20000_rf_lcld_new_200000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -719,9 +719,9 @@ runs:
       period: 20000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_20000_rf_lcld_opt_500000_4W
+  name: periodic_20000_rf_lcld_new_500000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -734,9 +734,9 @@ runs:
       period: 20000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_20000_rf_lcld_opt_500000_0
+  name: periodic_20000_rf_lcld_new_500000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -869,9 +869,9 @@ runs:
       period: 50000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_50000_rf_lcld_opt_50000_4W
+  name: periodic_50000_rf_lcld_new_50000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -884,9 +884,9 @@ runs:
       period: 50000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_50000_rf_lcld_opt_50000_0
+  name: periodic_50000_rf_lcld_new_50000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -899,9 +899,9 @@ runs:
       period: 50000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_50000_rf_lcld_opt_100000_4W
+  name: periodic_50000_rf_lcld_new_100000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -914,9 +914,9 @@ runs:
       period: 50000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_50000_rf_lcld_opt_100000_0
+  name: periodic_50000_rf_lcld_new_100000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -929,9 +929,9 @@ runs:
       period: 50000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_50000_rf_lcld_opt_200000_4W
+  name: periodic_50000_rf_lcld_new_200000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -944,9 +944,9 @@ runs:
       period: 50000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_50000_rf_lcld_opt_200000_0
+  name: periodic_50000_rf_lcld_new_200000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -959,9 +959,9 @@ runs:
       period: 50000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_50000_rf_lcld_opt_500000_4W
+  name: periodic_50000_rf_lcld_new_500000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -974,9 +974,9 @@ runs:
       period: 50000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_50000_rf_lcld_opt_500000_0
+  name: periodic_50000_rf_lcld_new_500000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1109,9 +1109,9 @@ runs:
       period: 100000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_100000_rf_lcld_opt_50000_4W
+  name: periodic_100000_rf_lcld_new_50000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1124,9 +1124,9 @@ runs:
       period: 100000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_100000_rf_lcld_opt_50000_0
+  name: periodic_100000_rf_lcld_new_50000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1139,9 +1139,9 @@ runs:
       period: 100000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_100000_rf_lcld_opt_100000_4W
+  name: periodic_100000_rf_lcld_new_100000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1154,9 +1154,9 @@ runs:
       period: 100000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_100000_rf_lcld_opt_100000_0
+  name: periodic_100000_rf_lcld_new_100000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1169,9 +1169,9 @@ runs:
       period: 100000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_100000_rf_lcld_opt_200000_4W
+  name: periodic_100000_rf_lcld_new_200000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1184,9 +1184,9 @@ runs:
       period: 100000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_100000_rf_lcld_opt_200000_0
+  name: periodic_100000_rf_lcld_new_200000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1199,9 +1199,9 @@ runs:
       period: 100000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_100000_rf_lcld_opt_500000_4W
+  name: periodic_100000_rf_lcld_new_500000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1214,9 +1214,9 @@ runs:
       period: 100000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_100000_rf_lcld_opt_500000_0
+  name: periodic_100000_rf_lcld_new_500000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1349,9 +1349,9 @@ runs:
       period: 200000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_200000_rf_lcld_opt_50000_4W
+  name: periodic_200000_rf_lcld_new_50000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1364,9 +1364,9 @@ runs:
       period: 200000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_200000_rf_lcld_opt_50000_0
+  name: periodic_200000_rf_lcld_new_50000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1379,9 +1379,9 @@ runs:
       period: 200000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_200000_rf_lcld_opt_100000_4W
+  name: periodic_200000_rf_lcld_new_100000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1394,9 +1394,9 @@ runs:
       period: 200000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_200000_rf_lcld_opt_100000_0
+  name: periodic_200000_rf_lcld_new_100000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1409,9 +1409,9 @@ runs:
       period: 200000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_200000_rf_lcld_opt_200000_4W
+  name: periodic_200000_rf_lcld_new_200000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1424,9 +1424,9 @@ runs:
       period: 200000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_200000_rf_lcld_opt_200000_0
+  name: periodic_200000_rf_lcld_new_200000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1439,9 +1439,9 @@ runs:
       period: 200000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_200000_rf_lcld_opt_500000_4W
+  name: periodic_200000_rf_lcld_new_500000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1454,9 +1454,9 @@ runs:
       period: 200000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_200000_rf_lcld_opt_500000_0
+  name: periodic_200000_rf_lcld_new_500000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1589,9 +1589,9 @@ runs:
       period: 500000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_500000_rf_lcld_opt_50000_4W
+  name: periodic_500000_rf_lcld_new_50000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1604,9 +1604,9 @@ runs:
       period: 500000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_500000_rf_lcld_opt_50000_0
+  name: periodic_500000_rf_lcld_new_50000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1619,9 +1619,9 @@ runs:
       period: 500000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_500000_rf_lcld_opt_100000_4W
+  name: periodic_500000_rf_lcld_new_100000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1634,9 +1634,9 @@ runs:
       period: 500000
   end_train_idx: 100000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_500000_rf_lcld_opt_100000_0
+  name: periodic_500000_rf_lcld_new_100000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1649,9 +1649,9 @@ runs:
       period: 500000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_500000_rf_lcld_opt_200000_4W
+  name: periodic_500000_rf_lcld_new_200000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1664,9 +1664,9 @@ runs:
       period: 500000
   end_train_idx: 200000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_500000_rf_lcld_opt_200000_0
+  name: periodic_500000_rf_lcld_new_200000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1679,9 +1679,9 @@ runs:
       period: 500000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_500000_rf_lcld_opt_500000_4W
+  name: periodic_500000_rf_lcld_new_500000_4W
   train_all_data: false
   type: baseline
 - delays:
@@ -1694,9 +1694,9 @@ runs:
       period: 500000
   end_train_idx: 500000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_500000_rf_lcld_opt_500000_0
+  name: periodic_500000_rf_lcld_new_500000_0
   train_all_data: false
   type: baseline
 - delays:
@@ -1739,9 +1739,9 @@ runs:
       period: 5000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_5000_rf_lcld_opt_4W
+  name: periodic_5000_rf_lcld_new_4W
   train_all_data: true
   type: baseline
 - delays:
@@ -1754,9 +1754,9 @@ runs:
       period: 5000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_5000_rf_lcld_opt_0
+  name: periodic_5000_rf_lcld_new_0
   train_all_data: true
   type: baseline
 - delays:
@@ -1799,9 +1799,9 @@ runs:
       period: 10000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_10000_rf_lcld_opt_4W
+  name: periodic_10000_rf_lcld_new_4W
   train_all_data: true
   type: baseline
 - delays:
@@ -1814,9 +1814,9 @@ runs:
       period: 10000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_10000_rf_lcld_opt_0
+  name: periodic_10000_rf_lcld_new_0
   train_all_data: true
   type: baseline
 - delays:
@@ -1859,9 +1859,9 @@ runs:
       period: 20000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_20000_rf_lcld_opt_4W
+  name: periodic_20000_rf_lcld_new_4W
   train_all_data: true
   type: baseline
 - delays:
@@ -1874,9 +1874,9 @@ runs:
       period: 20000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_20000_rf_lcld_opt_0
+  name: periodic_20000_rf_lcld_new_0
   train_all_data: true
   type: baseline
 - delays:
@@ -1919,9 +1919,9 @@ runs:
       period: 50000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_50000_rf_lcld_opt_4W
+  name: periodic_50000_rf_lcld_new_4W
   train_all_data: true
   type: baseline
 - delays:
@@ -1934,9 +1934,9 @@ runs:
       period: 50000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_50000_rf_lcld_opt_0
+  name: periodic_50000_rf_lcld_new_0
   train_all_data: true
   type: baseline
 - delays:
@@ -1979,9 +1979,9 @@ runs:
       period: 100000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_100000_rf_lcld_opt_4W
+  name: periodic_100000_rf_lcld_new_4W
   train_all_data: true
   type: baseline
 - delays:
@@ -1994,9 +1994,9 @@ runs:
       period: 100000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_100000_rf_lcld_opt_0
+  name: periodic_100000_rf_lcld_new_0
   train_all_data: true
   type: baseline
 - delays:
@@ -2039,9 +2039,9 @@ runs:
       period: 200000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_200000_rf_lcld_opt_4W
+  name: periodic_200000_rf_lcld_new_4W
   train_all_data: true
   type: baseline
 - delays:
@@ -2054,9 +2054,9 @@ runs:
       period: 200000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_200000_rf_lcld_opt_0
+  name: periodic_200000_rf_lcld_new_0
   train_all_data: true
   type: baseline
 - delays:
@@ -2099,9 +2099,9 @@ runs:
       period: 500000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_500000_rf_lcld_opt_4W
+  name: periodic_500000_rf_lcld_new_4W
   train_all_data: true
   type: baseline
 - delays:
@@ -2114,8 +2114,8 @@ runs:
       period: 500000
   end_train_idx: 50000
   model:
-    name: rf_lcld_opt
+    name: rf_lcld_new
     source: drift_study.model_arch.tree_model
-  name: periodic_500000_rf_lcld_opt_0
+  name: periodic_500000_rf_lcld_new_0
   train_all_data: true
   type: baseline
