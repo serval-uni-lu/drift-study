@@ -34,6 +34,38 @@ class RfLcld(SkModel):
         )
 
 
+class RfLcldNew(SkModel):
+    def __init__(self, name: str = "rf_lcld_new", **kwargs: Any):
+        super(RfLcldNew, self).__init__(
+            name=name, objective="binary", **kwargs
+        )
+
+        rf_parameters = {
+            "bootstrap": True,
+            "ccp_alpha": 0.0,
+            "class_weight": "balanced",
+            "criterion": "gini",
+            "max_depth": 13,
+            "max_features": 0.6404278584766243,
+            "max_leaf_nodes": None,
+            "max_samples": None,
+            "min_impurity_decrease": 0.0,
+            "min_samples_leaf": 49,
+            "min_samples_split": 146,
+            "min_weight_fraction_leaf": 0.0,
+            "n_estimators": 663,
+            "oob_score": False,
+            "verbose": 0,
+            "warm_start": False,
+        }
+
+        self.model = RandomForestClassifier(
+            **rf_parameters,
+            random_state=kwargs.get("random_state"),
+            n_jobs=kwargs.get("n_jobs"),
+        )
+
+
 class Rf(SkModel):
     def __init__(
         self,
@@ -82,6 +114,7 @@ class Rf(SkModel):
 models = [
     ("rf_regression", RandomForestRegressorModel),
     ("rf_lcld", RfLcld),
+    ("rf_lcld_new", RfLcldNew),
     ("rf_classifier", Rf),
     (
         "opt_rf_classifier",
