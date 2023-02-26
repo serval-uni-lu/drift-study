@@ -99,7 +99,6 @@ def execute_one_fold(
     list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> Tuple[int, float]:
 
-    run_config = copy.deepcopy(run_config)
     run_config["end_train_idx"] = int(train_idx[-1])
     run_config["last_idx"] = int(test_idx[-1])
     run_config["n_early_stopping"] = floor(
@@ -138,8 +137,8 @@ def execute_one_trial(
         metrics = Parallel(n_jobs=n_jobs)(
             delayed(execute_one_fold)(
                 trial,
-                config,
-                run_config,
+                copy.deepcopy(config),
+                copy.deepcopy(run_config),
                 list_drift_detector,
                 train_index,
                 test_index,
@@ -241,8 +240,8 @@ def run(
         study.optimize(
             lambda trial_l: execute_one_trial(
                 trial_l,
-                config,
-                run_config,
+                copy.deepcopy(config),
+                copy.deepcopy(run_config),
                 list_drift_detector,
                 lock_model_writing,
                 list_model_writing,
