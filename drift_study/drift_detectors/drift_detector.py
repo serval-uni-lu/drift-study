@@ -1,4 +1,5 @@
 import abc
+import logging
 from abc import ABC
 from typing import Any, Dict, Optional, Tuple, Union
 
@@ -56,3 +57,11 @@ class DriftDetector(ABC):
     @abc.abstractmethod
     def needs_model(self) -> bool:
         pass
+
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        logger = logging.getLogger()
+        logger.warning("Default parameters not set.")
+        return None

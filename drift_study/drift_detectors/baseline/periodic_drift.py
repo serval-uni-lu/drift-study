@@ -59,5 +59,12 @@ class PeriodicDrift(DriftDetector):
         }
         return params
 
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        params = {"period": trial_params["period"]["min"]}
+        return params
+
 
 detectors = {"periodic": PeriodicDrift}

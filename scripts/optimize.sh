@@ -1,3 +1,12 @@
+python -m drift_study.optimize_simulator \
+  -c config/lcld_opt.yaml \
+  -c config/delays_all.yaml \
+  -c config/lcld_rf.yaml \
+  -c config/rf_optimize.yaml \
+  -p sub_dir_path=opt_delays_all \
+  -p models_dir=./models
+
+
 sbatch launch.sh python -m drift_study.optimize_simulator \
   -c config/lcld.yaml \
   -c config/delays_all.yaml \

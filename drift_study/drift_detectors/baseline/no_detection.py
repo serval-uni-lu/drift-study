@@ -45,6 +45,11 @@ class NoDetection(DriftDetector):
     ) -> Dict[str, Any]:
         return {}
 
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {}
+
 
 detectors: Dict[str, Type[DriftDetector]] = {
     "no_detection": NoDetection,

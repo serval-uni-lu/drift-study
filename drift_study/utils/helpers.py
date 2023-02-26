@@ -97,10 +97,11 @@ def get_model_l(
 ) -> Model:
 
     model_class = get_model(run_config.get("model"))
+    n_jobs = config.get("performance", {}).get("n_jobs", {}).get("model", None)
     model = model_class(
         # x_metadata=metadata,
         verbose=0,
-        n_jobs=config.get("performance", {"n_jobs": 1}).get("n_jobs", 1),
+        n_jobs=n_jobs,
         random_state=config.get("experience", {}).get("random_state"),
     )
 

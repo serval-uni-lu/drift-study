@@ -1,15 +1,15 @@
 ---
 runs:
 # # ------------ NO Drift
-#   - name: no_detection
-#     type: baseline
-#     detectors:
-#       - name: no_detection
+   - name: no_detection
+     type: baseline
+     detectors:
+       - name: no_detection
 # # ------------ Periodic
-#   - name: periodic
-#     type: baseline
-#     detectors:
-#       - name: periodic
+   - name: periodic
+     type: baseline
+     detectors:
+       - name: periodic
 # # ------------ Error Based
 #   - name: adwin_proba
 #     type: error
@@ -95,12 +95,12 @@ runs:
 #       - name: n_batch
 #       - name: aries
 #       - name: adwin
-  - name: rf_uncertainty
-    type: predictive
-    detectors:
-      - name: n_batch
-      - name: rf_uncertainty
-      - name: adwin
-        params:
-          metric_conf:
-            name: y_scores
+#  - name: rf_uncertainty
+#    type: predictive
+#    detectors:
+#      - name: n_batch
+#      - name: rf_uncertainty
+#      - name: adwin
+#        params:
+#          metric_conf:
+#            name: y_scores

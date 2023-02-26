@@ -1,11 +1,16 @@
+import copy
 import logging
 import os
-from multiprocessing import Lock, Manager
+from math import floor
+from multiprocessing import Manager
+from multiprocessing.synchronize import Lock as LockType
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import configutils
 import joblib
+import numpy as np
+import numpy.typing as npt
 import optuna
 from configutils.utils import merge_parameters
 from joblib import Parallel, delayed, parallel_backend
@@ -14,6 +19,7 @@ from optuna import Study
 from optuna._callbacks import MaxTrialsCallback, RetryFailedTrialCallback
 from optuna.samplers import TPESampler
 from optuna.trial import FrozenTrial, TrialState
+from sklearn.model_selection import TimeSeriesSplit
 
 from drift_study import run_simulator
 from drift_study.drift_detectors.drift_detector_factory import (
@@ -45,12 +51,28 @@ def update_params(
     config["runs"] = [run_config]
 
 
+def get_default_params(
+    config: Dict[str, Any],
+    run_config: Dict[str, Any],
+    list_drift_detector: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    out = {}
+    for i, e in enumerate(list_drift_detector):
+        out = merge_parameters(
+            out,
+            e["detector"].get_default_params(
+                trial_params=config["trial_params"]
+            ),
+        )
+    return out
+
+
 def manual_save_run(
     config: Dict[str, Any],
     run_config: Dict[str, Any],
-    n_train: int,
-    ml_metric: float,
-):
+    n_train: List[int],
+    ml_metric: List[float],
+) -> None:
     out = {"config": config, "n_train": n_train, "ml_metric": ml_metric}
 
     model_name = run_config["model"]["name"]
@@ -66,14 +88,40 @@ def manual_save_run(
     save_json(out, out_path)
 
 
+def execute_one_fold(
+    trial: optuna.Trial,
+    config: Dict[str, Any],
+    run_config: Dict[str, Any],
+    list_drift_detector: List[Dict[str, Any]],
+    train_idx: npt.NDArray[np.int_],
+    test_idx: npt.NDArray[np.int_],
+    lock_model_writing: Optional[LockType] = None,
+    list_model_writing: Optional[Dict[str, Any]] = None,
+) -> Tuple[int, float]:
+
+    run_config = copy.deepcopy(run_config)
+    run_config["end_train_idx"] = train_idx[-1]
+    run_config["last_idx"] = test_idx[-1]
+    run_config["n_early_stopping"] = floor(
+        (test_idx[-1] - train_idx[-1])
+        / config["trial_params"]["period"]["min"]
+    )
+    config["runs"] = [run_config]
+    n_train, ml_metric = run_simulator.run(
+        config, 0, lock_model_writing, list_model_writing, verbose=0
+    )
+
+    return n_train, ml_metric
+
+
 def execute_one_trial(
     trial: optuna.Trial,
     config: Dict[str, Any],
     run_config: Dict[str, Any],
     list_drift_detector: List[Dict[str, Any]],
-    lock_model_writing: Optional[Lock] = None,
+    lock_model_writing: Optional[LockType] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
-) -> Tuple[int, float]:
+) -> Tuple[float, float]:
 
     update_params(
         trial,
@@ -81,18 +129,40 @@ def execute_one_trial(
         run_config,
         list_drift_detector,
     )
-    n_train, ml_metric = run_simulator.run(
-        config, 0, lock_model_writing, list_model_writing, verbose=0
-    )
+
+    n_jobs = config["performance"]["n_jobs"]["k_fold"]
+    tscv = TimeSeriesSplit(n_splits=config["evaluation_params"]["n_splits"])
+
+    end_train_idx = run_config["end_train_idx"]
+    with parallel_backend("loky", n_jobs=n_jobs):
+        metrics = Parallel(n_jobs=n_jobs)(
+            delayed(execute_one_fold)(
+                trial,
+                config,
+                run_config,
+                list_drift_detector,
+                train_index,
+                test_index,
+                lock_model_writing,
+                list_model_writing,
+            )
+            for (train_index, test_index) in reversed(
+                list(tscv.split(np.arange(end_train_idx)))
+            )
+        )
+
+    n_train = [m[0] for m in metrics]
+    ml_metric = [m[1] for m in metrics]
+
     manual_save_run(config, run_config, n_train, ml_metric)
 
-    return n_train, ml_metric
+    return float(np.mean(n_train)), float(np.mean(ml_metric))
 
 
 def run(
     config: Dict[str, Any],
     run_i: int,
-    lock_model_writing: Optional[Lock] = None,
+    lock_model_writing: Optional[LockType] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> None:
     optuna.logging.set_verbosity(optuna.logging.ERROR)
@@ -101,7 +171,7 @@ def run(
 
     # CONFIG
     run_config = merge_parameters(
-        config.get("common_runs_params"), config.get("runs")[run_i]
+        config.get("common_runs_params"), config["runs"][run_i]
     )
     logger.info(f"Optimizing config {run_config.get('name')}")
 
@@ -148,12 +218,24 @@ def run(
         load_if_exists=True,
     )
     n_to_finish = config["trial_params"]["n_trials"]
+    if run_config["detectors"][0]["name"] == "no_detection":
+        n_to_finish = 1
+
     n_completed = len(study.get_trials(states=(TrialState.COMPLETE,)))
     print(f"Completed {study_name}: {n_completed}")
 
-    def logger_done_callback(study_l: Study, frozen_trial: FrozenTrial):
+    def logger_done_callback(
+        study_l: Study, frozen_trial: FrozenTrial
+    ) -> None:
         n_done = len(study_l.get_trials(states=(TrialState.COMPLETE,)))
         print(f"Completed {study_name}: {n_done}")
+
+    if n_completed == 0:
+        default_params = get_default_params(
+            config, run_config, list_drift_detector
+        )
+        if default_params is not None:
+            study.enqueue_trial(default_params)
 
     if n_completed < n_to_finish:
         study.optimize(
@@ -167,7 +249,7 @@ def run(
             ),
             callbacks=[
                 MaxTrialsCallback(
-                    config["trial_params"]["n_trials"],
+                    n_to_finish,
                     states=(TrialState.COMPLETE,),
                 ),
                 lambda *_: joblib.dump(sampler, sampler_path),
@@ -187,17 +269,17 @@ def run_many() -> None:
     if n_jobs_optimiser == 1:
         logger.info("Running in sequence.")
         for i in range(len(config_all.get("runs"))):
-            run(config_all, i)
+            run(copy.deepcopy(config_all), i)
     else:
         logger.info("Running in parallel.")
         with Manager() as manager:
             lock = manager.Lock()
-            dico = manager.dict()
+            dico: Dict[str, Any] = manager.dict()
             with parallel_backend(
                 "loky", inner_max_num_threads=inner_max_num_threads
             ):
                 Parallel(n_jobs=n_jobs_optimiser,)(
-                    delayed(run)(config_all, i, lock, dico)
+                    delayed(run)(copy.deepcopy(config_all), i, lock, dico)
                     for i in range(len(config_all.get("runs")))
                 )
 
