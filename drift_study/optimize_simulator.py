@@ -100,8 +100,8 @@ def execute_one_fold(
 ) -> Tuple[int, float]:
 
     run_config = copy.deepcopy(run_config)
-    run_config["end_train_idx"] = train_idx[-1]
-    run_config["last_idx"] = test_idx[-1]
+    run_config["end_train_idx"] = int(train_idx[-1])
+    run_config["last_idx"] = int(test_idx[-1])
     run_config["n_early_stopping"] = floor(
         (test_idx[-1] - train_idx[-1])
         / config["trial_params"]["period"]["min"]
