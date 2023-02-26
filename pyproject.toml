@@ -23,6 +23,7 @@ autoattack = { git = "https://github.com/fra31/auto-attack.git", rev = "6482e4d6
 seaborn = "^0.12.1"
 alibi-detect = {extras = ["torch"], version = "^0.10.4"}
 imbalanced-learn = "^0.10.1"
+optuna = "^3.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
