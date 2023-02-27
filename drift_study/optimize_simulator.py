@@ -195,6 +195,8 @@ def run(
     studies_path = f"{studies_dir}/study_{study_name}.db"
     Path(studies_path).parent.mkdir(parents=True, exist_ok=True)
 
+    warnings.filterwarnings("ignore", category=ExperimentalWarning)
+
     failed_trial_callback = RetryFailedTrialCallback(max_retry=None)
     storage = optuna.storages.RDBStorage(
         url=f"sqlite:///{studies_path}",
