@@ -171,7 +171,7 @@ def run(
 ) -> None:
     # optuna.logging.set_verbosity(optuna.logging.ERROR)
 
-    logger = logging.getLogger()
+    logger = logging.getLogger(__name__)
     # CONFIG
     run_config = merge_parameters(
         config.get("common_runs_params"), config["runs"][run_i]

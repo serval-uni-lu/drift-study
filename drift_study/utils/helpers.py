@@ -1,5 +1,4 @@
 import logging
-import os
 from multiprocessing import Lock
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -23,9 +22,6 @@ from drift_study.utils.delays import Delays
 from drift_study.utils.drift_model import DriftModel
 from drift_study.utils.io_utils import load_do_save_model
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
-logger = logging.getLogger(__name__)
-
 
 def update_dataset_name(
     dataset: Dataset, minority_share: Optional[float]
@@ -45,6 +41,7 @@ def initialize(
     ArrayLike,
     ArrayLike,
 ]:
+    logger = logging.getLogger(__name__)
     logger.debug(f"Loading dataset {config.get('dataset', {}).get('name')}")
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
@@ -163,6 +160,7 @@ def compute_y_scores(
     predict_forward: int,
     last_idx: int,
 ):
+    logger = logging.getLogger(__name__)
     if model_used[current_index] < current_model_i:
         logger.debug(f"Seeing forward at index {current_index}")
         end_idx = min(current_index + predict_forward, last_idx)
