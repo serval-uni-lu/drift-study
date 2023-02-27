@@ -278,7 +278,7 @@ def run_many(config: Dict[str, Any]) -> None:
             lock = manager.Lock()
             dico: Dict[str, Any] = manager.dict()
             with parallel_backend("loky", n_jobs=n_jobs_optimiser):
-                Parallel(n_jobs=n_jobs_optimiser,)(
+                Parallel()(
                     delayed(run)(copy.deepcopy(config_all), i, lock, dico)
                     for i in range(len(config_all.get("runs")))
                 )
