@@ -135,8 +135,12 @@ def execute_one_trial(
     tscv = TimeSeriesSplit(n_splits=config["evaluation_params"]["n_splits"])
 
     end_train_idx = run_config["end_train_idx"]
-    with parallel_backend("loky", n_jobs=n_jobs):
-        metrics = Parallel(n_jobs=n_jobs)(
+    with parallel_backend(
+        "loky",
+        n_jobs=n_jobs,
+        inner_max_num_threads=config["performance"]["n_jobs"]["model"],
+    ):
+        metrics = Parallel()(
             delayed(execute_one_fold)(
                 i,
                 copy.deepcopy(config),
