@@ -97,6 +97,15 @@ class TabularAlibiDrift(DriftDetector):
             ),
         }
 
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {
+            "p_val": 0.05,
+            "correction": "bonferroni",
+        }
+
     def needs_model(self) -> bool:
         return False
 

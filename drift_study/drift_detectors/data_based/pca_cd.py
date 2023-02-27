@@ -410,5 +410,16 @@ class PcaCdDrift(DriftDetector):
             "ph_t_ratio": trial.suggest_float("ph_t_ratio", 1e-4, 1e-1),
         }
 
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {
+            "divergence_metric": "kl",
+            "ev_threshold": 0.99,
+            "delta": 0.1,
+            "ph_t_ratio": 0.001,
+        }
+
 
 detectors: Dict[str, Type[DriftDetector]] = {"pca_cd": PcaCdDrift}

@@ -107,6 +107,15 @@ class AdwinDrift(RiverDrift):
             "grace_period": trial.suggest_int("grace_period", 10, 1000),
         }
 
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {
+            "delta": 0.002,
+            "grace_period": 10,
+        }
+
 
 class DdmDrift(RiverDrift):
     def __init__(
@@ -134,6 +143,15 @@ class DdmDrift(RiverDrift):
             "drift_threshold": trial.suggest_float(
                 "drift_threshold", 3e-1, 3e1
             ),
+        }
+
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {
+            "warm_start": 30,
+            "drift_threshold": 3.0,
         }
 
 
@@ -166,6 +184,16 @@ class EddmDrift(RiverDrift):
             "alpha": alpha,
         }
 
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {
+            "warm_start": 30,
+            "alpha": 0.95,
+            "beta": 0.9,
+        }
+
 
 class HdddmADrift(RiverDrift):
     def __init__(
@@ -190,6 +218,14 @@ class HdddmADrift(RiverDrift):
     ) -> Dict[str, Any]:
         return {
             "drift_confidence": trial.suggest_float("drift_confidence", 0, 1),
+        }
+
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {
+            "drift_confidence": 0.001,
         }
 
 
@@ -220,6 +256,12 @@ class HdddmWDrift(RiverDrift):
             "drift_confidence": trial.suggest_float("drift_confidence", 0, 1),
             "lambda_val": trial.suggest_float("lambda_val", 0, 1),
         }
+
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {"drift_confidence": 0.001, "lambda_val": 0.05}
 
 
 class KswinDrift(RiverDrift):
@@ -252,6 +294,16 @@ class KswinDrift(RiverDrift):
             "alpha": trial.suggest_float("alpha", 1e-6, 2e-2),
             "stat_size": stat_size,
             "ks_window_size": ks_window_size,
+        }
+
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {
+            "alpha": 0.005,
+            "stat_size": 30,
+            "ks_window_size": 100,
         }
 
 
@@ -288,6 +340,17 @@ class PageHinkleyDrift(RiverDrift):
             "delta": trial.suggest_float("delta", 1e-6, 1e-2),
             "threshold": trial.suggest_float("threshold", 1, 5e2),
             "alpha": trial.suggest_float("alpha", 1 - 1e-1, 1 - 1e-9),
+        }
+
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {
+            "min_instances": 30,
+            "delta": 0.005,
+            "threshold": 50.0,
+            "alpha": 1 - 0.0001,
         }
 
 

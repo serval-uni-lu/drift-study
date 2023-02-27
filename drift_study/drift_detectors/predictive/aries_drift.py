@@ -111,6 +111,14 @@ class AriesDrift(DriftDetector):
             "section_num": trial.suggest_int("section_num", 10, 100),
         }
 
+    @staticmethod
+    def get_default_params(trial_params: Dict[str, Any]) -> Dict[str, Any]:
+        if trial_params["model_type"] == "random_forest":
+            return {}
+        return {
+            "section_num": 50,
+        }
+
 
 @dataclass
 class PredHist:

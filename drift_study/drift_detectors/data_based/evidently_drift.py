@@ -136,5 +136,15 @@ class EvidentlyDrift(DriftDetector):
             "drift_share": trial.suggest_float("drift_share", 1e-6, 1),
         }
 
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {
+            "num_threshold": 0.05,
+            "cat_threshold": 0.05,
+            "drift_share": 0.5,
+        }
+
 
 detectors: Dict[str, Type[DriftDetector]] = {"evidently": EvidentlyDrift}

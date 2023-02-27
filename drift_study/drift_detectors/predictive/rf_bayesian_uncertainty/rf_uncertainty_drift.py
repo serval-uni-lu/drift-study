@@ -121,6 +121,10 @@ class RfUncertaintyDrift(DriftDetector):
             )
         }
 
+    @staticmethod
+    def get_default_params(trial_params: Dict[str, Any]) -> Dict[str, Any]:
+        return {"uncertainty_type": "total"}
+
 
 detectors: Dict[str, Type[DriftDetector]] = {
     "rf_uncertainty": RfUncertaintyDrift
