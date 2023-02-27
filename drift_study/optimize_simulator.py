@@ -259,9 +259,8 @@ def run(
 def run_many() -> None:
     config_all = configutils.get_config()
 
-    n_jobs_optimiser = config_all["performance"].get("n_jobs_optimiser", 1)
-    inner_max_num_threads = config_all["performance"].get(
-        "inner_max_num_threads", 1
+    n_jobs_optimiser = (
+        config_all["performance"].get("n_jobs", {}).get("optimizer", 1)
     )
 
     if n_jobs_optimiser == 1:
@@ -273,9 +272,7 @@ def run_many() -> None:
         with Manager() as manager:
             lock = manager.Lock()
             dico: Dict[str, Any] = manager.dict()
-            with parallel_backend(
-                "loky", inner_max_num_threads=inner_max_num_threads
-            ):
+            with parallel_backend("loky", n_jobs=n_jobs_optimiser):
                 Parallel(n_jobs=n_jobs_optimiser,)(
                     delayed(run)(copy.deepcopy(config_all), i, lock, dico)
                     for i in range(len(config_all.get("runs")))
