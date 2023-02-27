@@ -1,7 +1,7 @@
 #!/bin/bash
 for dataset in lcld
 do
-    for delay in delays_all, delay_none
+    for delay in delays_all delays_none
     do
         for n_input in 100000 300000
         do
