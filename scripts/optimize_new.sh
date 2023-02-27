@@ -12,8 +12,7 @@ do
                   -c config/${dataset}_rf.yaml
                   -c config/rf_optimize.yaml
                   -p common_runs_params.end_train_idx=${n_input}
-                  -p sub_dir_path=opt_${n_input}_${delay}
-                  -p models_dir=./models"
+                  -p sub_dir_path=opt_${n_input}_${delay}"
         done
     done
 done
