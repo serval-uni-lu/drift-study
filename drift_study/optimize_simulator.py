@@ -99,6 +99,8 @@ def execute_one_fold(
 ) -> Tuple[int, float]:
 
     run_config["name"] = run_config["name"] + f"_f{fold_idx}"
+    print(f"Starting { run_config['name'] }...")
+
     run_config["end_train_idx"] = int(train_idx[-1])
     run_config["last_idx"] = int(test_idx[-1])
     run_config["n_early_stopping"] = floor(
@@ -109,7 +111,7 @@ def execute_one_fold(
     n_train, ml_metric = run_simulator.run(
         config, 0, lock_model_writing, list_model_writing, verbose=0
     )
-
+    print(f"Completed {run_config['name']}.")
     return n_train, ml_metric
 
 
