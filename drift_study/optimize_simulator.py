@@ -1,6 +1,7 @@
 import copy
-import logging
+import logging.config
 import os
+import warnings
 from math import floor
 from multiprocessing import Manager
 from multiprocessing.synchronize import Lock as LockType
@@ -17,6 +18,7 @@ from joblib import Parallel, delayed, parallel_backend
 from mlc.load_do_save import save_json
 from optuna import Study
 from optuna._callbacks import MaxTrialsCallback, RetryFailedTrialCallback
+from optuna.exceptions import ExperimentalWarning
 from optuna.samplers import TPESampler
 from optuna.trial import FrozenTrial, TrialState
 from sklearn.model_selection import TimeSeriesSplit
@@ -26,9 +28,6 @@ from drift_study.drift_detectors.drift_detector_factory import (
     get_drift_detector_class_from_conf,
 )
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
-logger = logging.getLogger(__name__)
-
 
 def update_params(
     trial: optuna.Trial,
@@ -36,7 +35,7 @@ def update_params(
     run_config: Dict[str, Any],
     list_drift_detector: List[Dict[str, Any]],
 ) -> None:
-
+    logger = logging.getLogger(__name__)
     run_config["name"] = run_config["name"] + str(trial.number)
     for i, e in enumerate(list_drift_detector):
         new_params = merge_parameters(
@@ -99,7 +98,8 @@ def execute_one_fold(
 ) -> Tuple[int, float]:
 
     run_config["name"] = run_config["name"] + f"_f{fold_idx}"
-    print(f"Starting { run_config['name'] }...")
+    logger = logging.getLogger(__name__)
+    logger.info(f"Starting { run_config['name'] }...")
 
     run_config["end_train_idx"] = int(train_idx[-1])
     run_config["last_idx"] = int(test_idx[-1])
@@ -111,7 +111,7 @@ def execute_one_fold(
     n_train, ml_metric = run_simulator.run(
         config, 0, lock_model_writing, list_model_writing, verbose=0
     )
-    print(f"Completed {run_config['name']}.")
+    logger.info(f"Completed {run_config['name']}.")
     return n_train, ml_metric
 
 
@@ -226,13 +226,13 @@ def run(
         n_to_finish = 1
 
     n_completed = len(study.get_trials(states=(TrialState.COMPLETE,)))
-    print(f"Completed {study_name}: {n_completed}")
+    logger.info(f"Completed {study_name}: {n_completed}")
 
     def logger_done_callback(
         study_l: Study, frozen_trial: FrozenTrial
     ) -> None:
         n_done = len(study_l.get_trials(states=(TrialState.COMPLETE,)))
-        print(f"Completed {study_name}: {n_done}")
+        logger.info(f"Completed {study_name}: {n_done}")
 
     if n_completed == 0:
         default_params = get_default_params(
@@ -262,9 +262,8 @@ def run(
         )
 
 
-def run_many() -> None:
-    config_all = configutils.get_config()
-
+def run_many(config: Dict[str, Any]) -> None:
+    logger = logging.getLogger(__name__)
     n_jobs_optimiser = (
         config_all["performance"].get("n_jobs", {}).get("optimizer", 1)
     )
@@ -286,5 +285,9 @@ def run_many() -> None:
 
 
 if __name__ == "__main__":
-    optuna.logging.set_verbosity(optuna.logging.ERROR)
-    run_many()
+    config_all = configutils.get_config()
+    logging_config = config_all.get("logging")
+    if logging_config is not None:
+        logging.config.dictConfig(logging_config)
+    warnings.filterwarnings("ignore", category=ExperimentalWarning)
+    run_many(config_all)

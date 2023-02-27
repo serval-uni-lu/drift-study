@@ -1,6 +1,5 @@
 import logging
 import os
-import warnings
 from multiprocessing import Lock, Manager
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -10,7 +9,6 @@ from configutils.utils import merge_parameters
 from joblib import Parallel, delayed, parallel_backend
 from mlc.metrics.metric_factory import create_metric
 from mlc.metrics.metrics import PredClassificationMetric
-from optuna.exceptions import ExperimentalWarning
 from tqdm import tqdm
 
 from drift_study.utils.delays import get_delays
@@ -24,13 +22,6 @@ from drift_study.utils.helpers import (
 )
 from drift_study.utils.io_utils import save_drift_run
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
-logger = logging.getLogger(__name__)
-
-warnings.filterwarnings(
-    "ignore", category=ExperimentalWarning, module="optuna.*"
-)
-
 
 def run(
     config,
@@ -39,7 +30,9 @@ def run(
     list_model_writing: Optional[Dict[str, Any]] = None,
     verbose=1,
 ) -> Tuple[int, Union[float, List[float]]]:
+
     # CONFIG
+    logger = logging.getLogger(__name__)
     run_config = merge_parameters(
         config.get("common_runs_params"), config.get("runs")[run_i]
     )
@@ -62,7 +55,7 @@ def run(
         config, run_config
     )
 
-    print(f"N inputs {len(y)}, with distribution {y.mean()}.")
+    logger.debug(f"N inputs {len(y)}, with distribution {y.mean()}.")
 
     delays = get_delays(run_config, f_new_detector())
     last_idx = run_config.get("last_idx", -1)

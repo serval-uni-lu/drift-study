@@ -7,6 +7,7 @@ do
         do
             eval "python \
                   -m drift_study.optimize_simulator \
+                  -c config/logging.yaml \
                   -c config/${dataset}_opt.yaml \
                   -c config/${delay}.yaml \
                   -c config/${dataset}_rf.yaml \
