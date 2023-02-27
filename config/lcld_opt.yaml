@@ -2,8 +2,8 @@
 performance:
   predict_forward: 10000
   n_jobs:
-    model: 2
-    optimizer: 1
+    model: 10
+    optimizer: 4
     k_fold: 3
 experience:
   random_state: 42
@@ -25,7 +25,7 @@ common_runs_params:
     drift: 0
     retraining: 4W
 trial_params:
-  n_trials: 5
+  n_trials: 100
   period:
     min: 5000
     max: 300000
