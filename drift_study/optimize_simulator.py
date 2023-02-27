@@ -169,7 +169,7 @@ def run(
     lock_model_writing: Optional[LockType] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> None:
-    # optuna.logging.set_verbosity(optuna.logging.ERROR)
+    optuna.logging.set_verbosity(optuna.logging.ERROR)
 
     logger = logging.getLogger(__name__)
     # CONFIG
