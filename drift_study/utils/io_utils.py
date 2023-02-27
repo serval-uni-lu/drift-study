@@ -13,10 +13,10 @@ from mlc.models.model import Model
 
 from drift_study.utils.drift_model import DriftModel
 
-logger = logging.getLogger(__name__)
-
 
 def attempt_read(path: str, model: Model) -> int:
+    logger = logging.getLogger(__name__)
+
     try:
         model.load(path)
         logger.debug(f"Model {path} loaded.")
@@ -34,6 +34,7 @@ def load_do_save_model(
     lock_model_writing: Optional[Lock] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> Model:
+    logger = logging.getLogger(__name__)
 
     if lock_model_writing is None:
         read = Path(path).exists()
