@@ -169,10 +169,9 @@ def run(
     lock_model_writing: Optional[LockType] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> None:
-    optuna.logging.set_verbosity(optuna.logging.ERROR)
-    logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
-    logger = logging.getLogger(__name__)
+    # optuna.logging.set_verbosity(optuna.logging.ERROR)
 
+    logger = logging.getLogger()
     # CONFIG
     run_config = merge_parameters(
         config.get("common_runs_params"), config["runs"][run_i]
