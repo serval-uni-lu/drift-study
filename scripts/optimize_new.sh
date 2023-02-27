@@ -5,7 +5,7 @@ do
     do
         for n_input in 100000 300000
         do
-            echo "python \
+            eval "python \
                   -m drift_study.optimize_simulator \
                   -c config/${dataset}_opt.yaml \
                   -c config/${delay}.yaml \
