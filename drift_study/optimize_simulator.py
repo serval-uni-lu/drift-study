@@ -1,7 +1,6 @@
 import copy
 import logging.config
 import os
-import warnings
 from math import floor
 from multiprocessing import Manager
 from multiprocessing.synchronize import Lock as LockType
@@ -18,7 +17,6 @@ from joblib import Parallel, delayed, parallel_backend
 from mlc.load_do_save import save_json
 from optuna import Study
 from optuna._callbacks import MaxTrialsCallback, RetryFailedTrialCallback
-from optuna.exceptions import ExperimentalWarning
 from optuna.samplers import TPESampler
 from optuna.trial import FrozenTrial, TrialState
 from sklearn.model_selection import TimeSeriesSplit
@@ -27,6 +25,7 @@ from drift_study import run_simulator
 from drift_study.drift_detectors.drift_detector_factory import (
     get_drift_detector_class_from_conf,
 )
+from drift_study.utils.logging import configure_logger
 
 
 def update_params(
@@ -123,6 +122,7 @@ def execute_one_trial(
     lock_model_writing: Optional[LockType] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> Tuple[float, float]:
+    configure_logger(config)
 
     update_params(
         trial,
@@ -169,6 +169,7 @@ def run(
     lock_model_writing: Optional[LockType] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> None:
+    configure_logger(config)
     optuna.logging.set_verbosity(optuna.logging.ERROR)
 
     logger = logging.getLogger(__name__)
@@ -195,7 +196,7 @@ def run(
     studies_path = f"{studies_dir}/study_{study_name}.db"
     Path(studies_path).parent.mkdir(parents=True, exist_ok=True)
 
-    warnings.filterwarnings("ignore", category=ExperimentalWarning)
+    # warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
     failed_trial_callback = RetryFailedTrialCallback(max_retry=None)
     storage = optuna.storages.RDBStorage(
@@ -287,8 +288,5 @@ def run_many(config: Dict[str, Any]) -> None:
 
 if __name__ == "__main__":
     config_all = configutils.get_config()
-    logging_config = config_all.get("logging")
-    if logging_config is not None:
-        logging.config.dictConfig(logging_config)
-    warnings.filterwarnings("ignore", category=ExperimentalWarning)
+    configure_logger(config_all)
     run_many(config_all)
