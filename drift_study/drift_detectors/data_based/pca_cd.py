@@ -417,7 +417,7 @@ class PcaCdDrift(DriftDetector):
         trial_params: Dict[str, Any]
     ) -> Optional[Dict[str, Any]]:
         return {
-            "divergence_metric": "kl",
+            "divergence_metric": "mkl",
             "ev_threshold": 0.99,
             "delta": 0.1,
             "ph_t_ratio": 0.001,
