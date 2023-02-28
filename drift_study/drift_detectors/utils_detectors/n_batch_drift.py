@@ -70,5 +70,11 @@ class NBatchDrift(DriftDetector):
     ) -> Dict[str, Any]:
         return {}
 
+    @staticmethod
+    def get_default_params(
+        trial_params: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        return {}
+
 
 detectors: Dict[str, Type[DriftDetector]] = {"n_batch": NBatchDrift}
