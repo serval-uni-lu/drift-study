@@ -197,7 +197,6 @@ def get_common_detectors_params(config: dict, metadata: pd.DataFrame):
         "categorical_features": metadata["feature"][
             metadata["type"] == "cat"
         ].to_list(),
-        "window_size": config.get("window_size"),
     }
     return {**config.get("common_detectors_params"), **auto_detector_params}
 

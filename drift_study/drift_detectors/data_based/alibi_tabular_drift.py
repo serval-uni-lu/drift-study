@@ -16,7 +16,6 @@ from drift_study.drift_detectors.drift_detector import (
 class TabularAlibiDrift(DriftDetector):
     def __init__(
         self,
-        window_size: int,
         x_metadata: pd.DataFrame,
         p_val: float = 0.05,
         correction: str = "bonferroni",
@@ -24,14 +23,13 @@ class TabularAlibiDrift(DriftDetector):
         **kwargs: Dict[str, Any],
     ) -> None:
         super().__init__(
-            window_size=window_size,
             x_metadata=x_metadata,
             p_val=p_val,
             correction=correction,
             alternative=alternative,
             **kwargs,
         )
-        self.window_size = window_size
+
         self.x_metadata = x_metadata
         self.p_val = p_val
         self.correction = correction
@@ -39,6 +37,7 @@ class TabularAlibiDrift(DriftDetector):
 
         self.x_test = pd.DataFrame()
         self.drift_detector = None
+        self.window_size = None
 
     def fit(
         self,
@@ -61,6 +60,7 @@ class TabularAlibiDrift(DriftDetector):
             categories_per_feature=categories_per_feature,
         )
         self.x_test = x
+        self.window_size = len(x)
 
     def update(
         self,

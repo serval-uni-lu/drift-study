@@ -48,7 +48,6 @@ class PcaCdDrift(DriftDetector):
 
     def __init__(
         self,
-        window_size: int,
         batch_size: int,
         divergence_metric: str = "kl",
         ev_threshold: float = 0.99,
@@ -84,7 +83,6 @@ class PcaCdDrift(DriftDetector):
         """
 
         super().__init__(
-            window_size=window_size,
             batch_size=batch_size,
             divergence_metric=divergence_metric,
             ev_threshold=ev_threshold,
@@ -92,14 +90,12 @@ class PcaCdDrift(DriftDetector):
             ph_t_ratio=ph_t_ratio,
             **kwargs,
         )
-        self.window_size = window_size
+        self.window_size = None
+        self.ph_threshold = None
+        self.bins = None
         self.batch_size = batch_size
         self.ph_t_ratio = ph_t_ratio
-        self.ph_threshold = (
-            round(self.ph_t_ratio * self.window_size) / self.batch_size
-        )
 
-        self.bins = int(np.floor(np.sqrt(self.window_size)))
         self.ev_threshold = ev_threshold
         self.divergence_metric = divergence_metric
 
@@ -126,6 +122,12 @@ class PcaCdDrift(DriftDetector):
         model: Optional[Model],
     ) -> None:
 
+        self.window_size = len(x)
+        self.ph_threshold = (
+            round(self.ph_t_ratio * self.window_size) / self.batch_size
+        )
+
+        self.bins = int(np.floor(np.sqrt(self.window_size)))
         self._reference_window = x
         self._test_window = x
         self._pca = PCA(self.ev_threshold)

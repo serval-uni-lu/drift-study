@@ -21,7 +21,6 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 class EvidentlyDrift(DriftDetector):
     def __init__(
         self,
-        window_size: int,
         numerical_features: List[str] = None,
         categorical_features: List[str] = None,
         num_threshold: float = 0.05,
@@ -31,7 +30,6 @@ class EvidentlyDrift(DriftDetector):
         **kwargs: Dict[str, Any],
     ) -> None:
         super().__init__(
-            window_size=window_size,
             numerical_features=numerical_features,
             categorical_features=categorical_features,
             num_threshold=num_threshold,
@@ -39,7 +37,7 @@ class EvidentlyDrift(DriftDetector):
             drift_share=drift_share,
             **kwargs,
         )
-        self.window_size = window_size
+        self.window_size = None
         self.numerical_features = numerical_features
         self.categorical_features = categorical_features
         self.drift_share = drift_share
@@ -77,6 +75,7 @@ class EvidentlyDrift(DriftDetector):
         self.x_ref = x
         self.x_last = x
         self.is_first_update = True
+        self.window_size = len(x)
 
     def update(
         self,
