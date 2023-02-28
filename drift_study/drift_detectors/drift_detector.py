@@ -62,6 +62,6 @@ class DriftDetector(ABC):
     def get_default_params(
         trial_params: Dict[str, Any]
     ) -> Optional[Dict[str, Any]]:
-        logger = logging.getLogger()
+        logger = logging.getLogger(__name__)
         logger.warning("Default parameters not set.")
         return None
