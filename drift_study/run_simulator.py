@@ -21,6 +21,7 @@ from drift_study.utils.helpers import (
     initialize,
 )
 from drift_study.utils.io_utils import save_drift_run
+from drift_study.utils.logging import configure_logger
 
 
 def run(
@@ -33,6 +34,7 @@ def run(
 
     # CONFIG
     logger = logging.getLogger(__name__)
+    configure_logger(config.get("logging"))
     run_config = merge_parameters(
         config.get("common_runs_params"), config.get("runs")[run_i]
     )
@@ -83,6 +85,17 @@ def run(
         f"{model_root_dir}/{dataset.name}/"
         f"{model_name}_{0}_{end_train_idx}.joblib"
     )
+
+    drift_data_path = (
+        f"./data/simulator/"
+        f"{config['dataset']['name']}/{model_name}/"
+        f"{config['sub_dir_path']}/{run_config['name']}.hdf5"
+    )
+
+    if os.path.exists(drift_data_path):
+        logger.info("Path exists, skipping.")
+        return -1, -1
+
     start_idx, end_idx = 0, end_train_idx
     add_model(
         models,
