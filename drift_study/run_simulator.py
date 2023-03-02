@@ -36,6 +36,8 @@ def run(
     # CONFIG
     configure_logger(config.get("logging"))
     logger = logging.getLogger(__name__)
+    print(__name__)
+    print(config.get("logging"))
     run_config = merge_parameters(
         config.get("common_runs_params"), config.get("runs")[run_i]
     )
