@@ -34,7 +34,7 @@ def run(
 ) -> Tuple[int, Union[float, List[float]]]:
 
     # CONFIG
-    configure_logger(config.get("logging"))
+    configure_logger(config)
     logger = logging.getLogger(__name__)
     run_config = merge_parameters(
         config.get("common_runs_params"), config.get("runs")[run_i]
@@ -92,9 +92,9 @@ def run(
         f"{config['dataset']['name']}/{model_name}/"
         f"{config['sub_dir_path']}/{run_config['name']}.hdf5"
     )
-    print(drift_data_path)
+    logger.debug(drift_data_path)
     if os.path.exists(drift_data_path):
-        print("Path exists, skipping.")
+        logger.info("Path exists, skipping.")
         return -1, -1
 
     start_idx, end_idx = 0, end_train_idx
