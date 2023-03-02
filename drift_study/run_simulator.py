@@ -36,8 +36,6 @@ def run(
     # CONFIG
     configure_logger(config.get("logging"))
     logger = logging.getLogger(__name__)
-    print(__name__)
-    print(config.get("logging"))
     run_config = merge_parameters(
         config.get("common_runs_params"), config.get("runs")[run_i]
     )
@@ -94,9 +92,9 @@ def run(
         f"{config['dataset']['name']}/{model_name}/"
         f"{config['sub_dir_path']}/{run_config['name']}.hdf5"
     )
-    logger.info(drift_data_path)
+    print(drift_data_path)
     if os.path.exists(drift_data_path):
-        logger.info("Path exists, skipping.")
+        print("Path exists, skipping.")
         return -1, -1
 
     start_idx, end_idx = 0, end_train_idx
