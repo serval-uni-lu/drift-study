@@ -1,3 +1,4 @@
+import copy
 import logging
 import os
 from multiprocessing import Lock, Manager
@@ -259,14 +260,17 @@ def run_many(
             dico = manager.dict()
             with parallel_backend("loky", n_jobs=16, inner_max_num_threads=8):
                 Parallel(n_jobs=16)(
-                    delayed(run)(config_all, i, lock, dico)
+                    delayed(run)(copy.deepcopy(config_all), i, lock, dico)
                     for i in range(len(config_all.get("runs")))
                 )
     else:
         with parallel_backend("loky", n_jobs=16, inner_max_num_threads=8):
             Parallel(n_jobs=16)(
                 delayed(run)(
-                    config_all, i, lock_model_writing, list_model_writing
+                    copy.deepcopy(config_all),
+                    i,
+                    lock_model_writing,
+                    list_model_writing,
                 )
                 for i in range(len(config_all.get("runs")))
             )
