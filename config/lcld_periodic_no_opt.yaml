@@ -1,0 +1,1071 @@
+common_detectors_params: {}
+common_runs_params:
+  delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+dataset:
+  name: lcld_201317_ds_time
+evaluation_params:
+  batch_size: 20000
+  metric:
+    name: mcc
+  n_score: 2
+experience:
+  random_state: 42
+performance:
+  inner_max_num_threads: 10
+  n_jobs: 8
+  n_jobs_optimiser: 1
+  predict_forward: 10000
+runs:
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_5000_rf_lcld_50000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_5000_rf_lcld_50000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_5000_rf_lcld_100000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_5000_rf_lcld_100000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_5000_rf_lcld_200000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_5000_rf_lcld_200000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_5000_rf_lcld_500000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_5000_rf_lcld_500000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 10000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_10000_rf_lcld_50000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 10000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_10000_rf_lcld_50000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 10000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_10000_rf_lcld_100000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 10000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_10000_rf_lcld_100000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 10000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_10000_rf_lcld_200000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 10000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_10000_rf_lcld_200000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 10000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_10000_rf_lcld_500000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 10000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_10000_rf_lcld_500000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 20000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_20000_rf_lcld_50000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 20000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_20000_rf_lcld_50000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 20000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_20000_rf_lcld_100000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 20000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_20000_rf_lcld_100000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 20000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_20000_rf_lcld_200000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 20000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_20000_rf_lcld_200000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 20000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_20000_rf_lcld_500000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 20000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_20000_rf_lcld_500000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 50000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_50000_rf_lcld_50000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 50000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_50000_rf_lcld_50000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 50000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_50000_rf_lcld_100000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 50000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_50000_rf_lcld_100000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 50000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_50000_rf_lcld_200000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 50000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_50000_rf_lcld_200000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 50000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_50000_rf_lcld_500000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 50000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_50000_rf_lcld_500000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 100000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_100000_rf_lcld_50000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 100000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_100000_rf_lcld_50000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 100000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_100000_rf_lcld_100000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 100000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_100000_rf_lcld_100000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 100000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_100000_rf_lcld_200000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 100000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_100000_rf_lcld_200000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 100000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_100000_rf_lcld_500000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 100000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_100000_rf_lcld_500000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 200000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_200000_rf_lcld_50000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 200000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_200000_rf_lcld_50000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 200000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_200000_rf_lcld_100000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 200000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_200000_rf_lcld_100000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 200000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_200000_rf_lcld_200000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 200000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_200000_rf_lcld_200000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 200000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_200000_rf_lcld_500000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 200000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_200000_rf_lcld_500000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 500000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_500000_rf_lcld_50000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 500000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_500000_rf_lcld_50000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 500000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_500000_rf_lcld_100000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 500000
+  end_train_idx: 100000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_500000_rf_lcld_100000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 500000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_500000_rf_lcld_200000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 500000
+  end_train_idx: 200000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_500000_rf_lcld_200000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 500000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_500000_rf_lcld_500000_4W
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 500000
+  end_train_idx: 500000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_500000_rf_lcld_500000_0
+  train_all_data: false
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_5000_rf_lcld_4W
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_5000_rf_lcld_0
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 10000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_10000_rf_lcld_4W
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 10000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_10000_rf_lcld_0
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 20000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_20000_rf_lcld_4W
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 20000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_20000_rf_lcld_0
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 50000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_50000_rf_lcld_4W
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 50000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_50000_rf_lcld_0
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 100000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_100000_rf_lcld_4W
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 100000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_100000_rf_lcld_0
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 200000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_200000_rf_lcld_4W
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 200000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_200000_rf_lcld_0
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 10days
+    retraining: 4W
+  detectors:
+  - name: periodic
+    params:
+      period: 500000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_500000_rf_lcld_4W
+  train_all_data: true
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 500000
+  end_train_idx: 50000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_500000_rf_lcld_0
+  train_all_data: true
+  type: baseline
