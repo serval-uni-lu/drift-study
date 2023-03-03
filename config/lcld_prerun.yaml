@@ -8,20 +8,20 @@ experience:
   random_state: 42
 evaluation_params:
   n_early_stopping: 2
-  end_train_idx: 100000
   batch_size: 10000
   rolling: False
   significance: 0.0
   metric:
     name: mcc
   n_score: 2
-  train_with_all: False
 dataset:
   name: lcld_201317_ds_time
 common_detectors_params:
   batch_size: 10000
   period: 10000
 common_runs_params:
+  end_train_idx: 100000
+  train_with_all: False
   delays:
     label: 0
     drift: 0
