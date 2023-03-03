@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Union
 
 import h5py
 import numpy as np
@@ -67,23 +67,16 @@ def rolling_f1(
     return tp / (tp + 0.5 * (fp + fn))
 
 
-def load_config_eval(
-    config: Dict[str, Any],
-    dataset: Dataset,
-    prediction_metric: Metric,
-    y: npt.NDArray[Any],
-) -> Dict[str, Any]:
-    test_i = np.arange(len(y))[config["evaluation_params"]["end_train_idx"] :]
-    batch_size = config["evaluation_params"]["batch_size"]
-    batch_size_min = config["evaluation_params"].get("batch_size", 0)
-    last_idx = config["evaluation_params"].get("last_idx", -1)
-    if last_idx > -1:
-        test_i = test_i[: last_idx - config.get("window_size")]
+def get_batches(
+    dataset: Dataset, batch_size: Union[int, str], batch_size_min: int, test_i
+):
     if isinstance(batch_size, int):
         length = len(test_i) - (len(test_i) % batch_size)
         index_batches = np.split(test_i[:length], int(length / batch_size))
-    if isinstance(batch_size, str):
+        return index_batches
 
+    if isinstance(batch_size, str):
+        last_idx = test_i[0]
         d = dataset.get_x_y_t()[2].iloc[test_i]
         d = pd.DataFrame(d, columns=["DATE"])
         d = d.groupby(pd.Grouper(key="DATE", axis=0, freq=batch_size)).size()
@@ -94,8 +87,27 @@ def load_config_eval(
                 np.concatenate(np.arange(last_idx, last_idx + e))
             last_idx += e
 
+        return index_batches
+
+
+def load_config_eval(
+    config: Dict[str, Any],
+    dataset: Dataset,
+    prediction_metric: Metric,
+    y: npt.NDArray[Any],
+) -> Dict[str, Any]:
+    batch_size = config["evaluation_params"]["batch_size"]
+    batch_size_min = config["evaluation_params"].get("batch_size", 0)
+
     sub_dir_path = config["sub_dir_path"]
     for run_config in config.get("runs", []):
+        start_test_idx = run_config["end_train_idx"]
+        end_test_idx = run_config.get("last_idx", len(y))
+        test_i = np.arange(start_test_idx, end_test_idx)
+        index_batches = get_batches(
+            dataset, batch_size, batch_size_min, test_i
+        )
+
         model_name = run_config.get("model").get("name")
         drift_data_path = (
             f"./data/simulator/{dataset.name}/{model_name}/"
@@ -123,6 +135,7 @@ def load_config_eval(
         if isinstance(prediction_metric, PredClassificationMetric):
             y_scores = np.argmax(y_scores, axis=1)
 
+        run_config["y_scores"] = y_scores
         run_config["prediction_metric"] = prediction_metric.compute(
             y[test_i], y_scores[test_i]
         )
