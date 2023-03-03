@@ -73,11 +73,18 @@ def get_run_name(config: Dict[str, Any]) -> str:
 
 
 def get_metrics(config: Dict[str, Any]) -> Tuple[float, float]:
-    return config["n_train"], config["ml_metric"]
+    n_train, ml_metric = config["n_train"], config["ml_metric"]
+    if isinstance(n_train, list):
+        n_train = float(np.mean(n_train))
+        ml_metric = float(np.mean(ml_metric))
+
+    return n_train, ml_metric
 
 
-def group_by_idx(str_list: List[str]) -> Dict[str, npt.NDArray[np.int_]]:
-
+def group_by_name(
+    configs: List[Dict[str, Any]]
+) -> Dict[str, npt.NDArray[np.int_]]:
+    str_list = [get_run_name(e) for e in configs]
     out: Dict[str, npt.NDArray[np.int_]] = {}
 
     for i, e in enumerate(str_list):
@@ -89,14 +96,102 @@ def group_by_idx(str_list: List[str]) -> Dict[str, npt.NDArray[np.int_]]:
     return out
 
 
+def filter_n_train(result: Dict[str, Any]):
+    # No detection must be run for baseline
+    if get_run_name(result) == "no_detection":
+        return True
+
+    # We do not execute the run if it never triggered retrain for any fold.
+    return get_metrics(result)[0] > 1.0
+
+
+def pareto_rank_by_group(
+    optimize_configs: List[Dict[str, Any]]
+) -> npt.NDArray[np.int_]:
+    configs_group = group_by_name(optimize_configs)
+    configs_rank_in_group = np.full(len(optimize_configs), -1)
+    objective_direction = np.array([1, -1])
+
+    for group in configs_group.keys():
+        group_idxs = configs_group[group]
+        if group == "no_detection":
+            # We want to run a single no detection, therefore
+            # Pareto rank 1 for first no detection, infinity for the others.
+            pareto_rank = np.array(
+                [1]
+                + [np.iinfo(np.int32).max]
+                * (len(configs_rank_in_group[configs_group[group]]) - 1)
+            )
+        else:
+            pareto_rank = calc_pareto_rank(
+                np.array(
+                    [
+                        list(get_metrics(e))
+                        for e in optimize_configs[group_idxs]
+                    ]
+                ),
+                objective_direction,
+            )
+        configs_rank_in_group[group_idxs] = pareto_rank
+
+    return configs_rank_in_group
+
+
+def filter_configs(
+    config: Dict[str, Any], optimize_configs: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+
+    # Filter by n_train (n_train > 1 for all detectors except no detection)
+    optimize_configs = list(
+        filter(filter_n_train, copy.deepcopy(optimize_configs))
+    )
+
+    # Evaluate
+    configs_rank_in_group = pareto_rank_by_group(optimize_configs)
+
+    # Filter by max config
+    pareto_filter = configs_rank_in_group <= int(config["max_pareto"])
+    optimize_configs = [
+        e for e, f in zip(optimize_configs, pareto_filter) if f
+    ]
+
+    return optimize_configs
+
+
+def update_config_to_run(
+    config: Dict[str, Any], optimize_config: Dict[str, Any]
+) -> Dict[str, Any]:
+
+    # Get config
+    config_l = optimize_config["config"]
+    config_run = config_l["runs"][0]
+
+    # Update
+    config_run["last_idx"] = -1
+    config_l["n_early_stopping"] = config.get("n_early_stopping", -1)
+
+    retraining_delay = config.get("retraining_delay")
+    if retraining_delay is not None:
+        config_l["common_runs_params"]["delays"][
+            "retraining"
+        ] = retraining_delay
+        config_run["delays"]["retraining"] = retraining_delay
+
+    return config_l
+
+
 def filter_config_to_run(
     config: Dict[str, Any], optimize_configs: List[Dict[str, Any]]
 ) -> List[Dict[str, Any]]:
-    configs_run_name = [get_run_name(e) for e in optimize_configs]
+
     configs_metrics = np.array([get_metrics(e) for e in optimize_configs])
 
-    configs_group = group_by_idx(configs_run_name)
+    configs_group = group_by_name(optimize_configs)
     configs_rank_in_group = np.full(len(optimize_configs), -1)
+
+    optimize_configs = list(
+        filter(filter_n_train, copy.deepcopy(optimize_configs))
+    )
 
     for group in configs_group.keys():
         n_train = configs_metrics[configs_group[group]][:, 0]
@@ -154,6 +249,7 @@ def filter_config_to_run(
             ] = retraining_delay
             config_l["runs"][0]["delays"]["retraining"] = retraining_delay
 
+        config_l["runs"][0]["end_train_idx"] = -1
         configs_to_run[i] = config_l
 
     return configs_to_run
@@ -181,9 +277,10 @@ def run() -> None:
     config = configutils.get_config()
 
     optimize_configs = load_config_from_dir(config["input_dir"])
-    configs_to_run = filter_config_to_run(
-        config, copy.deepcopy(optimize_configs)
-    )
+    configs_to_run = filter_configs(config, copy.deepcopy(optimize_configs))
+    configs_to_run = [
+        update_config_to_run(config, copy.deepcopy(e)) for e in configs_to_run
+    ]
     logger.info(
         f"That would run {len(configs_to_run)} out of {len(optimize_configs)}"
     )
