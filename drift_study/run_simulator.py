@@ -254,18 +254,19 @@ def run_many(
 ) -> None:
     config_all = configutils.get_config()
 
+    n_jobs = config_all["performance"].get("n_jobs", {}).get("simulator", 1)
     if lock_model_writing is None:
         with Manager() as manager:
             lock = manager.Lock()
             dico = manager.dict()
-            with parallel_backend("loky", n_jobs=16, inner_max_num_threads=8):
-                Parallel(n_jobs=16)(
+            with parallel_backend("loky", n_jobs=n_jobs):
+                Parallel()(
                     delayed(run)(copy.deepcopy(config_all), i, lock, dico)
                     for i in range(len(config_all.get("runs")))
                 )
     else:
-        with parallel_backend("loky", n_jobs=16, inner_max_num_threads=8):
-            Parallel(n_jobs=16)(
+        with parallel_backend("loky", n_jobs=n_jobs):
+            Parallel()(
                 delayed(run)(
                     copy.deepcopy(config_all),
                     i,
