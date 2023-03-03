@@ -99,7 +99,7 @@ def get_model_l(
         # x_metadata=metadata,
         verbose=0,
         n_jobs=n_jobs,
-        random_state=config.get("experience", {}).get("random_state"),
+        random_state=run_config["random_state"],
     )
 
     return model

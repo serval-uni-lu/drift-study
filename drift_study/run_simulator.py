@@ -81,6 +81,9 @@ def run(
     metrics = []
     model_name = f_new_model().name
 
+    if run_config["random_state"] != 42:
+        model_name = f"{model_name}_{str( run_config['random_state'])}"
+
     # TRAIN FIRST MODEL
     model_path = (
         f"{model_root_dir}/{dataset.name}/"
@@ -253,6 +256,10 @@ def run_many(
     list_model_writing: Optional[Dict[str, Any]] = None,
 ) -> None:
     config_all = configutils.get_config()
+
+    run_idx = config_all.get("run_idx")
+    if run_idx is not None:
+        config_all["runs"] = [config_all["runs"][run_idx]]
 
     n_jobs = config_all["performance"].get("n_jobs", {}).get("simulator", 1)
     if lock_model_writing is None:
