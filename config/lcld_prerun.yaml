@@ -121,3 +121,33 @@ runs:
       source: drift_study.model_arch.tree_model
       name: opt_rf_classifier
     train_all_data: True
+  - delays:
+      drift: 0
+      label: 0
+      retraining: 0
+    detectors:
+      - name: periodic
+        params:
+          period: 20000
+    end_train_idx: 50000
+    model:
+      name: rf_lcld
+      source: drift_study.model_arch.tree_model
+    name: periodic_20000_rf_lcld_0
+    train_all_data: true
+    type: baseline
+  - delays:
+      drift: 0
+      label: 0
+      retraining: 0
+    detectors:
+    - name: periodic
+      params:
+        period: 20000
+    end_train_idx: 200000
+    model:
+      name: rf_lcld
+      source: drift_study.model_arch.tree_model
+    name: periodic_20000_rf_lcld_200000_0
+    train_all_data: false
+    type: baseline
