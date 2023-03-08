@@ -17,6 +17,7 @@ detector_names = {
     "page_hinkley_class_error": "Page-Hinkley Error rate",
     "page_hinkley_proba_error": "Page-Hinkley Proba error",
     "n_batch_rf_uncertainty_adwin": "Uncertainty",
+    "n_batch_rf_uncertainty_adwin_y_scores": "Uncertainty",
     "n_batch_aries_adwin": "Aries ADWIN",
 }
 

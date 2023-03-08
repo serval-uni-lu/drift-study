@@ -2,6 +2,7 @@ import glob
 import os
 from typing import Any, Dict, List
 
+import numpy as np
 from mlc.load_do_save import load_json
 from tqdm import tqdm
 
@@ -36,8 +37,8 @@ def filter_conf(conf_results: Dict[str, Any]) -> Dict[str, Any]:
     )
     if metric_name is not None:
         detector_name = f"{detector_name}_{metric_name}"
-    ml_metric = conf_results["ml_metric"][2]
-    n_train = conf_results["n_train"][2]
+    ml_metric = float(np.mean(conf_results["ml_metric"]))
+    n_train = float(np.mean(conf_results["n_train"]))
 
     metric_name = (
         conf_results["config"]
