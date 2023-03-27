@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, Optional, Tuple, Union
 
 import h5py
@@ -96,11 +97,13 @@ def load_config_eval(
     prediction_metric: Metric,
     y: npt.NDArray[Any],
 ) -> Dict[str, Any]:
+    logger = logging.getLogger(__name__)
     batch_size = config["evaluation_params"]["batch_size"]
     batch_size_min = config["evaluation_params"].get("batch_size", 0)
 
     sub_dir_path = config["sub_dir_path"]
-    for run_config in config.get("runs", []):
+    for config_idx, run_config in enumerate(config.get("runs", [])):
+        logger.debug(f"Config {config_idx}")
         start_test_idx = run_config["end_train_idx"]
         end_test_idx = run_config.get("last_idx", len(y))
         test_i = np.arange(start_test_idx, end_test_idx)
@@ -116,9 +119,15 @@ def load_config_eval(
             f"./data/simulator/{dataset.name}/{model_name}/"
             f"{sub_dir_path}/{run_config.get('name')}.hdf5"
         )
-        with h5py.File(drift_data_path, "r") as f:
-            y_scores = f["y_scores"][()]
-            model_used = f["model_used"][()]
+        try:
+            with h5py.File(drift_data_path, "r") as f:
+                y_scores = f["y_scores"][()]
+                model_used = f["model_used"][()]
+        except OSError:
+            logger.error(drift_data_path)
+            logger.error(f"Error at index {config_idx}.")
+            exit(1)
+            # continue
 
         # Check if retrained
         run_config["model_used"] = model_used

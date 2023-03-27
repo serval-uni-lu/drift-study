@@ -101,7 +101,13 @@ def execute_one_fold(
     logger.info(f"Starting { run_config['name'] }...")
 
     run_config["end_train_idx"] = int(train_idx[-1])
-    run_config["last_idx"] = int(test_idx[-1])
+
+    if run_config.get("use_all_test", False):
+        run_config["last_idx"] = run_config["end_train_idx"]
+    else:
+        run_config["last_idx"] = int(test_idx[-1])
+
+    print(run_config["last_idx"])
     run_config["n_early_stopping"] = floor(
         (test_idx[-1] - train_idx[-1])
         / config["trial_params"]["period"]["min"]
