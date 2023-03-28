@@ -109,6 +109,9 @@ def load_config_eval(
         )
 
         model_name = run_config.get("model").get("name")
+        random_state = run_config.get("random_state")
+        if random_state != 42:
+            model_name = f"{model_name}_{random_state}"
         drift_data_path = (
             f"./data/simulator/{dataset.name}/{model_name}/"
             f"{sub_dir_path}/{run_config.get('name')}.hdf5"

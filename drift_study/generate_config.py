@@ -64,14 +64,17 @@ def deep_update(
     key: List[Union[str, int]],
     value: Any,
 ) -> Dict[str, Any]:
-    if isinstance(config, List) and not isinstance(key, int):
-        raise ValueError
-    if isinstance(config, Dict) and not isinstance(key, str):
-        raise ValueError
-
     if len(key) == 0:
         return value
-    config[key[0]] = deep_update(config[key[0]], key[1:], value)
+
+    current_key = key[0]
+    if isinstance(config, List) and not isinstance(current_key, int):
+        raise ValueError
+    if isinstance(config, Dict) and not isinstance(current_key, str):
+        logger.error(config, str)
+        raise ValueError
+
+    config[current_key] = deep_update(config[current_key], key[1:], value)
     return config
 
 

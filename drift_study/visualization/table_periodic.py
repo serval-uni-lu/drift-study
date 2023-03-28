@@ -1,8 +1,10 @@
 import copy
 import logging.config
+from pathlib import Path
 from typing import Any, Dict, List
 
 import configutils
+import numpy as np
 import pandas as pd
 from configutils.utils import merge_parameters
 from mlc.metrics.metric import Metric
@@ -18,6 +20,7 @@ BIG_NUMBER = 1_000_000_000
 def build_key(d: Dict[str, Any]):
     return (
         f"{d['model']['name']}_"
+        f"{d['random_state']}_"
         f"{d['detectors'][0]['params']['period']}_"
         f"{d['delays']['label']}_{d['delays']['retraining']}"
     )
@@ -32,7 +35,12 @@ def common_evaluation_correction(runs: List[Dict[str, Any]]) -> int:
     count = 0
     for r in runs:
         if r["train_all_data"]:
-            reference[build_key(r)] = r["y_scores"]
+
+            reference[build_key(r)] = {
+                "y_scores": r["y_scores"],
+                "prediction_metric_batch": r["prediction_metric_batch"],
+                "batch_start_idx": r["batch_start_idx"],
+            }
             min_start = min(min_start, r["end_train_idx"])
             count += 1
 
@@ -41,11 +49,25 @@ def common_evaluation_correction(runs: List[Dict[str, Any]]) -> int:
     for r in runs:
         if not r["train_all_data"]:
             if min_start < r["end_train_idx"]:
-                ref_y_scores = reference[build_key(r)]
-
+                ref_key = build_key(r)
+                # Update y scores
+                ref_y_scores = reference[ref_key]["y_scores"]
                 r["y_scores"][min_start : r["end_train_idx"]] = ref_y_scores[
                     min_start : r["end_train_idx"]
                 ]
+
+                # Update per batch preds
+                idx_to_add = np.where(
+                    reference[ref_key]["batch_start_idx"]
+                    < r["batch_start_idx"][0]
+                )[0]
+                for e in ["batch_start_idx", "prediction_metric_batch"]:
+                    r[e] = np.concatenate(
+                        [
+                            reference[ref_key][e][idx_to_add],
+                            r[e],
+                        ]
+                    )
 
     return min_start
 
@@ -55,6 +77,7 @@ def compute_metrics(
 ) -> None:
     for r in runs:
         r["metric"] = metric.compute(y[start_idx:], r["y_scores"][start_idx:])
+        r["metric_batch"] = r["prediction_metric_batch"]
 
 
 def build_df(runs: List[Dict[str, Any]]) -> pd.DataFrame:
@@ -67,6 +90,7 @@ def build_df(runs: List[Dict[str, Any]]) -> pd.DataFrame:
             "metric": r["metric"],
             "train_all_data": r["train_all_data"],
             "window_size": r["end_train_idx"],
+            "metric_batch": r["metric_batch"],
         }
         filtered_runs.append(filtered_r)
     return pd.DataFrame(filtered_runs)
@@ -99,17 +123,54 @@ def run(
     grouped = df.groupby(["delays", "model"])
 
     for name, group in grouped:
-        df_l = group[["window_size", "period", "metric"]]
+        df_l = group[["window_size", "period", "metric", "metric_batch"]]
         print(f"##### {name}")
-        print(
+
+        def batch_min(a, *args, **kwargs):
+            return np.min(np.concatenate(a.values))
+
+        def batch_mean(a, *args, **kwargs):
+            return np.mean(np.concatenate(a.values))
+
+        def batch_std(a, *args, **kwargs):
+            return np.std(np.concatenate(a.values))
+
+        def batch_q5(a, *args, **kwargs):
+            return np.quantile(np.concatenate(a.values), 0.05)
+
+        pivot_table = (
             pd.pivot_table(
                 df_l,
                 index=["window_size"],
                 columns=["period"],
-                values=["metric"],
-                aggfunc="mean",
+                values=["metric", "metric_batch"],
+                aggfunc={
+                    "metric": ["mean", "std"],
+                    "metric_batch": [
+                        batch_min,
+                        batch_q5,
+                        batch_mean,
+                        batch_std,
+                    ],
+                },
             )
+            .droplevel(0, 1)
+            .swaplevel(0, 1, 1)
+            .sort_index(level=0, axis=1)
         )
+        out_path = f"reports/periodic/{dataset.name}/{name}.csv"
+        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+        pivot_table.to_csv(out_path)
+
+        print(pivot_table)
+        pivot_table = pivot_table.values
+        print(f"Max col in row {np.argmax(pivot_table, axis =0)}")
+        print(f"Max row in col {np.argmax(pivot_table, axis =1)}")
+        max_idx = (
+            np.argmax(pivot_table) // pivot_table.shape[1],
+            np.argmax(pivot_table) % pivot_table.shape[1],
+        )
+        print(f"Max index {max_idx}")
 
 
 if __name__ == "__main__":
