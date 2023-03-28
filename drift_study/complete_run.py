@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import configutils
 import numpy as np
 import numpy.typing as npt
+import yaml
 from joblib import Parallel, delayed
 from mlc.load_do_save import load_json, save_json
 from tqdm import trange
@@ -67,7 +68,11 @@ def load_config_from_dir(input_dir: str) -> List[Dict[str, Any]]:
 
 
 def get_run_name(config: Dict[str, Any]) -> str:
-    run_name = config["config"]["runs"][0]["name"]
+    if "config" in config:
+        run_name = config["config"]["runs"][0]["name"]
+    else:
+        run_name = config["runs"][0]["name"]
+
     index = re.search(r"\d", run_name).start()
     return run_name[:index]
 
@@ -112,6 +117,8 @@ def pareto_rank_by_group(
     configs_rank_in_group = np.full(len(optimize_configs), -1)
     objective_direction = np.array([1, -1])
 
+    config_metrics = np.array([list(get_metrics(e)) for e in optimize_configs])
+
     for group in configs_group.keys():
         group_idxs = configs_group[group]
         if group == "no_detection":
@@ -124,12 +131,7 @@ def pareto_rank_by_group(
             )
         else:
             pareto_rank = calc_pareto_rank(
-                np.array(
-                    [
-                        list(get_metrics(e))
-                        for e in optimize_configs[group_idxs]
-                    ]
-                ),
+                config_metrics[group_idxs],
                 objective_direction,
             )
         configs_rank_in_group[group_idxs] = pareto_rank
@@ -286,6 +288,12 @@ def run() -> None:
     )
     if config["do_run"]:
         run_many(config, configs_to_run)
+
+    output_file = config.get("output_file")
+    if config.get("output_file"):
+        logger.info(f"Saving configs to {output_file}.")
+        with open(output_file, "w") as f:
+            yaml.dump(configs_to_run, f)
 
 
 if __name__ == "__main__":
