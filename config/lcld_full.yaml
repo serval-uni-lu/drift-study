@@ -20,3 +20,7 @@ common_runs_params:
   random_state: 42
   end_train_idx: 200000
   train_all_data: False
+  delays:
+    label: 10days
+    drift: 0
+    retraining: 4W
