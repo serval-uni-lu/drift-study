@@ -14,7 +14,6 @@ import numpy.typing as npt
 import optuna
 from configutils.utils import merge_parameters
 from joblib import Parallel, delayed, parallel_backend
-from mlc.load_do_save import save_json
 from optuna import Study
 from optuna._callbacks import MaxTrialsCallback, RetryFailedTrialCallback
 from optuna.samplers import TPESampler
@@ -25,6 +24,7 @@ from drift_study import run_simulator
 from drift_study.drift_detectors.drift_detector_factory import (
     get_drift_detector_class_from_conf,
 )
+from drift_study.utils.io_utils import manual_save_run
 from drift_study.utils.logging import configure_logger
 
 
@@ -63,27 +63,6 @@ def get_default_params(
             ),
         )
     return out
-
-
-def manual_save_run(
-    config: Dict[str, Any],
-    run_config: Dict[str, Any],
-    n_train: List[int],
-    ml_metric: List[float],
-) -> None:
-    out = {"config": config, "n_train": n_train, "ml_metric": ml_metric}
-
-    model_name = run_config["model"]["name"]
-    dataset_name = config["dataset"]["name"]
-    sub_dir_path = config["sub_dir_path"]
-
-    out_path = (
-        f"./data/optimizer_results/"
-        f"{dataset_name}/{model_name}/"
-        f"{sub_dir_path}/{run_config['name']}.json"
-    )
-    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    save_json(out, out_path)
 
 
 def execute_one_fold(

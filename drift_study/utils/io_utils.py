@@ -9,9 +9,9 @@ import joblib
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+from mlc.load_do_save import save_json
 from mlc.models.model import Model
 
-from drift_study.optimize_simulator import manual_save_run
 from drift_study.utils.drift_model import DriftModel
 
 
@@ -135,3 +135,24 @@ def save_drift_run(
 
 def check_parent_path(path: str) -> None:
     Path(path).parent.mkdir(parents=True, exist_ok=True)
+
+
+def manual_save_run(
+    config: Dict[str, Any],
+    run_config: Dict[str, Any],
+    n_train: Union[int, List[int]],
+    ml_metric: Union[float, List[float]],
+) -> None:
+    out = {"config": config, "n_train": n_train, "ml_metric": ml_metric}
+
+    model_name = run_config["model"]["name"]
+    dataset_name = config["dataset"]["name"]
+    sub_dir_path = config["sub_dir_path"]
+
+    out_path = (
+        f"./data/optimizer_results/"
+        f"{dataset_name}/{model_name}/"
+        f"{sub_dir_path}/{run_config['name']}.json"
+    )
+    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    save_json(out, out_path)

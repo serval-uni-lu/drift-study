@@ -3,7 +3,6 @@ import logging
 import os
 import re
 from multiprocessing import Lock, Manager
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import configutils
@@ -11,23 +10,15 @@ import numpy as np
 import numpy.typing as npt
 import yaml
 from joblib import Parallel, delayed
-from mlc.load_do_save import load_json, save_json
+from mlc.load_do_save import load_json
 from tqdm import trange
 
 from drift_study import run_simulator
+from drift_study.utils.io_utils import manual_save_run
 from drift_study.utils.pareto import calc_pareto_rank
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger(__name__)
-
-
-def manual_save_run(
-    config: Dict[str, Any], n_train: int, ml_metric: float, out_path: str
-):
-    out = {"config": config, "n_train": n_train, "ml_metric": ml_metric}
-
-    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    save_json(out, out_path)
 
 
 def execute_one_trial(
@@ -52,7 +43,7 @@ def execute_one_trial(
         n_train, ml_metric = run_simulator.run(
             config, 0, lock_model_writing, list_model_writing, verbose=0
         )
-        manual_save_run(config, n_train, ml_metric, out_path)
+        manual_save_run(config, run_config, n_train, ml_metric)
 
 
 def load_config_from_dir(input_dir: str) -> List[Dict[str, Any]]:
