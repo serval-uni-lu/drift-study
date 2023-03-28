@@ -275,6 +275,21 @@ def run_many(
         )
 
 
+def short_config(config: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+
+    out = []
+    for e in config:
+        r = e["runs"][0]
+        out.append(
+            {
+                "name": r["name"],
+                "type": r["type"],
+                "detectors": r["detectors"],
+            }
+        )
+    return out
+
+
 def run() -> None:
     config = configutils.get_config()
 
@@ -286,14 +301,17 @@ def run() -> None:
     logger.info(
         f"That would run {len(configs_to_run)} out of {len(optimize_configs)}"
     )
-    if config["do_run"]:
-        run_many(config, configs_to_run)
+    # if config["do_run"]:
+    #     run_many(config, configs_to_run)
 
     output_file = config.get("output_file")
     if config.get("output_file"):
         logger.info(f"Saving configs to {output_file}.")
+        out = {
+            "runs": short_config(configs_to_run),
+        }
         with open(output_file, "w") as f:
-            yaml.dump(configs_to_run, f)
+            yaml.dump(out, f)
 
 
 if __name__ == "__main__":
