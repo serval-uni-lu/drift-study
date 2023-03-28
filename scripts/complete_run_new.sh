@@ -6,7 +6,7 @@ do
         for n_input in 100000 300000
         do
             eval "python \
-                  -m drift_study.optimize_simulator \
+                  -m drift_study.run_simulator \
                   -c config/logging.yaml \
                   -c config/${dataset}_full.yaml \
                   -c config/${delay}.yaml \
