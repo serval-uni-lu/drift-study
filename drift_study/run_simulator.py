@@ -207,22 +207,6 @@ def run(
                     ):
                         early_stopped = True
 
-    # Save
-    save_drift_run(
-        numpy_to_save={
-            "is_drifts": is_drifts,
-            "is_drift_warnings": is_drift_warnings,
-            "y_scores": y_scores,
-            "model_used": model_used,
-        },
-        models=models,
-        metrics=metrics,
-        dataset_name=dataset.name,
-        model_name=model_name,
-        run_name=run_config.get("name"),
-        sub_dir_path=config["sub_dir_path"],
-    )
-
     # Metrics
     n_train = int(np.max(model_used) + 1)
     prediction_metric = create_metric(config["evaluation_params"]["metric"])
@@ -247,6 +231,26 @@ def run(
             )
             for m_idx_start, m_idx_end in metric_idxs
         ]
+
+    # Save
+    save_drift_run(
+        numpy_to_save={
+            "is_drifts": is_drifts,
+            "is_drift_warnings": is_drift_warnings,
+            "y_scores": y_scores,
+            "model_used": model_used,
+        },
+        models=models,
+        metrics=metrics,
+        dataset_name=dataset.name,
+        model_name=model_name,
+        run_name=run_config.get("name"),
+        sub_dir_path=config["sub_dir_path"],
+        config=copy.deepcopy(config),
+        run_config=copy.deepcopy(run_config),
+        n_train=n_train,
+        ml_metric=metric,
+    )
 
     return n_train, metric
 

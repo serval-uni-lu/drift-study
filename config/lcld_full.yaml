@@ -1,0 +1,22 @@
+---
+performance:
+  predict_forward: 10000
+  n_jobs:
+    model: 14
+    optimizer: 9
+    k_fold: 1
+experience:
+  random_state: 42
+evaluation_params:
+  batch_size: 25000
+  metric:
+    name: mcc
+  n_score: 2
+dataset:
+  name: lcld_201317_ds_time
+common_detectors_params:
+  batch_size: 5000
+common_runs_params:
+  random_state: 42
+  end_train_idx: 200000
+  train_all_data: False

@@ -11,6 +11,7 @@ import numpy.typing as npt
 import pandas as pd
 from mlc.models.model import Model
 
+from drift_study.optimize_simulator import manual_save_run
 from drift_study.utils.drift_model import DriftModel
 
 
@@ -104,6 +105,10 @@ def save_drift_run(
     model_name: str,
     run_name: str,
     sub_dir_path: str,
+    config: Dict[str, Any],
+    run_config: Dict[str, Any],
+    n_train: Union[int, List[int]],
+    ml_metric: Union[float, List[float]],
 ):
     model_start_indexes = np.array([model.start_idx for model in models])
     model_end_indexes = np.array([model.end_idx for model in models])
@@ -123,6 +128,9 @@ def save_drift_run(
     )
     save_arrays(numpy_to_save, f"{drift_data_path}.hdf5")
     metrics.to_hdf(f"{drift_data_path}_metrics.hdf5", "metrics")
+
+    config["runs"] = run_config
+    manual_save_run(config, run_config, n_train, ml_metric)
 
 
 def check_parent_path(path: str) -> None:
