@@ -261,7 +261,7 @@ def run_many(
     config: Dict[str, Any], configs_to_run: List[Dict[str, Any]]
 ) -> None:
 
-    n_jobs_optimiser = config["performance"].get("n_jobs_optimiser", 1)
+    n_jobs_optimiser = 1
 
     with Manager() as manager:
         lock = manager.Lock()
