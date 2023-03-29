@@ -1,4 +1,3 @@
-import time
 from typing import Any, Dict, Optional, Union
 
 import numpy as np
@@ -60,14 +59,15 @@ class TimeOptimizer(Model):
         y_train: npt.NDArray[np.float_],
         y_test: npt.NDArray[np.float_],
     ) -> float:
-        start = time.time()
+        # start = time.time()
         with parallel_backend("loky", n_jobs=self.n_jobs):
             model.fit(x_train, y_train)
             y_scores = self._compute_metric(model, x_test)
         if isinstance(self.metric, PredClassificationMetric):
             y_scores = np.argmax(y_scores, axis=1)
         metric = self.metric.compute(y_test, y_scores)
-        print(f"Train_time {time.time() - start}")
+        # elasped = time.time() - start
+        # print(f"Train_time {elasped}")
         return metric
 
     def _objective(
@@ -82,7 +82,7 @@ class TimeOptimizer(Model):
         metrics = Parallel(n_jobs=3, backend="loky")(
             delayed(self._objective_one)(
                 self.model.__class__(
-                    n_jobs=self.n_jobs, verbose=1, **model_params
+                    n_jobs=self.n_jobs, verbose=0, **model_params
                 ),
                 x[train_index],
                 x[test_index],
@@ -129,7 +129,7 @@ class TimeOptimizer(Model):
             **study.best_trial.params,
             random_state=42,
             n_jobs=self.n_jobs * 3,
-            verbose=1,
+            verbose=0,
         )
         with parallel_backend("loky", n_jobs=self.n_jobs * 3):
             self.model.fit(x, y)
