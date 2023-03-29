@@ -63,7 +63,7 @@ class TimeOptimizer(Model):
         start = time.time()
         with parallel_backend("loky", n_jobs=self.n_jobs):
             model.fit(x_train, y_train)
-        y_scores = self._compute_metric(model, x_test)
+            y_scores = self._compute_metric(model, x_test)
         if isinstance(self.metric, PredClassificationMetric):
             y_scores = np.argmax(y_scores, axis=1)
         metric = self.metric.compute(y_test, y_scores)
