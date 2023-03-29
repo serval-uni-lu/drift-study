@@ -124,11 +124,12 @@ class TimeOptimizer(Model):
             lambda trial: self._objective(trial, trial_params, x, y),
             n_trials=25,
         )
+
+        self.model = self.model.__class__(
+            **study.best_trial.params,
+            random_state=42,
+            n_jobs=self.n_jobs * 3,
+            verbose=1,
+        )
         with parallel_backend("loky", n_jobs=self.n_jobs * 3):
-            self.model = self.model.__class__(
-                **study.best_trial.params,
-                random_state=42,
-                n_jobs=self.n_jobs * 3,
-                verbose=1,
-            )
-        self.model.fit(x, y)
+            self.model.fit(x, y)
