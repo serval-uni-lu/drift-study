@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Union
 import numpy as np
 import numpy.typing as npt
 import optuna
-from joblib import Parallel, delayed, parallel_backend
+from joblib import Parallel, delayed
 from mlc.metrics.metric import Metric
 from mlc.metrics.metrics import PredClassificationMetric
 from mlc.models.model import Model
@@ -61,8 +61,7 @@ class TimeOptimizer(Model):
         y_test: npt.NDArray[np.float_],
     ) -> float:
         start = time.time()
-        with parallel_backend("loky", n_jobs=self.n_jobs):
-            model.fit(x_train, y_train)
+        model.fit(x_train, y_train)
         y_scores = self._compute_metric(model, x_test)
         if isinstance(self.metric, PredClassificationMetric):
             y_scores = np.argmax(y_scores, axis=1)
@@ -79,17 +78,18 @@ class TimeOptimizer(Model):
     ) -> float:
         model_params = self.model.define_trial_parameters(trial, trial_params)
         tscv = TimeSeriesSplit(n_splits=self.n_splits)
-        with parallel_backend("loky", n_jobs=3, inner_max_num_threads=128):
-            metrics = Parallel(n_jobs=3)(
-                delayed(self._objective_one)(
-                    self.model.__class__(n_jobs=self.n_jobs, **model_params),
-                    x[train_index],
-                    x[test_index],
-                    y[train_index],
-                    y[test_index],
-                )
-                for (train_index, test_index) in reversed(list(tscv.split(x)))
+        metrics = Parallel(n_jobs=3, backend="loky")(
+            delayed(self._objective_one)(
+                self.model.__class__(
+                    n_jobs=self.n_jobs, verbose=1, **model_params
+                ),
+                x[train_index],
+                x[test_index],
+                y[train_index],
+                y[test_index],
             )
+            for (train_index, test_index) in reversed(list(tscv.split(x)))
+        )
 
         return float(np.mean(metrics))
 
@@ -124,6 +124,9 @@ class TimeOptimizer(Model):
             n_trials=25,
         )
         self.model = self.model.__class__(
-            **study.best_trial.params, random_state=42
+            **study.best_trial.params,
+            random_state=42,
+            n_jobs=self.n_jobs * 3,
+            verbose=1,
         )
         self.model.fit(x, y)
