@@ -16,6 +16,7 @@ from drift_study.drift_detectors.drift_detector import (
     DriftDetector,
     NotFittedDetectorException,
 )
+from drift_study.model_arch.sklearn_opt import TimeOptimizer
 
 
 class AriesDrift(DriftDetector):
@@ -53,6 +54,8 @@ class AriesDrift(DriftDetector):
             raise NotImplementedError
         if isinstance(self.model[-1].model, RandomForestClassifier):
             self.section_num = self.model[-1].model.n_estimators
+        if isinstance(self.model[-1].model, TimeOptimizer):
+            self.section_num = self.model[-1].model.model.n_estimators
         self.pred_hist = build_hist(
             self.model, x, y, section_num=self.section_num
         )
@@ -192,6 +195,14 @@ def compute_mode(model, x, section_num) -> npt.NDArray[np.int_]:
         mode_list = np.round(prediction * model[-1].model.n_estimators).astype(
             int
         )
+        return mode_list
+
+    elif isinstance(model[-1].model, TimeOptimizer):
+        prediction = model.predict_proba(x)
+        prediction = np.max(prediction, axis=1)
+        mode_list = np.round(
+            prediction * model[-1].model.model.n_estimators
+        ).astype(int)
         return mode_list
 
     else:
