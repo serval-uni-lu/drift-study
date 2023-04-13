@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional, Union
 import numpy as np
 import numpy.typing as npt
 import optuna
+from joblib import parallel_backend
 from mlc.metrics.metric import Metric
 from mlc.metrics.metrics import PredClassificationMetric
 from mlc.models.model import Model
@@ -59,7 +60,8 @@ class TimeOptimizer(Model):
         y_test: npt.NDArray[np.float_],
     ) -> float:
         # start = time.time()
-        model.fit(x_train, y_train)
+        with parallel_backend("threading"):
+            model.fit(x_train, y_train)
         y_scores = self._compute_metric(model, x_test)
         if isinstance(self.metric, PredClassificationMetric):
             y_scores = np.argmax(y_scores, axis=1)
@@ -129,5 +131,5 @@ class TimeOptimizer(Model):
             n_jobs=self.n_jobs,
             verbose=0,
         )
-        # with parallel_backend("loky", n_jobs=self.n_jobs * 3):
-        self.model.fit(x, y)
+        with parallel_backend("threading"):
+            self.model.fit(x, y)
