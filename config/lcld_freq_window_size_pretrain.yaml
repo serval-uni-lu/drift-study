@@ -1,0 +1,58 @@
+---
+sub_dir_path: periodic
+performance:
+  predict_forward: 10000
+  n_jobs:
+    model: 126
+    simulator: 1
+evaluation_params:
+  batch_size: 20000
+  metric:
+    name: mcc
+  n_score: 2
+dataset:
+  name: lcld_201317_ds_time
+common_detectors_params: {}
+common_runs_params: {}
+runs:
+  - name: periodic
+    random_state:
+      grid: [42, 43, 44, 45, 46]
+    type: baseline
+    detectors:
+      - name: periodic
+        params:
+          period:
+            grid: [5000]
+    model:
+      source: drift_study.model_arch.tree_model
+      name:
+        grid: [rf_lcld_new]
+    train_all_data: False
+    end_train_idx:
+      grid: [50000, 100000, 200000, 500000]
+    delays:
+      grid:
+        - label: 0
+          drift: 0
+          retraining: 0
+  - name: periodic
+    random_state:
+      grid: [ 42, 43, 44, 45, 46 ]
+    type: baseline
+    detectors:
+      - name: periodic
+        params:
+          period:
+            grid: [5000]
+    model:
+      source: drift_study.model_arch.tree_model
+      name:
+        grid: [rf_lcld_new]
+    train_all_data: True
+    end_train_idx: 50000
+    delays:
+      grid:
+        - label: 0
+          drift: 0
+          retraining: 0
