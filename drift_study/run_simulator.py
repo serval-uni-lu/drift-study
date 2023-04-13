@@ -63,9 +63,7 @@ def run(
     training_step_size = run_config.get("training_step_size", 1)
 
     predict_forward = config.get("performance").get("predict_forward")
-    n_early_stopping = config.get("evaluation_params", {}).get(
-        "n_early_stopping", 0
-    )
+    n_early_stopping = run_config.get("n_early_stopping", 0)
     early_stopped = False
 
     # LOAD AND CREATE OBJECTS
