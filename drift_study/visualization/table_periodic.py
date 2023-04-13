@@ -122,6 +122,35 @@ def run(
     df = df.drop("train_all_data", axis=1)
     grouped = df.groupby(["delays", "model"])
 
+    df_all_out = df.drop(["metric_batch"], axis=1)
+    df_all_out = df_all_out.groupby(
+        ["delays", "period", "window_size", "model"]
+    ).agg({"metric": ["mean", "std"]})
+
+    def text(x):
+        avg = np.mean(x)
+        std = np.std(x)
+        std_str = std * 10000
+        return f"{avg:.5f} \\footnotesize{{$\\pm$ {std_str:.1f}}}"
+
+    pd.pivot_table(
+        df_all_out,
+        index=["delays", "window_size", "model"],
+        columns=["period"],
+        values=["metric"],
+        aggfunc={
+            "metric": ["mean", "std", text],
+        },
+    ).swaplevel(1, 2, 0).swaplevel(0, 1, 0).sort_index(
+        level=0, axis=0
+    ).swaplevel(
+        0, 1, 1
+    )[
+        "text"
+    ].to_csv(
+        "results.csv"
+    )
+
     for name, group in grouped:
         df_l = group[["window_size", "period", "metric", "metric_batch"]]
         print(f"##### {name}")
