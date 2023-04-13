@@ -1,5 +1,6 @@
 import copy
 import logging
+import math
 import os
 from multiprocessing import Lock, Manager
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -25,6 +26,18 @@ from drift_study.utils.io_utils import save_drift_run
 from drift_study.utils.logging import configure_logger
 
 
+def round_up_to_multiple(a, n):
+    return int(math.ceil(a / n)) * n
+
+
+def get_start_end_idx(end_idx: int, windows_size: int) -> Tuple[int, int]:
+    if windows_size > 0:
+        start_idx = max(end_idx - windows_size, 0)
+    else:
+        start_idx = 0
+    return start_idx, end_idx
+
+
 def run(
     config,
     run_i,
@@ -32,7 +45,6 @@ def run(
     list_model_writing: Optional[Dict[str, Any]] = None,
     verbose=1,
 ) -> Tuple[int, Union[float, List[float]]]:
-
     # CONFIG
     configure_logger(config)
     logger = logging.getLogger(__name__)
@@ -45,8 +57,11 @@ def run(
     )
 
     # INITIALIZE PARAMETERS
-    train_all_data = run_config["train_all_data"]
-    end_train_idx = run_config["end_train_idx"]
+    test_start_idx = run_config["test_start_idx"]
+    train_window_size = run_config["train_window_size"]
+    first_train_window_size = run_config["first_train_window_size"]
+    training_step_size = run_config.get("training_step_size", 1)
+
     predict_forward = config.get("performance").get("predict_forward")
     n_early_stopping = config.get("evaluation_params", {}).get(
         "n_early_stopping", 0
@@ -82,13 +97,9 @@ def run(
     model_name = f_new_model().name
 
     if run_config["random_state"] != 42:
-        model_name = f"{model_name}_{str( run_config['random_state'])}"
+        model_name = f"{model_name}_{str(run_config['random_state'])}"
 
     # TRAIN FIRST MODEL
-    model_path = (
-        f"{model_root_dir}/{dataset.name}/"
-        f"{model_name}_{0}_{end_train_idx}.joblib"
-    )
 
     drift_data_path = (
         f"./data/simulator/"
@@ -100,7 +111,16 @@ def run(
         logger.info("Path exists, skipping.")
         return -1, -1
 
-    start_idx, end_idx = 0, end_train_idx
+    start_idx, end_idx = get_start_end_idx(
+        test_start_idx, first_train_window_size
+    )
+    model_path = (
+        f"{model_root_dir}/{dataset.name}/"
+        f"{model_name}_{start_idx}_{end_idx}.joblib"
+    )
+
+    logger.debug(f"start_index {start_idx}, end_index {end_idx}.")
+
     add_model(
         models,
         model_path,
@@ -119,7 +139,7 @@ def run(
 
     # Main loop
     for x_idx in tqdm(
-        np.arange(end_train_idx, last_idx), disable=(verbose == 0)
+        np.arange(test_start_idx, last_idx), disable=(verbose == 0)
     ):
 
         # Find current model
@@ -162,13 +182,13 @@ def run(
             # not using the latest drift model available
             # Due to delay
             if drift_model_idx == len(models) - 1:
-                if is_drifts[x_idx]:
+                end_idx = round_up_to_multiple(x_idx + 1, training_step_size)
+                if is_drifts[x_idx] and (end_idx < last_idx):
                     logger.debug(f"Drift at index {x_idx}")
-                    if train_all_data:
-                        start_idx = 0
-                    else:
-                        start_idx = (x_idx + 1) - end_train_idx
-                    end_idx = x_idx + 1
+                    start_idx, end_idx = get_start_end_idx(
+                        end_idx, train_window_size
+                    )
+
                     logger.debug(
                         f"start_index {start_idx}, end_index {end_idx}."
                     )
@@ -182,7 +202,7 @@ def run(
                         model_path,
                         f_new_model,
                         f_new_detector,
-                        x_idx,
+                        round_up_to_multiple(x_idx, training_step_size),
                         delays,
                         x,
                         y,
@@ -216,13 +236,13 @@ def run(
     val_test_idx = config["evaluation_params"].get("val_test_idx")
     if val_test_idx is None:
         metric = prediction_metric.compute(
-            y[end_train_idx:last_idx], y_scores[end_train_idx:last_idx]
+            y[test_start_idx:last_idx], y_scores[test_start_idx:last_idx]
         )
 
     else:
         metric_idxs = [
-            (end_train_idx, last_idx),
-            (end_train_idx, val_test_idx),
+            (test_start_idx, last_idx),
+            (test_start_idx, val_test_idx),
             (val_test_idx, last_idx),
         ]
         metric = [
@@ -290,3 +310,5 @@ def run_many(
 
 if __name__ == "__main__":
     run_many()
+
+# write function to round up a to a multiple of n
