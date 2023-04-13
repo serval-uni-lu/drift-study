@@ -3,7 +3,6 @@ from typing import Any, Dict, Optional, Union
 import numpy as np
 import numpy.typing as npt
 import optuna
-from joblib import Parallel, delayed, parallel_backend
 from mlc.metrics.metric import Metric
 from mlc.metrics.metrics import PredClassificationMetric
 from mlc.models.model import Model
@@ -60,9 +59,8 @@ class TimeOptimizer(Model):
         y_test: npt.NDArray[np.float_],
     ) -> float:
         # start = time.time()
-        with parallel_backend("loky", n_jobs=self.n_jobs):
-            model.fit(x_train, y_train)
-            y_scores = self._compute_metric(model, x_test)
+        model.fit(x_train, y_train)
+        y_scores = self._compute_metric(model, x_test)
         if isinstance(self.metric, PredClassificationMetric):
             y_scores = np.argmax(y_scores, axis=1)
         metric = self.metric.compute(y_test, y_scores)
@@ -79,10 +77,10 @@ class TimeOptimizer(Model):
     ) -> float:
         model_params = self.model.define_trial_parameters(trial, trial_params)
         tscv = TimeSeriesSplit(n_splits=self.n_splits)
-        metrics = Parallel(n_jobs=3, backend="loky")(
-            delayed(self._objective_one)(
+        metrics = [
+            self._objective_one(
                 self.model.__class__(
-                    n_jobs=self.n_jobs, verbose=0, **model_params
+                    n_jobs=self.n_jobs, verbose=1, **model_params
                 ),
                 x[train_index],
                 x[test_index],
@@ -90,7 +88,7 @@ class TimeOptimizer(Model):
                 y[test_index],
             )
             for (train_index, test_index) in reversed(list(tscv.split(x)))
-        )
+        ]
 
         return float(np.mean(metrics))
 
@@ -128,8 +126,8 @@ class TimeOptimizer(Model):
         self.model = self.model.__class__(
             **study.best_trial.params,
             random_state=42,
-            n_jobs=self.n_jobs * 3,
+            n_jobs=self.n_jobs,
             verbose=0,
         )
-        with parallel_backend("loky", n_jobs=self.n_jobs * 3):
-            self.model.fit(x, y)
+        # with parallel_backend("loky", n_jobs=self.n_jobs * 3):
+        self.model.fit(x, y)
