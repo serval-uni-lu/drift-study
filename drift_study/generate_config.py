@@ -79,6 +79,8 @@ def deep_update(
 
 
 def run(config: Dict[str, Any]) -> None:
+
+    output_path = config.pop("output_path")
     runs = config["runs"]
     all_runs: List[Dict[str, Any]] = []
     for r in runs:
@@ -90,7 +92,7 @@ def run(config: Dict[str, Any]) -> None:
 
     out_config = copy.deepcopy(config)
     out_config["runs"] = all_runs
-    with open("./new_conf.yaml", "w") as f:
+    with open(output_path, "w") as f:
         yaml.dump(out_config, f)
 
     logger.info(f"{len(all_runs)} config generated.")
