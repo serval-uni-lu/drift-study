@@ -19,9 +19,9 @@ common_runs_params:
   test_start_idx: 400000
   random_state: 42
   delays:
-    - label: 0
-      drift: 0
-      retraining: 0
+    label: 0
+    drift: 0
+    retraining: 0
 runs:
   - name: manual
     type: baseline
