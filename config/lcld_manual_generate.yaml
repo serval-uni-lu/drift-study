@@ -33,6 +33,6 @@ runs:
       name:
         grid: [rf_lcld, opt_rf_classifier]
     test_start_idx:
-      grid: [400000]
+      grid: [400000, 420000, 600000, 800000, 860000, 940000]
     train_window_size:
       grid: [400000, -1]
