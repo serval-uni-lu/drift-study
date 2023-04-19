@@ -104,7 +104,7 @@ def load_config_eval(
     sub_dir_path = config["sub_dir_path"]
     for config_idx, run_config in enumerate(config.get("runs", [])):
         logger.debug(f"Config {config_idx}")
-        start_test_idx = run_config["end_train_idx"]
+        start_test_idx = run_config["test_start_idx"]
         end_test_idx = run_config.get("last_idx", len(y))
         test_i = np.arange(start_test_idx, end_test_idx)
         index_batches = get_batches(
