@@ -1,7 +1,6 @@
 import copy
 import logging.config
 import os
-from math import floor
 from multiprocessing import Manager
 from multiprocessing.synchronize import Lock as LockType
 from pathlib import Path
@@ -79,21 +78,21 @@ def execute_one_fold(
     logger = logging.getLogger(__name__)
     logger.info(f"Starting { run_config['name'] }...")
 
-    run_config["end_train_idx"] = int(train_idx[-1])
-
-    if run_config.get("use_all_test", False):
-        run_config["last_idx"] = run_config["end_train_idx"]
+    if run_config.get("use_all_test", True):
+        run_config["last_idx"] = run_config["test_start_idx"]
     else:
         run_config["last_idx"] = int(test_idx[-1])
 
+    run_config["test_start_idx"] = int(test_idx[0])
+
     print(run_config["last_idx"])
-    run_config["n_early_stopping"] = floor(
-        (test_idx[-1] - train_idx[-1])
-        / config["trial_params"]["period"]["min"]
-    )
+    # run_config["n_early_stopping"] = floor(
+    #     (test_idx[-1] - train_idx[-1])
+    #     / config["trial_params"]["period"]["min"]
+    # )
     config["runs"] = [run_config]
     n_train, ml_metric = run_simulator.run(
-        config, 0, lock_model_writing, list_model_writing, verbose=0
+        config, 0, lock_model_writing, list_model_writing, verbose=1
     )
     logger.info(f"Completed {run_config['name']}.")
     return n_train, ml_metric
@@ -116,17 +115,15 @@ def execute_one_trial(
         list_drift_detector,
     )
 
-    n_jobs = config["performance"]["n_jobs"]["k_fold"]
     tscv = TimeSeriesSplit(n_splits=config["evaluation_params"]["n_splits"])
 
-    end_train_idx = run_config["end_train_idx"]
-    with parallel_backend(
-        "loky",
-        n_jobs=n_jobs,
-        inner_max_num_threads=config["performance"]["n_jobs"]["model"],
+    test_start_idx = run_config["test_start_idx"]
+    metrics = []
+    for i, (train_index, test_index) in reversed(
+        list(enumerate(tscv.split(np.arange(test_start_idx))))
     ):
-        metrics = Parallel()(
-            delayed(execute_one_fold)(
+        metrics.append(
+            execute_one_fold(
                 i,
                 copy.deepcopy(config),
                 copy.deepcopy(run_config),
@@ -134,9 +131,6 @@ def execute_one_trial(
                 test_index,
                 lock_model_writing,
                 list_model_writing,
-            )
-            for i, (train_index, test_index) in reversed(
-                list(enumerate(tscv.split(np.arange(end_train_idx))))
             )
         )
 

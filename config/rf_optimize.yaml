@@ -1,15 +1,5 @@
 ---
 runs:
-# # ------------ NO Drift
-   - name: no_detection
-     type: baseline
-     detectors:
-       - name: no_detection
-# # ------------ Periodic
-   - name: periodic
-     type: baseline
-     detectors:
-       - name: periodic
 # # ------------ Error Based
    - name: adwin_proba
      type: error

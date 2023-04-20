@@ -1,34 +1,34 @@
 ---
 performance:
-  predict_forward: 10000
+  predict_forward: 5000
   n_jobs:
     model: 4
-    optimizer: 10
-    k_fold: 3
+    optimizer: 4
 experience:
   random_state: 42
 evaluation_params:
-  batch_size: 25000
+  batch_size: 20000
   metric:
     name: mcc
   n_score: 2
-  n_splits: 5
+  n_splits: 4
 dataset:
   name: lcld_201317_ds_time
 common_detectors_params:
   batch_size: 5000
 common_runs_params:
-  use_all_test: true
+  first_train_window_size: -1
+  training_step_size: 5000
+  test_start_idx: 400000
   random_state: 42
-  end_train_idx: 300000
-  train_all_data: False
+  train_window_size: -1
+  model:
+    source: drift_study.model_arch.tree_model
+    name: rf_lcld_400
   delays:
     label: 10days
     drift: 0
     retraining: 4W
 trial_params:
-  n_trials: 100
-  period:
-    min: 5000
-    max: 300000
+  n_trials: 25
   model_type: random_forest
