@@ -1,0 +1,153 @@
+---
+performance:
+  predict_forward: 50000
+  n_jobs: 20
+  n_jobs_optimiser: 17
+  inner_max_num_threads: 10
+experience:
+  random_state: 42
+evaluation_params:
+  n_early_stopping: 2
+  batch_size: 10000
+  rolling: False
+  significance: 0.0
+  metric:
+    name: mcc
+  n_score: 2
+dataset:
+  name: lcld_201317_ds_time
+common_detectors_params:
+  batch_size: 10000
+  period: 10000
+common_runs_params:
+  end_train_idx: 100000
+  train_with_all: False
+  delays:
+    label: 0
+    drift: 0
+    retraining: 0
+runs:
+# ------------ NO Drift
+  - name: no_detection
+    type: baseline
+    detectors:
+      - name: no_detection
+    model:
+      source: drift_study.model_arch.tree_model
+      name: rf_lcld
+    train_all_data: False
+  - name: no_detection_opt
+    type: baseline
+    detectors:
+      - name: no_detection
+    model:
+      source: drift_study.model_arch.tree_model
+      name: opt_rf_classifier
+    train_all_data: False
+# ------------ Periodic
+  - name: periodic
+    type: baseline
+    detectors:
+      - name: periodic
+    model:
+      source: drift_study.model_arch.tree_model
+      name: rf_lcld
+    train_all_data: False
+  - name: periodic_all
+    type: baseline
+    detectors:
+      - name: periodic
+    model:
+      source: drift_study.model_arch.tree_model
+      name: rf_lcld
+    train_all_data: True
+  - name: at_600_opt
+    type: baseline
+    detectors:
+      - name: periodic
+        params:
+          period: 500000
+    model:
+      source: drift_study.model_arch.tree_model
+      name: opt_rf_classifier
+    train_all_data: False
+  - name: at_600_all_opt
+    type: baseline
+    detectors:
+      - name: periodic
+        params:
+          period: 500000
+    model:
+      source: drift_study.model_arch.tree_model
+      name: opt_rf_classifier
+    train_all_data: True
+  - name: at_720_opt
+    type: baseline
+    detectors:
+      - name: periodic
+        params:
+          period: 620000
+    model:
+      source: drift_study.model_arch.tree_model
+      name: opt_rf_classifier
+    train_all_data: False
+  - name: at_720_all_opt
+    type: baseline
+    detectors:
+      - name: periodic
+        params:
+          period: 620000
+    model:
+      source: drift_study.model_arch.tree_model
+      name: opt_rf_classifier
+    train_all_data: True
+  - name: at_940_opt
+    type: baseline
+    detectors:
+      - name: periodic
+        params:
+          period: 840000
+    model:
+      source: drift_study.model_arch.tree_model
+      name: opt_rf_classifier
+    train_all_data: False
+  - name: at_940_all_opt
+    type: baseline
+    detectors:
+      - name: periodic
+        params:
+          period: 840000
+    model:
+      source: drift_study.model_arch.tree_model
+      name: opt_rf_classifier
+    train_all_data: True
+  - delays:
+      drift: 0
+      label: 0
+      retraining: 0
+    detectors:
+      - name: periodic
+        params:
+          period: 20000
+    end_train_idx: 50000
+    model:
+      name: rf_lcld
+      source: drift_study.model_arch.tree_model
+    name: periodic_20000_rf_lcld_0
+    train_all_data: true
+    type: baseline
+  - delays:
+      drift: 0
+      label: 0
+      retraining: 0
+    detectors:
+    - name: periodic
+      params:
+        period: 20000
+    end_train_idx: 200000
+    model:
+      name: rf_lcld
+      source: drift_study.model_arch.tree_model
+    name: periodic_20000_rf_lcld_200000_0
+    train_all_data: false
+    type: baseline
