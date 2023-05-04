@@ -26,7 +26,7 @@ runs:
       - name: periodic
         params:
           period:
-            grid: [5000, 10000, 20000, 50000, 100000, 200000, 500000]
+            grid: [5000, 10000, 20000, 50000, 100000, 200000, 400000]
     model:
       source: drift_study.model_arch.tree_model
       name:
@@ -37,7 +37,13 @@ runs:
       grid:
         - label: 10days
           drift: 0
+          retraining: 8W
+        - label: 10days
+          drift: 0
           retraining: 4W
         - label: 0
           drift: 0
           retraining: 0
+        - label: 10days
+          drift: 0
+          retraining: 2W
