@@ -37,12 +37,6 @@ runs:
       grid:
         - label: 10days
           drift: 0
-          retraining: 2W
-        - label: 10days
-          drift: 0
-          retraining: 8W
-        - label: 10days
-          drift: 0
           retraining: 4W
         - label: 0
           drift: 0
