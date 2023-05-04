@@ -6,6 +6,7 @@ from mlc.models.pipeline import Pipeline
 
 class LazyPipeline:
     def __init__(self, pipeline: Pipeline):
+        self.name = pipeline.name
         self.pipeline = pipeline
         self.path = None
         self.loaded = False
