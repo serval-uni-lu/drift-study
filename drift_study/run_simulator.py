@@ -142,7 +142,7 @@ def run(
 
         # Find current model
         ml_model_idx, drift_model_idx = get_current_models(
-            models, t[x_idx], last_ml_model_used, last_drift_model_used
+            models, x_idx, t[x_idx], last_ml_model_used, last_drift_model_used
         )
         last_ml_model_used, last_drift_model_used = (
             ml_model_idx,

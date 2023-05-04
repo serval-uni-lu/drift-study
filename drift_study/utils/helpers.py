@@ -17,6 +17,7 @@ from drift_study.drift_detectors import DriftDetector
 from drift_study.drift_detectors.drift_detector_factory import (
     get_drift_detector_from_conf,
 )
+from drift_study.model_arch.lazy_pipeline import LazyPipeline
 from drift_study.utils.date_sampler import sample_date
 from drift_study.utils.delays import Delays
 from drift_study.utils.drift_model import DriftModel
@@ -76,13 +77,15 @@ def get_f_new_model(
 ) -> Callable[[], Model]:
     def new_model() -> Model:
         model = get_model_l(config, run_config, metadata_x)
-        model = Pipeline(
-            steps=[
-                TabTransformer(
-                    metadata=metadata_x, scale=True, one_hot_encode=True
-                ),
-                model,
-            ]
+        model = LazyPipeline(
+            Pipeline(
+                steps=[
+                    TabTransformer(
+                        metadata=metadata_x, scale=True, one_hot_encode=True
+                    ),
+                    model,
+                ]
+            )
         )
         return model
 
@@ -107,6 +110,7 @@ def get_model_l(
 
 def get_current_model(
     models: List[DriftModel],
+    i,
     t,
     model_type: str,
     last_model_used_idx=None,
@@ -120,12 +124,14 @@ def get_current_model(
     for model in models:
         if model_type == "ml":
             t_model = model.ml_available_time
+
         elif model_type == "drift":
             t_model = model.drift_available_time
         else:
             raise NotImplementedError
 
-        if t_model <= t:
+        i_model = model.end_idx
+        if (t_model <= t) and (i_model <= i):
             model_idx += 1
         else:
             break
@@ -137,13 +143,14 @@ def get_current_model(
 
 def get_current_models(
     models: List[DriftModel],
+    i,
     t,
     last_ml_model_used=None,
     last_drift_model_used=None,
 ) -> Tuple[int, int]:
     ml_model_idx, drift_model_idx = (
-        get_current_model(models, t, "ml", last_ml_model_used),
-        get_current_model(models, t, "drift", last_drift_model_used),
+        get_current_model(models, i, t, "ml", last_ml_model_used),
+        get_current_model(models, i, t, "drift", last_drift_model_used),
     )
     if models[drift_model_idx].drift_detector.needs_model():
         assert ml_model_idx == drift_model_idx
@@ -164,14 +171,21 @@ def compute_y_scores(
     if model_used[current_index] < current_model_i:
         logger.debug(f"Seeing forward at index {current_index}")
         end_idx = min(current_index + predict_forward, last_idx)
-        x_to_pred = x[current_index:end_idx]
-        if model.objective in ["regression"]:
-            y_pred = model.predict(x_to_pred)
-        elif model.objective in ["binary", "classification"]:
-            y_pred = model.predict_proba(x_to_pred)
+
+        if isinstance(model, LazyPipeline):
+            y_scores[current_index:end_idx] = model.lazy_predict(
+                current_index, end_idx
+            )
         else:
-            raise NotImplementedError
-        y_scores[current_index:end_idx] = y_pred
+            x_to_pred = x[current_index:end_idx]
+            if model.objective in ["regression"]:
+                y_pred = model.predict(x_to_pred)
+            elif model.objective in ["binary", "classification"]:
+                y_pred = model.predict_proba(x_to_pred)
+            else:
+                raise NotImplementedError
+            y_scores[current_index:end_idx] = y_pred
+
         model_used[current_index:end_idx] = current_model_i
     return y_scores, model_used
 
@@ -234,12 +248,16 @@ def add_model(
         list_model_writing,
     )
     quite_model(model)
-    if model.objective in ["regression"]:
-        y_scores = model.predict(x.iloc[start_idx:end_idx])
-    elif model.objective in ["binary", "classification"]:
-        y_scores = model.predict_proba(x.iloc[start_idx:end_idx])
+
+    if isinstance(model, LazyPipeline):
+        y_scores = model.safe_lazy_predict(x, start_idx, end_idx)
     else:
-        raise NotImplementedError
+        if model.objective in ["regression"]:
+            y_scores = model.predict(x.iloc[start_idx:end_idx])
+        elif model.objective in ["binary", "classification"]:
+            y_scores = model.predict_proba(x.iloc[start_idx:end_idx])
+        else:
+            raise NotImplementedError
 
     drift_detector = f_new_detector()
     drift_detector.fit(
