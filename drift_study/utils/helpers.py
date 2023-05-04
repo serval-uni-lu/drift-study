@@ -60,10 +60,12 @@ def get_f_new_detector(
     run_config: Dict[str, Any],
     metadata_x: pd.DataFrame,
 ) -> Callable[[], DriftDetector]:
-    def f_new_detector() -> DriftDetector:
+    def f_new_detector(start_idx, end_idx) -> DriftDetector:
         drift_detector = get_drift_detector_from_conf(
             run_config.get("detectors"),
-            get_common_detectors_params(config, metadata_x),
+            get_common_detectors_params(
+                config, metadata_x, start_idx, end_idx
+            ),
         )
         return drift_detector
 
@@ -201,7 +203,9 @@ def get_ref_eval_config(configs: dict, ref_config_names: List[str]):
     return ref_configs, eval_configs
 
 
-def get_common_detectors_params(config: dict, metadata: pd.DataFrame):
+def get_common_detectors_params(
+    config: dict, metadata: pd.DataFrame, start_idx: int, end_idx: int
+):
     auto_detector_params = {
         "x_metadata": metadata,
         "features": metadata["feature"].to_list(),
@@ -211,6 +215,8 @@ def get_common_detectors_params(config: dict, metadata: pd.DataFrame):
         "categorical_features": metadata["feature"][
             metadata["type"] == "cat"
         ].to_list(),
+        "start_idx": start_idx,
+        "end_idx": end_idx,
     }
     return {**config.get("common_detectors_params"), **auto_detector_params}
 
@@ -259,7 +265,7 @@ def add_model(
         else:
             raise NotImplementedError
 
-    drift_detector = f_new_detector()
+    drift_detector = f_new_detector(start_idx, end_idx)
     drift_detector.fit(
         x=x.iloc[start_idx:end_idx],
         t=t[start_idx:end_idx],

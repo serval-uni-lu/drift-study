@@ -17,7 +17,8 @@ common_runs_params:
   training_step_size: 5000
   test_start_idx: 400000
   random_state: 42
-  train_window_size: 0
+  train_window_size: 400000
+  first_train_window_size: 400000
   delays:
     label: 0
     drift: 0
@@ -31,8 +32,21 @@ runs:
     model:
       source: drift_study.model_arch.tree_model
       name:
-        grid: [rf_lcld, opt_rf_classifier]
+        grid: [rf_lcld, opt_rf_classifier, rf_lcld_400]
     test_start_idx:
       grid: [400000, 420000, 600000, 800000, 860000, 940000]
     first_train_window_size:
       grid: [400000, -1]
+  - name: manual_chain
+    type: baseline
+    detectors:
+      - name: manual_index
+        params:
+          detect_idxs: [400000, 419999, 599999, 799999, 859999, 939999]
+    model:
+      source: drift_study.model_arch.tree_model
+      name:
+        grid: [rf_lcld, opt_rf_classifier, rf_lcld_400]
+    test_start_idx: 400000
+    train_window_size:
+      grid: [ 400000, -1 ]
