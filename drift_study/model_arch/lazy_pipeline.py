@@ -89,6 +89,6 @@ class LazyPipeline:
         self.save_pred(x)
         return self.lazy_predict(start_idx, end_idx)
 
-    def fit(self, x, y, x_val, y_val):
+    def fit(self, x, y, x_val=None, y_val=None):
         self._pipeline_load()
         self.pipeline.fit(x, y, x_val, y_val)
