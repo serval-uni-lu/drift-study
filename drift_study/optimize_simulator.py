@@ -169,7 +169,7 @@ def run(
     sub_dir_path = config["sub_dir_path"]
 
     studies_dir = (
-        f"./data/optimizer/{dataset_name}/{model_name}/" f"{sub_dir_path}/"
+        f"./data/optimizer/{dataset_name}/{model_name}/{sub_dir_path}/"
     )
 
     studies_path = f"{studies_dir}/study_{study_name}.db"

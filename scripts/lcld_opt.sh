@@ -9,6 +9,6 @@ do
               -c config/${dataset}_opt.yaml \
               -c config/rf_optimize.yaml \
               -c config/${delay}.yaml \
-              -p sub_dir_path=opt_${delay}"
+              -p sub_dir_path=opt400_${delay}"
     done
 done
