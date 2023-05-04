@@ -3,8 +3,8 @@ sub_dir_path: periodic400
 performance:
   predict_forward: 10000
   n_jobs:
-    model: 2
-    simulator: 64
+    model: 32
+    simulator: 1
 evaluation_params:
   batch_size: 20000
   metric:
@@ -37,6 +37,9 @@ runs:
       grid:
         - label: 10days
           drift: 0
+          retraining: 2W
+        - label: 10days
+          drift: 0
           retraining: 8W
         - label: 10days
           drift: 0
@@ -44,6 +47,3 @@ runs:
         - label: 0
           drift: 0
           retraining: 0
-        - label: 10days
-          drift: 0
-          retraining: 2W
