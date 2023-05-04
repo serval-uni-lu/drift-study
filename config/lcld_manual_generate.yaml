@@ -3,7 +3,7 @@ sub_dir_path: manual400
 performance:
   predict_forward: 1000000
   n_jobs:
-    model: 128
+    model: -1
     simulator: 1
 evaluation_params:
   batch_size: 20000
