@@ -73,7 +73,7 @@ def run(
 
     logger.debug(f"N inputs {len(y)}, with distribution {y.mean()}.")
 
-    delays = get_delays(run_config, f_new_detector())
+    delays = get_delays(run_config, f_new_detector(0, 0))
     last_idx = run_config.get("last_idx", -1)
     if last_idx == -1:
         last_idx = len(x)

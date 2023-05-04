@@ -37,7 +37,7 @@ def initialize(
 ) -> Tuple[
     Dataset,
     Callable[[], Model],
-    Callable[[], DriftDetector],
+    Callable[[int, int], DriftDetector],
     ArrayLike,
     ArrayLike,
     ArrayLike,
@@ -59,7 +59,7 @@ def get_f_new_detector(
     config: Dict[str, Any],
     run_config: Dict[str, Any],
     metadata_x: pd.DataFrame,
-) -> Callable[[], DriftDetector]:
+) -> Callable[[int, int], DriftDetector]:
     def f_new_detector(start_idx, end_idx) -> DriftDetector:
         drift_detector = get_drift_detector_from_conf(
             run_config.get("detectors"),
