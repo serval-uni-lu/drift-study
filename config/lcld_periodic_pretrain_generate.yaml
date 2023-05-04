@@ -1,7 +1,7 @@
 ---
 sub_dir_path: periodic400
 performance:
-  predict_forward: 10000
+  predict_forward: 5000
   n_jobs:
     model: -1
     simulator: 1
@@ -32,7 +32,7 @@ runs:
       name:
         grid: [rf_lcld, rf_lcld_400]
     train_window_size:
-      grid: [50000, 100000, 200000, 500000, -1]
+      grid: [50000, 100000, 200000, 400000, -1]
     delays:
       grid:
         - label: 0
