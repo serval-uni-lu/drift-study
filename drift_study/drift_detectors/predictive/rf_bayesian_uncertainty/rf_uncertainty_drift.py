@@ -14,6 +14,7 @@ from drift_study.drift_detectors.drift_detector import (
     NoModelException,
     NotFittedDetectorException,
 )
+from drift_study.model_arch.lazy_pipeline import LazyPipeline
 
 from .rf_uncertainty import RandomForestClassifierWithUncertainty
 
@@ -52,6 +53,11 @@ class RfUncertaintyDrift(DriftDetector):
     ) -> None:
         if model is None:
             raise NoModelException
+
+        if isinstance(model, LazyPipeline):
+            model._pipeline_load()
+            model = model.pipeline
+
         if not isinstance(model, Pipeline):
             raise NotImplementedError("Model is expected to be a Pipeline")
 

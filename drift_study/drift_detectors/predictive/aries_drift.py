@@ -16,6 +16,7 @@ from drift_study.drift_detectors.drift_detector import (
     DriftDetector,
     NotFittedDetectorException,
 )
+from drift_study.model_arch.lazy_pipeline import LazyPipeline
 from drift_study.model_arch.sklearn_opt import TimeOptimizer
 
 
@@ -50,6 +51,10 @@ class AriesDrift(DriftDetector):
         model: Optional[Model],
     ) -> None:
         self.model = model
+        if isinstance(self.model, LazyPipeline):
+            self.model._pipeline_load()
+            self.model = self.model.pipeline
+
         if not isinstance(self.model, Pipeline):
             raise NotImplementedError
         if isinstance(self.model[-1].model, RandomForestClassifier):
