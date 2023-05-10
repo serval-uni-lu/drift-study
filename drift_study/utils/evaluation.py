@@ -151,6 +151,7 @@ def load_config_eval(
         run_config["prediction_metric"] = prediction_metric.compute(
             y[test_i], y_scores[test_i]
         )
+        run_config["metric"] = run_config["prediction_metric"]
         run_config["prediction_metric_batch"] = np.array(
             [
                 prediction_metric.compute(
