@@ -7,7 +7,6 @@ import numpy.typing as npt
 import pandas as pd
 from mlc.datasets.dataset import Dataset
 from mlc.metrics.metric import Metric
-from mlc.metrics.metrics import PredClassificationMetric
 
 
 def score_to_pred(
@@ -144,8 +143,8 @@ def load_config_eval(
                 else:
                     run_config["is_retrained"].append(False)
 
-        if isinstance(prediction_metric, PredClassificationMetric):
-            y_scores = np.argmax(y_scores, axis=1)
+        # if isinstance(prediction_metric, PredClassificationMetric):
+        #     y_scores = np.argmax(y_scores, axis=1)
 
         run_config["y_scores"] = y_scores
         run_config["prediction_metric"] = prediction_metric.compute(
