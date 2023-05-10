@@ -159,6 +159,7 @@ def load_config_eval(
                 for index_batch in index_batches
             ]
         )
+        run_config["metric_batch"] = run_config["prediction_metric_batch"]
         run_config["batch_start_idx"] = np.array([e[0] for e in index_batches])
 
     return config
