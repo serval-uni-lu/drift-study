@@ -1,6 +1,5 @@
 import copy
 import logging.config
-from pathlib import Path
 from typing import Any, Dict, List
 
 import configutils
@@ -15,6 +14,22 @@ from drift_study.utils.helpers import initialize
 from drift_study.utils.logging import configure_logger
 
 BIG_NUMBER = 1_000_000_000
+
+
+def batch_min(a, *args, **kwargs):
+    return np.min(np.concatenate(a.values))
+
+
+def batch_mean(a, *args, **kwargs):
+    return np.mean(np.concatenate(a.values))
+
+
+def batch_std(a, *args, **kwargs):
+    return np.std(np.concatenate(a.values))
+
+
+def batch_q5(a, *args, **kwargs):
+    return np.quantile(np.concatenate(a.values), 0.05)
 
 
 def build_key(d: Dict[str, Any]):
@@ -88,8 +103,9 @@ def build_df(runs: List[Dict[str, Any]]) -> pd.DataFrame:
             "period": r["detectors"][0]["params"]["period"],
             "model": r["model"]["name"],
             "metric": r["metric"],
-            "train_all_data": r["train_all_data"],
-            "window_size": r["end_train_idx"],
+            "window_size": r["train_window_size"]
+            if r["train_window_size"] > 0
+            else 100000000,
             "metric_batch": r["metric_batch"],
         }
         filtered_runs.append(filtered_r)
@@ -112,20 +128,27 @@ def run(
     logger.info(f"Starting dataset {dataset.name}")
 
     prediction_metric = create_metric(config["evaluation_params"]["metric"])
+    batch_size = config["evaluation_params"]["batch_size"]
     config = load_config_eval(config, dataset, prediction_metric, y)
-    start_test_idx = common_evaluation_correction(config["runs"])
-    compute_metrics(config["runs"], prediction_metric, y, start_test_idx)
+
+    test_start_idx = config["common_runs_params"]["test_start_idx"]
+
+    # compute_metrics(config["runs"], prediction_metric, y, start_test_idx)
     df = build_df(config["runs"])
     logger.info("Done")
 
-    df["window_size"][df["train_all_data"]] = BIG_NUMBER
-    df = df.drop("train_all_data", axis=1)
-    grouped = df.groupby(["delays", "model"])
+    # df["window_size"][df["train_all_data"]] = BIG_NUMBER
+    # df = df.drop("train_all_data", axis=1)
+    # grouped = df.groupby(["delays", "model"])
 
-    df_all_out = df.drop(["metric_batch"], axis=1)
-    df_all_out = df_all_out.groupby(
-        ["delays", "period", "window_size", "model"]
-    ).agg({"metric": ["mean", "std"]})
+    # df_all_out = df.drop(["metric_batch"], axis=1)
+    # df_all_out = df_all_out.groupby(
+    #     ["delays", "period", "window_size", "model"]
+    # ).agg({"metric": ["mean", "std"]})
+
+    path_out = f"reports/{dataset.name}_periodic_{batch_size}_{test_start_idx}"
+
+    df.to_csv(f"{path_out}_raw.csv")
 
     def text(x):
         avg = np.mean(x)
@@ -134,7 +157,7 @@ def run(
         return f"{avg:.5f} \\footnotesize{{$\\pm$ {std_str:.1f}}}"
 
     pd.pivot_table(
-        df_all_out,
+        df,
         index=["delays", "window_size", "model"],
         columns=["period"],
         values=["metric"],
@@ -148,58 +171,25 @@ def run(
     )[
         "text"
     ].to_csv(
-        "results.csv"
+        f"{path_out}.csv"
     )
 
-    for name, group in grouped:
-        df_l = group[["window_size", "period", "metric", "metric_batch"]]
-        print(f"##### {name}")
-
-        def batch_min(a, *args, **kwargs):
-            return np.min(np.concatenate(a.values))
-
-        def batch_mean(a, *args, **kwargs):
-            return np.mean(np.concatenate(a.values))
-
-        def batch_std(a, *args, **kwargs):
-            return np.std(np.concatenate(a.values))
-
-        def batch_q5(a, *args, **kwargs):
-            return np.quantile(np.concatenate(a.values), 0.05)
-
-        pivot_table = (
-            pd.pivot_table(
-                df_l,
-                index=["window_size"],
-                columns=["period"],
-                values=["metric", "metric_batch"],
-                aggfunc={
-                    "metric": ["mean", "std"],
-                    "metric_batch": [
-                        batch_min,
-                        batch_q5,
-                        batch_mean,
-                        batch_std,
-                    ],
-                },
-            )
-            .droplevel(0, 1)
-            .swaplevel(0, 1, 1)
-            .sort_index(level=0, axis=1)
-        )
-        out_path = f"reports/periodic/{dataset.name}/{name}.csv"
-        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-        pivot_table.to_csv(out_path)
-
-        print(pivot_table)
-        pivot_table = pivot_table.values
-        print(f"Max col in row {np.argmax(pivot_table, axis =0)}")
-        print(f"Max row in col {np.argmax(pivot_table, axis =1)}")
-        max_idx = (
-            np.argmax(pivot_table) // pivot_table.shape[1],
-            np.argmax(pivot_table) % pivot_table.shape[1],
-        )
-        print(f"Max index {max_idx}")
+    pd.pivot_table(
+        df,
+        index=["delays", "window_size", "model"],
+        columns=["period"],
+        values=["metric", "metric_batch"],
+        aggfunc={
+            "metric": ["mean", "std"],
+            "metric_batch": [batch_mean, batch_std, batch_min, batch_q5],
+        },
+    ).swaplevel(1, 2, 0).swaplevel(0, 1, 0).sort_index(
+        level=0, axis=0
+    ).swaplevel(
+        0, 1, 1
+    ).to_csv(
+        f"{path_out}_int.csv"
+    )
 
 
 if __name__ == "__main__":
