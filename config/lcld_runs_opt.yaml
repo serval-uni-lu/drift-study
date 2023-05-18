@@ -1,0 +1,1773 @@
+runs:
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.09898977046025592
+  name: tabular_alibi52
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.005902552855603127
+  name: tabular_alibi3
+  type: data
+- detectors:
+  - name: eddm
+    params:
+      alpha: 0.9678305675579442
+      beta: 0.9678305675579442
+      warm_start: 593
+  name: eddm_error41
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.07429952104819863
+  name: tabular_alibi48
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.035689155272382755
+  name: tabular_alibi60
+  type: data
+- detectors:
+  - name: adwin
+    params:
+      delta: 0.19414132190182293
+      grace_period: 40
+      metric_conf:
+        name: proba_error
+  name: adwin_proba43
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.0959331058689393
+  name: tabular_alibi84
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.04368958683575085
+  name: tabular_alibi59
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.02852332270504232
+  name: tabular_alibi39
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.0171571876654616
+  name: tabular_alibi91
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.6850733927222011
+      grace_period: 220
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty59
+  type: predictive
+- detectors:
+  - name: page_hinkley
+    params:
+      alpha: 0.9969909842462896
+      delta: 0.00708101770538266
+      metric_conf:
+        name: class_error
+      min_instances: 613
+      threshold: 11.271662653605421
+  name: page_hinkley_class_error3
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.040853860258242766
+  name: tabular_alibi14
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.06541096864074528
+  name: tabular_alibi44
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.04963293321842499
+  name: tabular_alibi17
+  type: data
+- detectors:
+  - name: adwin
+    params:
+      delta: 0.19165116932533477
+      grace_period: 19
+      metric_conf:
+        name: proba_error
+  name: adwin_proba57
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.07365567949006195
+  name: tabular_alibi73
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.38704623890283935
+      grace_period: 263
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty38
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.09147121175207557
+  name: tabular_alibi45
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.9725491342828385
+      grace_period: 811
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty33
+  type: predictive
+- detectors:
+  - name: adwin
+    params:
+      delta: 0.5699053358187891
+      grace_period: 618
+      metric_conf:
+        name: proba_error
+  name: adwin_proba83
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: aries
+    params: {}
+  - name: adwin
+    params:
+      delta: 0.16889535664675268
+      grace_period: 177
+  name: aries_all84
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.07946608037150799
+  name: tabular_alibi69
+  type: data
+- detectors:
+  - name: ddm
+    params:
+      drift_threshold: 2.3028242716263088
+      warm_start: 35
+  name: ddm_error38
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.09050691657076682
+  name: tabular_alibi83
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.0014652570710423016
+  name: tabular_alibi34
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.003251867261435783
+  name: tabular_alibi33
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.07213250378400239
+  name: tabular_alibi88
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: evidently
+    params:
+      cat_threshold: 0.34780605512929336
+      drift_share: 0.022535635616113353
+      num_threshold: 0.03509092381102515
+  name: data_evidently87
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: evidently
+    params:
+      cat_threshold: 0.31438013118869274
+      drift_share: 0.03834538490635805
+      num_threshold: 0.03791360461785724
+  name: data_evidently54
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.4054945942737117
+      grace_period: 712
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty65
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.0744787611208924
+  name: tabular_alibi54
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.05990598257128396
+  name: tabular_alibi2
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.09171131419146245
+  name: tabular_alibi51
+  type: data
+- detectors:
+  - name: hddm_a
+    params:
+      drift_confidence: 0.0015818385429966254
+  name: hddm_a_error57
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.00010333777552935103
+  name: tabular_alibi62
+  type: data
+- detectors:
+  - name: hddm_a
+    params:
+      drift_confidence: 0.001
+  name: hddm_a_error0
+  type: error
+- detectors:
+  - name: hddm_a
+    params:
+      drift_confidence: 0.0010368372733102528
+  name: hddm_a_error34
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.059284129072860736
+  name: tabular_alibi72
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.005157000168419802
+  name: tabular_alibi32
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.06238784927889545
+  name: tabular_alibi50
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.8211448522578042
+      grace_period: 793
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty15
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.02307513870070435
+  name: tabular_alibi96
+  type: data
+- detectors:
+  - name: periodic
+    params:
+      period: 5559
+  name: periodic83
+  type: baseline
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: evidently
+    params:
+      cat_threshold: 0.33703469998394076
+      drift_share: 0.037496843520306536
+      num_threshold: 0.05254957323179218
+  name: data_evidently45
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.003822631952435509
+  name: tabular_alibi93
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.031123425734246493
+  name: tabular_alibi12
+  type: data
+- detectors:
+  - name: kswin
+    params:
+      alpha: 0.0032184934336774817
+      ks_window_size: 154
+      metric_conf:
+        name: class_error
+      stat_size: 51
+  name: kswin_class_error63
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.027588595863008984
+  name: tabular_alibi61
+  type: data
+- detectors:
+  - name: kswin
+    params:
+      alpha: 0.0024329059237818444
+      ks_window_size: 66
+      metric_conf:
+        name: class_error
+      stat_size: 22
+  name: kswin_class_error88
+  type: error
+- detectors:
+  - name: kswin
+    params:
+      alpha: 0.00013105048705470366
+      ks_window_size: 710
+      metric_conf:
+        name: proba_error
+      stat_size: 236
+  name: kswin_proba_error55
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.05000223515968637
+  name: tabular_alibi68
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.04488198093285764
+  name: tabular_alibi26
+  type: data
+- detectors:
+  - name: ddm
+    params:
+      drift_threshold: 1.2345824988200254
+      warm_start: 45
+  name: ddm_error74
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.023327325144035477
+  name: tabular_alibi16
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: evidently
+    params:
+      cat_threshold: 0.3460215251694013
+      drift_share: 0.0186071032355999
+      num_threshold: 0.022422295077787088
+  name: data_evidently96
+  type: data
+- detectors:
+  - name: adwin
+    params:
+      delta: 0.0034007334255208243
+      grace_period: 21
+      metric_conf:
+        name: proba_error
+  name: adwin_proba42
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.9296404973188204
+      grace_period: 613
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty83
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.09451914076861563
+  name: tabular_alibi5
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: evidently
+    params:
+      cat_threshold: 0.1712586543528846
+      drift_share: 0.12357649623600064
+      num_threshold: 0.07352172137419838
+  name: data_evidently12
+  type: data
+- detectors:
+  - name: ddm
+    params:
+      drift_threshold: 3.0
+      warm_start: 30
+  name: ddm_error0
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.03361572051382822
+  name: tabular_alibi10
+  type: data
+- detectors:
+  - name: periodic
+    params:
+      period: 11643
+  name: periodic79
+  type: baseline
+- detectors:
+  - name: kswin
+    params:
+      alpha: 0.0019774190786798033
+      ks_window_size: 55
+      metric_conf:
+        name: class_error
+      stat_size: 18
+  name: kswin_class_error31
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.04078346503271936
+  name: tabular_alibi74
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.06898426446880107
+  name: tabular_alibi71
+  type: data
+- detectors:
+  - name: adwin
+    params:
+      delta: 0.564730273070325
+      grace_period: 525
+      metric_conf:
+        name: proba_error
+  name: adwin_proba67
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.0833144014557741
+  name: tabular_alibi81
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.03539785295296345
+  name: tabular_alibi36
+  type: data
+- detectors:
+  - name: adwin
+    params:
+      delta: 0.005594052483670385
+      grace_period: 200
+      metric_conf:
+        name: class_error
+  name: adwin_class53
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.9155264365841576
+      grace_period: 497
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty37
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.056509851047797724
+  name: tabular_alibi46
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.09998462642123679
+  name: tabular_alibi85
+  type: data
+- detectors:
+  - name: kswin
+    params:
+      alpha: 0.0002261543456757151
+      ks_window_size: 876
+      metric_conf:
+        name: class_error
+      stat_size: 292
+  name: kswin_class_error66
+  type: error
+- detectors:
+  - name: adwin
+    params:
+      delta: 0.6847490802106478
+      grace_period: 131
+      metric_conf:
+        name: class_error
+  name: adwin_class77
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.04341800154588076
+  name: tabular_alibi24
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.47336886233393066
+      grace_period: 424
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty69
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.919176875671984
+      grace_period: 363
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty43
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.04966504008324776
+  name: tabular_alibi55
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.04174858372525192
+  name: tabular_alibi13
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.07584653933960608
+  name: tabular_alibi35
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.019444752713658576
+  name: tabular_alibi64
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.6106146765755278
+      grace_period: 580
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty7
+  type: predictive
+- detectors:
+  - name: kswin
+    params:
+      alpha: 0.0008887323452465646
+      ks_window_size: 61
+      metric_conf:
+        name: class_error
+      stat_size: 20
+  name: kswin_class_error95
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.03786762496085903
+  name: tabular_alibi49
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.06926824368819536
+  name: tabular_alibi25
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.4523258382678616
+      grace_period: 11
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty56
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.6529544191641488
+      grace_period: 668
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty46
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.06424742873187633
+  name: tabular_alibi7
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.0950537145170485
+  name: tabular_alibi8
+  type: data
+- detectors:
+  - name: adwin
+    params:
+      delta: 0.001548114333407154
+      grace_period: 256
+      metric_conf:
+        name: class_error
+  name: adwin_class86
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.02409967398486248
+  name: tabular_alibi40
+  type: data
+- detectors:
+  - name: n_batch
+    params:
+      batch_size: 50
+  - name: pca_cd
+    params:
+      delta: 0.0012148881960610536
+      divergence_metric: intersection
+      ev_threshold: 0.7443762675053436
+      ph_t_ratio: 0.02095467931447154
+  name: pca_cd26
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: aries
+    params: {}
+  - name: adwin
+    params:
+      delta: 0.22731429795457647
+      grace_period: 213
+  name: aries_all99
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.014586268217525747
+  name: tabular_alibi29
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.984830129442148
+      grace_period: 23
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty9
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.5820191268240408
+      grace_period: 494
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty19
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: aries
+    params: {}
+  - name: adwin
+    params:
+      delta: 0.3393933158957596
+      grace_period: 32
+  name: aries_all56
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.9592167275785407
+      grace_period: 146
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty42
+  type: predictive
+- detectors:
+  - name: page_hinkley
+    params:
+      alpha: 0.9934074205249013
+      delta: 0.004441770132147509
+      metric_conf:
+        name: class_error
+      min_instances: 131
+      threshold: 29.178196775644878
+  name: page_hinkley_class_error32
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.06798410611900703
+  name: tabular_alibi78
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.0614330705154815
+  name: tabular_alibi42
+  type: data
+- detectors:
+  - name: periodic
+    params:
+      period: 18336
+  name: periodic50
+  type: baseline
+- detectors:
+  - name: page_hinkley
+    params:
+      alpha: 0.9908172727027598
+      delta: 0.00047279504873339127
+      metric_conf:
+        name: class_error
+      min_instances: 556
+      threshold: 29.678185957032667
+  name: page_hinkley_class_error65
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.03657144186782174
+  name: tabular_alibi27
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.009684823219815045
+  name: tabular_alibi31
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.06084187537773301
+  name: tabular_alibi90
+  type: data
+- detectors:
+  - name: adwin
+    params:
+      delta: 0.6965515358907592
+      grace_period: 28
+      metric_conf:
+        name: class_error
+  name: adwin_class5
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.04683839245212619
+  name: tabular_alibi38
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.04816672074416632
+  name: tabular_alibi65
+  type: data
+- detectors:
+  - name: eddm
+    params:
+      alpha: 0.9145947888083129
+      beta: 0.9145947888083129
+      warm_start: 462
+  name: eddm_error21
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.04813235803576414
+  name: tabular_alibi11
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.5870147157278188
+      grace_period: 211
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty98
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.021314472782246838
+      grace_period: 194
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty88
+  type: predictive
+- detectors:
+  - name: hddm_a
+    params:
+      drift_confidence: 0.026660422663458815
+  name: hddm_a_error56
+  type: error
+- detectors:
+  - name: page_hinkley
+    params:
+      alpha: 0.9999
+      delta: 0.005
+      metric_conf:
+        name: proba_error
+      min_instances: 30
+      threshold: 50.0
+  name: page_hinkley_proba_error0
+  type: error
+- detectors:
+  - name: hddm_a
+    params:
+      drift_confidence: 0.0002320706266985672
+  name: hddm_a_error61
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.4378516820440943
+      grace_period: 772
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty16
+  type: predictive
+- detectors:
+  - name: periodic
+    params:
+      period: 8876
+  name: periodic41
+  type: baseline
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.07469067762666157
+  name: tabular_alibi30
+  type: data
+- detectors:
+  - name: hddm_a
+    params:
+      drift_confidence: 0.0010238925166427431
+  name: hddm_a_error98
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.08064813104398103
+  name: tabular_alibi41
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.0051397882103882825
+  name: tabular_alibi9
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.05
+  name: tabular_alibi0
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.06416118582906337
+  name: tabular_alibi19
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.008192538746344506
+  name: tabular_alibi92
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.05754694827633507
+  name: tabular_alibi23
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.08460617848316657
+  name: tabular_alibi79
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.04878233649181855
+  name: tabular_alibi99
+  type: data
+- detectors:
+  - name: hddm_a
+    params:
+      drift_confidence: 0.0009826614065576562
+  name: hddm_a_error52
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.012015829438216784
+  name: tabular_alibi37
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.05382919041836714
+  name: tabular_alibi47
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.6395682627671307
+      grace_period: 478
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty86
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.03540554776765349
+  name: tabular_alibi80
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.09651349291256396
+  name: tabular_alibi43
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.9979991536344943
+      grace_period: 300
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty75
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.03751655787285152
+  name: tabular_alibi1
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.01826033888623945
+  name: tabular_alibi18
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.06041638805495658
+  name: tabular_alibi58
+  type: data
+- detectors:
+  - name: kswin
+    params:
+      alpha: 7.713361114993443e-05
+      ks_window_size: 917
+      metric_conf:
+        name: proba_error
+      stat_size: 305
+  name: kswin_proba_error35
+  type: error
+- detectors:
+  - name: hddm_w
+    params:
+      drift_confidence: 0.26730389233688534
+      lambda_val: 0.00026657701067448435
+  name: hddm_w_error42
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.05455018840604901
+  name: tabular_alibi22
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.0271455058931205
+  name: tabular_alibi77
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.014828139324032485
+      grace_period: 307
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty47
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.09795992509097352
+  name: tabular_alibi82
+  type: data
+- detectors:
+  - name: hddm_a
+    params:
+      drift_confidence: 0.0032721519037693194
+  name: hddm_a_error23
+  type: error
+- detectors:
+  - name: hddm_w
+    params:
+      drift_confidence: 0.3077477146225018
+      lambda_val: 0.011629959898168814
+  name: hddm_w_error53
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.5986582868800682
+      grace_period: 164
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty1
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.07826992728838925
+  name: tabular_alibi20
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.00019008279545540754
+  name: tabular_alibi98
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.005709820505583239
+  name: tabular_alibi95
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.06335733492032922
+  name: tabular_alibi70
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.05400804866959949
+  name: tabular_alibi21
+  type: data
+- detectors:
+  - name: page_hinkley
+    params:
+      alpha: 0.9592305497284478
+      delta: 0.009848616149794041
+      metric_conf:
+        name: class_error
+      min_instances: 294
+      threshold: 9.087521759434281
+  name: page_hinkley_class_error86
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: epistemic
+  - name: adwin
+    params:
+      delta: 0.6477719035528685
+      grace_period: 779
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty48
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.07083645052182495
+  name: tabular_alibi4
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.012742796517919285
+  name: tabular_alibi94
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.055388866526504286
+  name: tabular_alibi97
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.028422267934341897
+  name: tabular_alibi56
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.07056760572868434
+  name: tabular_alibi15
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.02975063570335287
+  name: tabular_alibi6
+  type: data
+- detectors:
+  - name: eddm
+    params:
+      alpha: 0.9332404537832737
+      beta: 0.9332404537832737
+      warm_start: 544
+  name: eddm_error51
+  type: error
+- detectors:
+  - name: no_detection
+    params: {}
+  name: no_detection0
+  type: baseline
+- detectors:
+  - name: kswin
+    params:
+      alpha: 5.148098789262846e-05
+      ks_window_size: 859
+      metric_conf:
+        name: proba_error
+      stat_size: 286
+  name: kswin_proba_error22
+  type: error
+- detectors:
+  - name: adwin
+    params:
+      delta: 0.004844614627301996
+      grace_period: 53
+      metric_conf:
+        name: proba_error
+  name: adwin_proba59
+  type: error
+- detectors:
+  - name: kswin
+    params:
+      alpha: 0.00011737993741088388
+      ks_window_size: 872
+      metric_conf:
+        name: proba_error
+      stat_size: 290
+  name: kswin_proba_error83
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.5290366322426289
+      grace_period: 40
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty18
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.049642708742907965
+  name: tabular_alibi87
+  type: data
+- detectors:
+  - name: n_batch
+    params:
+      batch_size: 50
+  - name: pca_cd
+    params:
+      delta: 0.0022310753167434916
+      divergence_metric: intersection
+      ev_threshold: 0.6483897848957748
+      ph_t_ratio: 0.05670049870752742
+  name: pca_cd50
+  type: data
+- detectors:
+  - name: kswin
+    params:
+      alpha: 0.00481051715368029
+      ks_window_size: 66
+      metric_conf:
+        name: class_error
+      stat_size: 22
+  name: kswin_class_error84
+  type: error
+- detectors:
+  - name: eddm
+    params:
+      alpha: 0.9875837275218629
+      beta: 0.9875837275218629
+      warm_start: 477
+  name: eddm_error33
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.05652749085146445
+  name: tabular_alibi76
+  type: data
+- detectors:
+  - name: hddm_a
+    params:
+      drift_confidence: 0.0011507699718011147
+  name: hddm_a_error44
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.007038693374518398
+  name: tabular_alibi67
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: evidently
+    params:
+      cat_threshold: 0.2067076364322567
+      drift_share: 0.48807043374579084
+      num_threshold: 0.04295286778220059
+  name: data_evidently25
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.07884491039969421
+  name: tabular_alibi57
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.035123991034261656
+  name: tabular_alibi63
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.001957243114254453
+  name: tabular_alibi75
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: fdr
+      p_val: 0.018768908893373078
+  name: tabular_alibi66
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.03608933681462756
+  name: tabular_alibi89
+  type: data
+- detectors:
+  - name: kswin
+    params:
+      alpha: 0.01894473011352092
+      ks_window_size: 973
+      metric_conf:
+        name: proba_error
+      stat_size: 324
+  name: kswin_proba_error21
+  type: error
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: rf_uncertainty
+    params:
+      uncertainty_type: total
+  - name: adwin
+    params:
+      delta: 0.6869895955595287
+      grace_period: 967
+      metric_conf:
+        name: y_scores
+  name: rf_uncertainty17
+  type: predictive
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.05635922819635217
+  name: tabular_alibi28
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.09704081979483102
+  name: tabular_alibi53
+  type: data
+- detectors:
+  - name: n_batch
+    params: {}
+  - name: tabular_alibi
+    params:
+      correction: bonferroni
+      p_val: 0.09600212561950404
+  name: tabular_alibi86
+  type: data

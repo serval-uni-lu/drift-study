@@ -2,9 +2,8 @@
 performance:
   predict_forward: 10000
   n_jobs:
-    model: 14
-    optimizer: 9
-    k_fold: 1
+    model: 5
+    simulator: 12
 experience:
   random_state: 42
 evaluation_params:

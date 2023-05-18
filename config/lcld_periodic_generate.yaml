@@ -20,7 +20,7 @@ common_runs_params:
 runs:
   - name: periodic
     random_state:
-      grid: [42, 43, 44, 45, 46]
+      grid: [42]
     type: baseline
     detectors:
       - name: periodic
@@ -32,7 +32,7 @@ runs:
       name:
         grid: [rf_lcld, rf_lcld_400]
     train_window_size:
-      grid: [50000, 100000, 200000, 500000, -1]
+      grid: [50000, 100000, 200000, 400000, -1]
     delays:
       grid:
         - label: 10days

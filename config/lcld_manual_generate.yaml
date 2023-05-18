@@ -3,8 +3,8 @@ sub_dir_path: manual400
 performance:
   predict_forward: 1000000
   n_jobs:
-    model: -1
-    simulator: 1
+    model: 16
+    simulator: 8
 evaluation_params:
   batch_size: 20000
   metric:
@@ -34,7 +34,7 @@ runs:
       name:
         grid: [rf_lcld, opt_rf_classifier, rf_lcld_400]
     test_start_idx:
-      grid: [400000, 420000, 600000, 800000, 860000, 940000]
+      grid: [420000, 600000, 800000, 860000, 940000]
     first_train_window_size:
       grid: [400000, -1]
   - name: manual_chain

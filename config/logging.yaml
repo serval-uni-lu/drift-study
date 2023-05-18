@@ -12,9 +12,9 @@ logging:
       stream: ext://sys.stdout
   loggers:
     __main__:
-      level: INFO
+      level: DEBUG
     optuna:
       level: ERROR
   root:
-    level: WARNING
+    level: DEBUG
     handlers: [console]

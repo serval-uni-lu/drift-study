@@ -1,7 +1,7 @@
 ---
-sub_dir_path: periodic400
+sub_dir_path: rq1.2
 performance:
-  predict_forward: 5000
+  predict_forward: 20000
   n_jobs:
     model: -1
     simulator: 1
@@ -17,6 +17,7 @@ common_runs_params:
   training_step_size: 5000
   first_train_window_size: -1
   test_start_idx: 400000
+  train_window_size: 400000
 runs:
   - name: periodic
     random_state:
@@ -25,14 +26,12 @@ runs:
     detectors:
       - name: periodic
         params:
-          period:
-            grid: [5000]
+          period: 
+            grid: [20000, 50000, 100000, 200000, 400000]
     model:
       source: drift_study.model_arch.tree_model
       name:
-        grid: [rf_lcld, rf_lcld_400]
-    train_window_size:
-      grid: [50000, 100000, 200000, 400000, -1]
+        grid: [rf_lcld, rf_lcld_400, opt_rf_classifier]
     delays:
       grid:
         - label: 0
