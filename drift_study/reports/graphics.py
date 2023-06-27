@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy
 import seaborn as sns
 from matplotlib import rc
-from matplotlib.dates import DateFormatter
 from pandas.plotting import register_matplotlib_converters
 
 rc("text", usetex=True)
@@ -32,15 +31,29 @@ def lineplot(
     y_lim=None,
     fig_size=(6, 4),
     legend_pos="best",
+    style=None,
+    markers=None,
+    dashes=True,
     v_lines=[],
     h_lines=[],
 ):
     plt.figure(figsize=fig_size)
-    sns.set(style="white", color_codes=True, font_scale=FONT_SCALE)
+    sns.set(style="darkgrid", color_codes=True, font_scale=FONT_SCALE)
 
     palette = _color_palette(data, hue)
 
-    g = sns.lineplot(x=x, y=y, hue=hue, data=data, palette=palette)
+    g = sns.lineplot(
+        x=x,
+        y=y,
+        hue=hue,
+        data=data,
+        palette=palette,
+        style=style,
+        markers=markers,
+        dashes=dashes,
+        linestyle="dotted",
+        marker="o",
+    )
 
     if hue and legend_pos:
         handles, labels = g.get_legend_handles_labels()
@@ -49,22 +62,22 @@ def lineplot(
                 loc="center left",
                 bbox_to_anchor=OUTSIDE_LEGEND,
                 prop={"size": FONT_SCALE * 12},
-                handles=handles[1:],
-                labels=labels[1:],
+                # handles=handles[1:],
+                # labels=labels[1:],
             )
         else:
             plt.legend(
                 loc=legend_pos,
                 prop={"size": FONT_SCALE * 12},
-                handles=handles[1:],
-                labels=labels[1:],
+                # handles=handles[1:],
+                # labels=labels[1:],
             )
 
     plt.ylabel(y_label)
     plt.xlabel(x_label)
-
-    g.xaxis.set_major_formatter(DateFormatter("%m-%Y"))
-    g.xaxis.set_major_locator(plt.MaxNLocator(5))
+    #
+    # g.xaxis.set_major_formatter(DateFormatter("%m-%Y"))
+    # g.xaxis.set_major_locator(plt.MaxNLocator(5))
 
     if y_lim is not None and len(y_lim) == 2:
         plt.ylim(y_lim)
@@ -256,10 +269,15 @@ def scatterplot(
     fig_size=(32, 4),
     legend_pos="best",
     markers=None,
+    xlim=None,
+    ylim=None,
     **kwargs,
 ):
     # - fig = plt.figure(figsize=fig_size)
-    sns.set(style="white", color_codes=True, font_scale=FONT_SCALE)
+    # sns.set_style("darkgrid")
+
+    sns.set(style="darkgrid", color_codes=True, font_scale=FONT_SCALE)
+    # sns.set_style()
 
     palette = _color_palette(data, hue)
 
@@ -279,9 +297,13 @@ def scatterplot(
         **kwargs,
     )
     _setup_legend(data, legend_pos, hue)
-
     plt.ylabel(y_label)
     plt.xlabel(x_label)
+
+    if xlim is not None:
+        plt.xlim(xlim)
+    if ylim is not None:
+        plt.ylim(ylim)
 
     plt.tight_layout()
 
