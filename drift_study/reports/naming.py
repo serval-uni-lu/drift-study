@@ -5,20 +5,32 @@ detector_names = {
     "periodic": "Periodic",
     "n_batch_tabular_alibi": "Statistical test",
     "n_batch_evidently": "Divergence",
+    "data_evidently": "Divergence",
     "n_batch_pca_cd": "PCA-CD",
+    "pca_cd": "PCA-CD",
     "adwin_class_error": "ADWIN Error rate",
     "adwin_proba_error": "ADWIN Proba error",
+    "adwin_proba": "ADWIN Proba error",
+    "adwin_class": "ADWIN Error rate",
     "ddm": "DDM",
     "eddm": "EDDM",
     "hddm_a": "HDDM-A",
+    "hddm_a_error": "HDDM-A Error rate",
+    "hddm_w_error": "HDDM-W Error rate",
     "hddm_w": "HDDM-W",
     "kswin_class_error": "KSWIN Error rate",
     "kswin_proba_error": "KSWIN Proba error",
     "page_hinkley_class_error": "Page-Hinkley Error rate",
     "page_hinkley_proba_error": "Page-Hinkley Proba error",
     "n_batch_rf_uncertainty_adwin": "Uncertainty",
+    "rf_uncertainty": "Uncertainty",
     "n_batch_rf_uncertainty_adwin_y_scores": "Uncertainty",
     "n_batch_aries_adwin": "Aries ADWIN",
+    "manual_rf_odav": "No detection",
+    "aries_all": "Aries ADWIN",
+    "tabular_alibi": "Statistical test",
+    "ddm_error": "DDM",
+    "eddm_error": "EDDM",
 }
 
 detector_types = {
@@ -26,6 +38,13 @@ detector_types = {
     "data": "Data",
     "error": "Error",
     "predictive": "Predictive",
+}
+
+delays_names = {
+    "0": "No delay",
+    "2W": "$\\delta_d / 2$",
+    "4W": "$\\delta_d$",
+    "8W": "$2 \\delta_d$",
 }
 
 
@@ -41,7 +60,16 @@ def beautify_dataframe(
         "sum"
     )
 
-    df["Detector"] = df["detector_name"].map(lambda x: detector_names[x])
+    def detector_name(x):
+        if x in detector_names:
+            return detector_names[x]
+        for e in detector_names:
+            if e in x:
+                return detector_names[e]
+
+        return x
+
+    df["Detector"] = df["detector_name"].map(lambda x: detector_name(x))
     df["Type"] = df["detector_type"].map(lambda x: detector_types[x])
 
     df["Pareto / Total"] = (
@@ -65,5 +93,8 @@ def beautify_dataframe(
         lambda x: list(detector_names.keys()).index(x)
     )
     df = df.sort_values(by=["detector_order"], ignore_index=True)
+
+    if "delays" in df:
+        df["Delays"] = df["delays"].map(lambda x: delays_names[x])
 
     return df
