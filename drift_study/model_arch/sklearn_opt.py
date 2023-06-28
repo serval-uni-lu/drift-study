@@ -10,7 +10,7 @@ from mlc.models.model import Model
 from optuna import Trial
 from optuna.samplers import TPESampler
 from sklearn.model_selection import TimeSeriesSplit
-
+import time
 
 class TimeOptimizer(Model):
     def __init__(
@@ -59,15 +59,15 @@ class TimeOptimizer(Model):
         y_train: npt.NDArray[np.float_],
         y_test: npt.NDArray[np.float_],
     ) -> float:
-        # start = time.time()
-        with parallel_backend("threading"):
-            model.fit(x_train, y_train)
+        start = time.time()
+        # with parallel_backend("threading"):
+        model.fit(x_train, y_train)
         y_scores = self._compute_metric(model, x_test)
         if isinstance(self.metric, PredClassificationMetric):
             y_scores = np.argmax(y_scores, axis=1)
         metric = self.metric.compute(y_test, y_scores)
-        # elasped = time.time() - start
-        # print(f"Train_time {elasped}")
+        elasped = time.time() - start
+        print(f"Train_time {elasped}")
         return metric
 
     def _objective(
