@@ -15,6 +15,7 @@ def filter_extreme(
     confs: List[Dict[str, Any]], extreme_value: int
 ) -> List[Dict[str, Any]]:
     out = [conf for conf in confs if conf["n_train"] <= extreme_value]
+    out = [conf for conf in out if (conf["n_train"] > 1) or (conf["detector_type"] == "baseline")]
     return out
 
 
@@ -31,7 +32,6 @@ def run() -> None:
 
     max_n_train = config.get("max_n_train", -1)
     if max_n_train > 0:
-        if plot_engine == "sns":
             conf_results = filter_extreme(conf_results, max_n_train)
     df = pd.DataFrame(conf_results)
 
@@ -60,14 +60,19 @@ def run() -> None:
         )
     elif plot_engine == "plotly":
         import plotly.express as px
-
+        
+        max_pareto_rank = config.get("max_pareto_rank", -1)
+        if max_pareto_rank > 0:
+            df = df[(df["pareto_rank"] <= max_pareto_rank) | (df["detector_type"] == "baseline")]
+        
+        df = df
         fig = px.scatter(
             df,
             x="n_train",
             y="ml_metric",
-            color="pareto_rank",
+            # color="pareto_rank",
             symbol="detector_type",
-            hover_data=["detector_name"],
+            hover_data=["detector_name", "pareto_rank"],
         )
         fig.write_html(output_file)
 

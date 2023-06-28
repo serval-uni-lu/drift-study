@@ -118,6 +118,8 @@ def run(
     configure_logger(config)
     logger = logging.getLogger(__name__)
 
+    test_start_idx = config["common_runs_params"]["test_start_idx"]
+    logger.info(test_start_idx)
     for i in range(len(config.get("runs"))):
         config.get("runs")[i] = merge_parameters(
             copy.deepcopy(config.get("common_runs_params")),
@@ -131,7 +133,8 @@ def run(
     batch_size = config["evaluation_params"]["batch_size"]
     config = load_config_eval(config, dataset, prediction_metric, y)
 
-    test_start_idx = config["common_runs_params"]["test_start_idx"]
+    
+    
 
     # compute_metrics(config["runs"], prediction_metric, y, start_test_idx)
     df = build_df(config["runs"])
