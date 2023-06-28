@@ -1,5 +1,0 @@
----
-common_runs_params:
-  model:
-    source: drift_study.model_arch.torch_models
-    name: mlp_lcld
