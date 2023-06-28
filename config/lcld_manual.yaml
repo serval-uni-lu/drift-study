@@ -1,153 +1,427 @@
----
-performance:
-  predict_forward: 50000
-  n_jobs: 20
-  n_jobs_optimiser: 17
-  inner_max_num_threads: 10
-experience:
+common_detectors_params: {}
+common_runs_params:
+  delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  first_train_window_size: 400000
   random_state: 42
+  test_start_idx: 400000
+  train_window_size: 400000
+  training_step_size: 5000
+dataset:
+  name: lcld_201317_ds_time
 evaluation_params:
-  n_early_stopping: 2
-  batch_size: 10000
-  rolling: False
-  significance: 0.0
+  batch_size: 20000
   metric:
     name: mcc
   n_score: 2
-dataset:
-  name: lcld_201317_ds_time
-common_detectors_params:
-  batch_size: 10000
-  period: 10000
-common_runs_params:
-  end_train_idx: 100000
-  train_with_all: False
-  delays:
-    label: 0
-    drift: 0
-    retraining: 0
+performance:
+  n_jobs:
+    model: 64
+    simulator: 2
+  predict_forward: 1000000
 runs:
-# ------------ NO Drift
+- detectors:
   - name: no_detection
-    type: baseline
-    detectors:
-      - name: no_detection
-    model:
-      source: drift_study.model_arch.tree_model
-      name: rf_lcld
-    train_all_data: False
-  - name: no_detection_opt
-    type: baseline
-    detectors:
-      - name: no_detection
-    model:
-      source: drift_study.model_arch.tree_model
-      name: opt_rf_classifier
-    train_all_data: False
-# ------------ Periodic
-  - name: periodic
-    type: baseline
-    detectors:
-      - name: periodic
-    model:
-      source: drift_study.model_arch.tree_model
-      name: rf_lcld
-    train_all_data: False
-  - name: periodic_all
-    type: baseline
-    detectors:
-      - name: periodic
-    model:
-      source: drift_study.model_arch.tree_model
-      name: rf_lcld
-    train_all_data: True
-  - name: at_600_opt
-    type: baseline
-    detectors:
-      - name: periodic
-        params:
-          period: 500000
-    model:
-      source: drift_study.model_arch.tree_model
-      name: opt_rf_classifier
-    train_all_data: False
-  - name: at_600_all_opt
-    type: baseline
-    detectors:
-      - name: periodic
-        params:
-          period: 500000
-    model:
-      source: drift_study.model_arch.tree_model
-      name: opt_rf_classifier
-    train_all_data: True
-  - name: at_720_opt
-    type: baseline
-    detectors:
-      - name: periodic
-        params:
-          period: 620000
-    model:
-      source: drift_study.model_arch.tree_model
-      name: opt_rf_classifier
-    train_all_data: False
-  - name: at_720_all_opt
-    type: baseline
-    detectors:
-      - name: periodic
-        params:
-          period: 620000
-    model:
-      source: drift_study.model_arch.tree_model
-      name: opt_rf_classifier
-    train_all_data: True
-  - name: at_940_opt
-    type: baseline
-    detectors:
-      - name: periodic
-        params:
-          period: 840000
-    model:
-      source: drift_study.model_arch.tree_model
-      name: opt_rf_classifier
-    train_all_data: False
-  - name: at_940_all_opt
-    type: baseline
-    detectors:
-      - name: periodic
-        params:
-          period: 840000
-    model:
-      source: drift_study.model_arch.tree_model
-      name: opt_rf_classifier
-    train_all_data: True
-  - delays:
-      drift: 0
-      label: 0
-      retraining: 0
-    detectors:
-      - name: periodic
-        params:
-          period: 20000
-    end_train_idx: 50000
-    model:
-      name: rf_lcld
-      source: drift_study.model_arch.tree_model
-    name: periodic_20000_rf_lcld_0
-    train_all_data: true
-    type: baseline
-  - delays:
-      drift: 0
-      label: 0
-      retraining: 0
-    detectors:
-    - name: periodic
-      params:
-        period: 20000
-    end_train_idx: 200000
-    model:
-      name: rf_lcld
-      source: drift_study.model_arch.tree_model
-    name: periodic_20000_rf_lcld_200000_0
-    train_all_data: false
-    type: baseline
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_420000_400000
+  test_start_idx: 420000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_420000_-1
+  test_start_idx: 420000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_600000_400000
+  test_start_idx: 600000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_600000_-1
+  test_start_idx: 600000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_800000_400000
+  test_start_idx: 800000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_800000_-1
+  test_start_idx: 800000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_860000_400000
+  test_start_idx: 860000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_860000_-1
+  test_start_idx: 860000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_940000_400000
+  test_start_idx: 940000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_940000_-1
+  test_start_idx: 940000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_opt_rf_classifier_420000_400000
+  test_start_idx: 420000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_opt_rf_classifier_420000_-1
+  test_start_idx: 420000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_opt_rf_classifier_600000_400000
+  test_start_idx: 600000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_opt_rf_classifier_600000_-1
+  test_start_idx: 600000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_opt_rf_classifier_800000_400000
+  test_start_idx: 800000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_opt_rf_classifier_800000_-1
+  test_start_idx: 800000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_opt_rf_classifier_860000_400000
+  test_start_idx: 860000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_opt_rf_classifier_860000_-1
+  test_start_idx: 860000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_opt_rf_classifier_940000_400000
+  test_start_idx: 940000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_opt_rf_classifier_940000_-1
+  test_start_idx: 940000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_400_420000_400000
+  test_start_idx: 420000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_400_420000_-1
+  test_start_idx: 420000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_400_600000_400000
+  test_start_idx: 600000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_400_600000_-1
+  test_start_idx: 600000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_400_800000_400000
+  test_start_idx: 800000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_400_800000_-1
+  test_start_idx: 800000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_400_860000_400000
+  test_start_idx: 860000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_400_860000_-1
+  test_start_idx: 860000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: 400000
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_400_940000_400000
+  test_start_idx: 940000
+  type: baseline
+- detectors:
+  - name: no_detection
+    params: {}
+  first_train_window_size: -1
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_rf_lcld_400_940000_-1
+  test_start_idx: 940000
+  type: baseline
+- detectors:
+  - name: manual_index
+    params:
+      detect_idxs:
+      - 400000
+      - 419999
+      - 599999
+      - 799999
+      - 859999
+      - 939999
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_chain_rf_lcld_400000
+  test_start_idx: 400000
+  train_window_size: 400000
+  type: baseline
+- detectors:
+  - name: manual_index
+    params:
+      detect_idxs:
+      - 400000
+      - 419999
+      - 599999
+      - 799999
+      - 859999
+      - 939999
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: manual_chain_rf_lcld_-1
+  test_start_idx: 400000
+  train_window_size: -1
+  type: baseline
+- detectors:
+  - name: manual_index
+    params:
+      detect_idxs:
+      - 400000
+      - 419999
+      - 599999
+      - 799999
+      - 859999
+      - 939999
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_chain_opt_rf_classifier_400000
+  test_start_idx: 400000
+  train_window_size: 400000
+  type: baseline
+- detectors:
+  - name: manual_index
+    params:
+      detect_idxs:
+      - 400000
+      - 419999
+      - 599999
+      - 799999
+      - 859999
+      - 939999
+  model:
+    name: opt_rf_classifier
+    source: drift_study.model_arch.tree_model
+  name: manual_chain_opt_rf_classifier_-1
+  test_start_idx: 400000
+  train_window_size: -1
+  type: baseline
+- detectors:
+  - name: manual_index
+    params:
+      detect_idxs:
+      - 400000
+      - 419999
+      - 599999
+      - 799999
+      - 859999
+      - 939999
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_chain_rf_lcld_400_400000
+  test_start_idx: 400000
+  train_window_size: 400000
+  type: baseline
+- detectors:
+  - name: manual_index
+    params:
+      detect_idxs:
+      - 400000
+      - 419999
+      - 599999
+      - 799999
+      - 859999
+      - 939999
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: manual_chain_rf_lcld_400_-1
+  test_start_idx: 400000
+  train_window_size: -1
+  type: baseline
+sub_dir_path: manual400

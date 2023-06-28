@@ -1,10 +1,10 @@
 ---
-sub_dir_path: manual400
+sub_dir_path: rq1.1
 performance:
-  predict_forward: 1000000
+  predict_forward: 2000000
   n_jobs:
     model: -1
-    simulator: 1
+    simulator: -1
 evaluation_params:
   batch_size: 20000
   metric:
@@ -24,7 +24,7 @@ common_runs_params:
     drift: 0
     retraining: 0
 runs:
-  - name: manual
+  - name: no_detection
     type: baseline
     detectors:
       - name: no_detection
@@ -32,12 +32,8 @@ runs:
     model:
       source: drift_study.model_arch.tree_model
       name:
-        grid: [rf_lcld, opt_rf_classifier, rf_lcld_400]
-    test_start_idx:
-      grid: [400000, 420000, 600000, 800000, 860000, 940000]
-    first_train_window_size:
-      grid: [400000, -1]
-  - name: manual_chain
+        grid: [rf_lcld, rf_lcld_400]
+  - name: manual
     type: baseline
     detectors:
       - name: manual_index
@@ -46,7 +42,5 @@ runs:
     model:
       source: drift_study.model_arch.tree_model
       name:
-        grid: [rf_lcld, opt_rf_classifier, rf_lcld_400]
+        grid: [rf_lcld, rf_lcld_400, opt_rf_classifier]
     test_start_idx: 400000
-    train_window_size:
-      grid: [ 400000, -1 ]

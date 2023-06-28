@@ -13,7 +13,7 @@ do
                   -c config/${dataset}_rf_opt.yaml \
                   -c config/${dataset}_rf_complete.yaml \
                   -p common_runs_params.end_train_idx=${n_input} \
-                  -p sub_dir_path=opt_${n_input}_${delay}"
+                  -p sub_dir_path=opt_${n_input}_${delay}_all_test"
         done
     done
 done

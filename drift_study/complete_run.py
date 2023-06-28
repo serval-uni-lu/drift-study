@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def load_config_from_dir(input_dir: str) -> List[Dict[str, Any]]:
     json_files = [
-        path for path in os.listdir(input_dir) if path.endswith(".json")
+        path for path in os.listdir(input_dir) if (path.endswith(".json") and (not(any([path.endswith(f"f{e}.json") for e in range(4)]))))
     ]
 
     optimizer_results = [

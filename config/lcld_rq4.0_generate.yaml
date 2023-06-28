@@ -1,10 +1,10 @@
 ---
-sub_dir_path: periodic400
+sub_dir_path: rq4.0
 performance:
-  predict_forward: 5000
+  predict_forward: 10000
   n_jobs:
     model: -1
-    simulator: 1
+    simulator: -1
 evaluation_params:
   batch_size: 20000
   metric:
@@ -26,15 +26,18 @@ runs:
       - name: periodic
         params:
           period:
-            grid: [5000]
+            grid: [5000, 10000, 20000, 50000, 100000, 200000, 400000]
     model:
       source: drift_study.model_arch.tree_model
       name:
-        grid: [rf_lcld, rf_lcld_400]
+        grid: [rf_lcld_400]
     train_window_size:
-      grid: [50000, 100000, 200000, 400000, -1]
+      grid: [200000]
     delays:
       grid:
-        - label: 0
+        - label: 10days
           drift: 0
-          retraining: 0
+          retraining: 2W
+        - label: 10days
+          drift: 0
+          retraining: 8W

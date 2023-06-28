@@ -1,10 +1,10 @@
 ---
-sub_dir_path: periodic400
+sub_dir_path: rq1.3
 performance:
   predict_forward: 10000
   n_jobs:
-    model: 32
-    simulator: 1
+    model: -1
+    simulator: -1
 evaluation_params:
   batch_size: 20000
   metric:
@@ -20,7 +20,7 @@ common_runs_params:
 runs:
   - name: periodic
     random_state:
-      grid: [42, 43, 44, 45, 46]
+      grid: [42]
     type: baseline
     detectors:
       - name: periodic
@@ -30,9 +30,9 @@ runs:
     model:
       source: drift_study.model_arch.tree_model
       name:
-        grid: [rf_lcld, rf_lcld_400]
+        grid: [rf_lcld_400]
     train_window_size:
-      grid: [50000, 100000, 200000, 500000, -1]
+      grid: [50000, 100000, 200000, 400000, -1]
     delays:
       grid:
         - label: 10days

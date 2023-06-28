@@ -79,18 +79,18 @@ runs:
            batch_size: 50
        - name: pca_cd
  ## ------------ PREDICTIVE
-   - name: aries_all
-     type: predictive
-     detectors:
-       - name: n_batch
-       - name: aries
-       - name: adwin
-   - name: rf_uncertainty
-     type: predictive
-     detectors:
-       - name: n_batch
-       - name: rf_uncertainty
-       - name: adwin
-         params:
-           metric_conf:
-             name: y_scores
+ - name: aries_all
+ type: predictive
+ detectors:
+  - name: n_batch
+  - name: aries
+  - name: adwin
+- name: rf_uncertainty
+  type: predictive
+  detectors:
+    - name: n_batch
+    - name: rf_uncertainty
+    - name: adwin
+      params:
+        metric_conf:
+          name: y_scores

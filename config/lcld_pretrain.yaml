@@ -1,0 +1,48 @@
+common_detectors_params: {}
+common_runs_params:
+  first_train_window_size: -1
+  test_start_idx: 80000
+  train_window_size: -1
+  training_step_size: 5000
+dataset:
+  name: lcld_201317_ds_time
+evaluation_params:
+  batch_size: 20000
+  metric:
+    name: mcc
+  n_score: 2
+performance:
+  n_jobs:
+    model: -1
+    simulator: 1
+  predict_forward: 5000
+runs:
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  model:
+    name: rf_lcld
+    source: drift_study.model_arch.tree_model
+  name: periodic_rf_lcld_0
+  random_state: 42
+  type: baseline
+- delays:
+    drift: 0
+    label: 0
+    retraining: 0
+  detectors:
+  - name: periodic
+    params:
+      period: 5000
+  model:
+    name: rf_lcld_400
+    source: drift_study.model_arch.tree_model
+  name: periodic_rf_lcld_400_0
+  random_state: 42
+  type: baseline
+sub_dir_path: pretrain

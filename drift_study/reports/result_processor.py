@@ -27,10 +27,10 @@ def load_confs(input_path: str) -> List[Dict[str, Any]]:
 
 def filter_conf(conf_results: Dict[str, Any]) -> Dict[str, Any]:
     detector_name = "_".join(
-        [e["name"] for e in conf_results["config"]["runs"][0]["detectors"]]
+        [e["name"] for e in conf_results["config"]["runs"]["detectors"]]
     )
     metric_name = (
-        conf_results["config"]["runs"][0]["detectors"][-1]
+        conf_results["config"]["runs"]["detectors"][-1]
         .get("params", {})
         .get("metric_conf", {})
         .get("name")
@@ -49,9 +49,9 @@ def filter_conf(conf_results: Dict[str, Any]) -> Dict[str, Any]:
     out = {
         "n_train": n_train,
         "ml_metric": ml_metric,
-        "detector_type": conf_results["config"]["runs"][0]["type"],
+        "detector_type": conf_results["config"]["runs"]["type"],
         "detector_name": detector_name,
-        "params": conf_results["config"]["runs"][0]["detectors"][-1].get(
+        "params": conf_results["config"]["runs"]["detectors"][-1].get(
             "params", "No params provided"
         ),
         "metric_name": metric_name,

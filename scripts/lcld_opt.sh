@@ -1,7 +1,7 @@
 #!/bin/bash
 for dataset in lcld
 do
-    for delay in delays_all
+    for delay in delays_none
     do
         eval "python \
               -m drift_study.optimize_simulator \
