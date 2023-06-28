@@ -11,9 +11,11 @@ from drift_study.utils.pareto import calc_pareto_rank
 BIG_RANK = 1000000
 
 
-def filter_extreme(n_train, pareto_rank, extreme_value: int):
+def filter_extreme(n_train, pareto_rank, non_baseline, extreme_value: int):
     for i in range(len(n_train)):
-        if n_train[i] > extreme_value:
+        if non_baseline[i] and (
+            (n_train[i] > extreme_value) or (n_train[i] == 1)
+        ):
             pareto_rank[i] = BIG_RANK
     return pareto_rank
 
@@ -35,9 +37,10 @@ def run() -> None:
         np.array([df["n_train"], df["ml_metric"]]).T, np.array([1, -1])
     )
     max_n_train = config.get("max_n_train", -1)
+    non_baseline = df["detector_type"] != "baseline"
     if max_n_train > 0:
         pareto_rank = filter_extreme(
-            df["n_train"].to_numpy(), pareto_rank, max_n_train
+            df["n_train"].to_numpy(), pareto_rank, non_baseline, max_n_train
         )
 
     df["pareto_rank"] = pareto_rank
