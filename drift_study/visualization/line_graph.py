@@ -41,6 +41,8 @@ def run() -> None:
 
     Path(output_file).parent.mkdir(parents=True, exist_ok=True)
     plot_engine = config.get("plot_engine", "sns")
+    df["x_batch"] = df["x_batch"] / 1000
+    legend_pos = "best" if (len(config["runs"]) > 1) else False
     if plot_engine == "sns":
         lineplot(
             df,
@@ -49,9 +51,9 @@ def run() -> None:
             y="metric",
             y_label=config["evaluation_params"]["metric"]["name"].upper(),
             hue="run_name",
-            x_label="\\# Input",
+            x_label="Evaluation batch (starting index x1,000)",
             fig_size=(6, 4),
-            legend_pos="best",
+            legend_pos=legend_pos,
         )
     elif plot_engine == "plotly":
         import plotly.express as px

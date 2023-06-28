@@ -14,8 +14,14 @@ from drift_study.utils.pareto import calc_pareto_rank
 def filter_extreme(
     confs: List[Dict[str, Any]], extreme_value: int
 ) -> List[Dict[str, Any]]:
-    out = [conf for conf in confs if conf["n_train"] <= extreme_value]
-    out = [conf for conf in out if (conf["n_train"] > 1) or (conf["detector_type"] == "baseline")]
+    out = [
+        conf
+        for conf in confs
+        if (
+            (conf["detector_type"] <= "baseline")
+            or ((conf["n_train"] <= extreme_value) and conf["n_train"] > 1)
+        )
+    ]
     return out
 
 
@@ -41,6 +47,15 @@ def run() -> None:
     )
     df["pareto_rank"] = pareto_rank
 
+    max_pareto_rank = config.get("max_pareto_rank", -1)
+    if max_pareto_rank > 0:
+        df = df[
+            (df["pareto_rank"] <= max_pareto_rank)
+            | (df["detector_type"] == "baseline")
+        ]
+
+    print("----------------------")
+    print(df)
     df = beautify_dataframe(df.copy())
 
     Path(output_file).parent.mkdir(parents=True, exist_ok=True)
@@ -56,7 +71,7 @@ def run() -> None:
             x_label="\\# Train",
             fig_size=(6, 4),
             legend_pos="best",
-            markers=["o", "s", "^", "x"],
+            markers=["x", "s", "^", "o"],
         )
     elif plot_engine == "plotly":
         import plotly.express as px
