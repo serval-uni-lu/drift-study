@@ -3,11 +3,12 @@ import logging
 from abc import ABC
 from typing import Any, Dict, Optional, Tuple, Union
 
-import numpy as np
-import numpy.typing as npt
 import optuna
 import pandas as pd
 from mlc.models.model import Model
+
+from drift_study.drift_logger.drift_logger import DriftLogger
+from drift_study.typing import NDFloat, NDInt, NDNumber
 
 
 class NotFittedDetectorException(Exception):
@@ -23,16 +24,19 @@ class NoModelException(Exception):
 
 
 class DriftDetector(ABC):
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(
+        self, drift_logger: Optional[DriftLogger] = None, **kwargs: Any
+    ) -> None:
+        self.drift_logger = drift_logger
         self.kwargs = kwargs
 
     @abc.abstractmethod
     def fit(
         self,
         x: pd.DataFrame,
-        t: Union[pd.Series, npt.NDArray[np.int_]],
-        y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
-        y_scores: Union[npt.NDArray[np.float_]],
+        t: Union[pd.Series, NDInt],
+        y: NDNumber,
+        y_scores: NDFloat,
         model: Optional[Model],
     ) -> None:
         pass
@@ -41,9 +45,9 @@ class DriftDetector(ABC):
     def update(
         self,
         x: pd.DataFrame,
-        t: Union[pd.Series, npt.NDArray[np.int_]],
-        y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
-        y_scores: Union[npt.NDArray[np.float_]],
+        t: Union[pd.Series, NDInt],
+        y: NDNumber,
+        y_scores: NDFloat,
     ) -> Tuple[bool, bool, pd.DataFrame]:
         pass
 
