@@ -9,8 +9,8 @@ import configutils
 import numpy as np
 from configutils.utils import merge_parameters
 from joblib import Parallel, delayed, parallel_backend
+from mlc.metrics.compute import compute_metrics_from_scores
 from mlc.metrics.metric_factory import create_metric
-from mlc.metrics.metrics import PredClassificationMetric
 from tqdm import tqdm
 
 from drift_study.utils.delays import get_delays
@@ -24,6 +24,7 @@ from drift_study.utils.helpers import (
 )
 from drift_study.utils.io_utils import save_drift_run
 from drift_study.utils.logging import configure_logger
+from drift_study.utils.run_results import RunResult
 
 
 def round_up_to_multiple(a, n):
@@ -225,52 +226,35 @@ def run(
                     ):
                         early_stopped = True
 
-    # Metrics
-    n_train = int(np.max(model_used) + 1)
     prediction_metric = create_metric(config["evaluation_params"]["metric"])
-    if isinstance(prediction_metric, PredClassificationMetric):
-        y_scores = np.argmax(y_scores, axis=1)
+    ml_metric = compute_metrics_from_scores(
+        prediction_metric,
+        y[test_start_idx:last_idx],
+        y_scores[test_start_idx:last_idx],
+    )
 
-    val_test_idx = config["evaluation_params"].get("val_test_idx")
-    if val_test_idx is None:
-        metric = prediction_metric.compute(
-            y[test_start_idx:last_idx], y_scores[test_start_idx:last_idx]
-        )
-
-    else:
-        metric_idxs = [
-            (test_start_idx, last_idx),
-            (test_start_idx, val_test_idx),
-            (val_test_idx, last_idx),
-        ]
-        metric = [
-            prediction_metric.compute(
-                y[m_idx_start:m_idx_end], y_scores[m_idx_start:m_idx_end]
-            )
-            for m_idx_start, m_idx_end in metric_idxs
-        ]
+    run_result = RunResult(
+        model_used=model_used,
+        model_start_idx=np.array([model.start_idx for model in models]),
+        model_end_idx=np.array([model.end_idx for model in models]),
+        y_scores=y_scores,
+        ml_metric=ml_metric,
+    )
 
     # Save
     save_drift_run(
-        numpy_to_save={
-            "is_drifts": is_drifts,
-            "is_drift_warnings": is_drift_warnings,
-            "y_scores": y_scores,
-            "model_used": model_used,
-        },
-        models=models,
+        run_result=run_result,
         metrics=metrics,
-        dataset_name=dataset.name,
-        model_name=model_name,
-        run_name=run_config.get("name"),
-        sub_dir_path=config["sub_dir_path"],
+        drift_data_path=(
+            f"./data/simulator/"
+            f"{dataset.name}/{model_name}/"
+            f"{config['sub_dir_path']}/{run_config.get('name')}"
+        ),
         config=copy.deepcopy(config),
         run_config=copy.deepcopy(run_config),
-        n_train=n_train,
-        ml_metric=metric,
     )
 
-    return n_train, metric
+    return run_result.ml_metric, run_result.n_train
 
 
 def run_many(

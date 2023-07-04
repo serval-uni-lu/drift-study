@@ -6,13 +6,12 @@ from typing import Any, Dict, List, Optional, Union
 
 import h5py
 import joblib
-import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from mlc.load_do_save import save_json
 from mlc.models.model import Model
 
-from drift_study.utils.drift_model import DriftModel
+from drift_study.utils.run_results import RunResult
 
 
 def attempt_read(path: str, model: Model) -> int:
@@ -98,22 +97,21 @@ def save_arrays(
 
 
 def save_drift_run(
-    numpy_to_save: Dict[str, Any],
-    models: List[DriftModel],
+    run_result: RunResult,
     metrics: List[pd.DataFrame],
-    dataset_name: str,
-    model_name: str,
-    run_name: str,
-    sub_dir_path: str,
+    drift_data_path: str,
     config: Dict[str, Any],
     run_config: Dict[str, Any],
-    n_train: Union[int, List[int]],
-    ml_metric: Union[float, List[float]],
 ):
-    model_start_indexes = np.array([model.start_idx for model in models])
-    model_end_indexes = np.array([model.end_idx for model in models])
-    numpy_to_save["model_start_indexes"] = model_start_indexes
-    numpy_to_save["model_end_indexes"] = model_end_indexes
+
+    numpy_to_save = {
+        "is_drifts": run_result.is_drifts,
+        "is_drift_warnings": run_result.is_drift_warnings,
+        "y_scores": run_result.y_scores,
+        "model_used": run_result.model_used,
+        "model_start_idxs": run_result.model_start_idxs,
+        "model_end_idxs": run_result.model_end_idxs,
+    }
 
     any_df = any([isinstance(e, pd.DataFrame) for e in metrics])
     if any_df:
@@ -121,16 +119,13 @@ def save_drift_run(
     else:
         metrics = pd.DataFrame()
 
-    drift_data_path = (
-        f"./data/simulator/"
-        f"{dataset_name}/{model_name}/"
-        f"{sub_dir_path}/{run_name}"
-    )
     save_arrays(numpy_to_save, f"{drift_data_path}.hdf5")
     metrics.to_hdf(f"{drift_data_path}_metrics.hdf5", "metrics")
 
     config["runs"] = run_config
-    manual_save_run(config, run_config, n_train, ml_metric)
+    manual_save_run(
+        config, run_config, run_result.n_train, run_result.ml_metric
+    )
 
 
 def check_parent_path(path: str) -> None:
