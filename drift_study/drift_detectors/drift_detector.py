@@ -8,6 +8,7 @@ import pandas as pd
 from mlc.models.model import Model
 
 from drift_study.drift_logger.drift_logger import DriftLogger
+from drift_study.drift_logger.empty_drift_logger import EmptyDriftLogger
 from drift_study.typing import NDFloat, NDInt, NDNumber
 
 
@@ -27,7 +28,10 @@ class DriftDetector(ABC):
     def __init__(
         self, drift_logger: Optional[DriftLogger] = None, **kwargs: Any
     ) -> None:
-        self.drift_logger = drift_logger
+        if drift_logger is None:
+            self.drift_logger = EmptyDriftLogger()
+        else:
+            self.drift_logger = drift_logger
         self.kwargs = kwargs
 
     @abc.abstractmethod
