@@ -65,7 +65,8 @@ class DivergenceDrift(DriftDetector):
         y_scores: NDFloat,
         model: Optional[Model],
     ) -> None:
-        self.x_ref = x
+        self.x_ref = x.copy()
+        self.x_last = x.copy()
         self.window_size = len(x)
 
         for name in self.numerical_features:
