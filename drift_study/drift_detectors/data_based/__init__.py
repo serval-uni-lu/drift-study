@@ -3,6 +3,7 @@ from typing import Dict, Type
 from drift_study.drift_detectors.data_based import (
     alibi_drift,
     alibi_tabular_drift,
+    divergence_drift,
     evidently_drift,
     pca_cd,
 )
@@ -13,4 +14,5 @@ detectors: Dict[str, Type[DriftDetector]] = {
     **alibi_tabular_drift.detectors,
     **evidently_drift.detectors,
     **pca_cd.detectors,
+    **divergence_drift.detectors,
 }
