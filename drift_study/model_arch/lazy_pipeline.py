@@ -84,7 +84,7 @@ class LazyPipeline:
 
     def lazy_predict(self, start_idx, end_idx):
         self._pred_load()
-        print("Lazy prediction")
+        # print("Lazy prediction")
         return self.pred[start_idx:end_idx]
 
     def safe_lazy_predict(self, x, start_idx, end_idx):

@@ -14,6 +14,7 @@ class NBatchDrift(DriftDetector):
         self,
         drift_detector: DriftDetector,
         batch_size: int,
+        x_metadata: pd.DataFrame,
         **kwargs: Dict[str, Any],
     ) -> None:
         super().__init__(
@@ -22,6 +23,7 @@ class NBatchDrift(DriftDetector):
         self.drift_detector = drift_detector
         self.batch_size = batch_size
         self.counter = 0
+        self.x_metadata = x_metadata
         self.mem: List[Dict[str, Any]] = []
 
     def fit(
@@ -47,7 +49,15 @@ class NBatchDrift(DriftDetector):
         self.counter += 1
         if self.counter >= self.batch_size:
             mem = {k: [dic[k] for dic in self.mem] for k in self.mem[0]}
-            mem["x"] = pd.concat(mem["x"])
+
+            if isinstance(mem["x"], pd.DataFrame):
+                mem["x"] = pd.concat(mem["x"])
+            else:
+                mem["x"] = pd.DataFrame(
+                    np.concatenate(mem["x"], axis=0),
+                    columns=self.x_metadata["feature"],
+                )
+
             if isinstance(mem["t"], pd.Series):
                 mem["t"] = pd.concat(mem["t"])
             else:

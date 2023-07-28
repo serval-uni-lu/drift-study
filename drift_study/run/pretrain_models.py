@@ -4,8 +4,10 @@ from multiprocessing import Lock
 from typing import Any, Dict, List, Optional, Tuple
 
 import configutils
+import numpy as np
 import pandas as pd
 from mlc.datasets.dataset_factory import get_dataset
+from sklearn.model_selection import TimeSeriesSplit
 
 from drift_study.model_arch.lazy_pipeline import LazyPipeline
 from drift_study.run.no_retrain_baseline import add_best_params_to_models
@@ -47,7 +49,7 @@ def get_idx_window_size_period(
     train_idxs: List[Tuple[int, int]] = []
     for window_size in windows_sizes:
         for period in periods:
-            for i in range(test_start_idx + period, last_idx + 1, period):
+            for i in range(test_start_idx, last_idx + 1, period):
                 train_idxs.append(get_start_end_idx(i, window_size))
     return train_idxs
 
@@ -77,6 +79,23 @@ def get_pretrains(
                 last_idx,
             )
         )
+    if config.get("pretrain_schedules_opt"):
+        tss = TimeSeriesSplit(
+            n_splits=config["optimization_splits"]["detector"]
+        )
+        for i, (train_idx, test_idx) in enumerate(
+            tss.split(np.arange(test_start_idx))
+        ):
+            local_test_start_idx = test_idx[0]
+            local_last_idx = test_start_idx
+            train_idxs.extend(
+                get_idx_window_size_period(
+                    config.get("train_window_size"),
+                    [config.get("training_step_size")],
+                    local_test_start_idx,
+                    local_last_idx,
+                )
+            )
 
     return list(set(train_idxs))
 
@@ -88,7 +107,7 @@ def run(config: Dict[str, Any]) -> None:
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
     metadata = dataset.get_metadata(only_x=True)
-    f_new_model = get_f_new_model(config["models"][0], metadata)
+    f_new_model = get_f_new_model(config["model"], metadata)
 
     idx_to_train = get_pretrains(config, x)
     if config.get("dry_run"):

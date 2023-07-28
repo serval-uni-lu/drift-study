@@ -39,7 +39,9 @@ def initialize(
 
     metadata = dataset.get_metadata(only_x=True)
     f_new_model = get_f_new_model(config.get("model"), metadata)
-    f_new_detector = get_f_new_detector(config.get("detectors"), metadata)
+    f_new_detector = get_f_new_detector(
+        config["schedule"]["detectors"], metadata
+    )
     return dataset, f_new_model, f_new_detector, x, y, t
 
 
@@ -106,7 +108,7 @@ def add_model(
     model = load_do_save_model(
         model,
         model_path,
-        x.iloc[start_idx:end_idx],
+        x[start_idx:end_idx],
         y[start_idx:end_idx],
         lock_model_writing,
         list_model_writing,
@@ -117,15 +119,15 @@ def add_model(
         y_scores = model.safe_lazy_predict(x, start_idx, end_idx)
     else:
         if model.objective in ["regression"]:
-            y_scores = model.predict(x.iloc[start_idx:end_idx])
+            y_scores = model.predict(x[start_idx:end_idx])
         elif model.objective in ["binary", "classification"]:
-            y_scores = model.predict_proba(x.iloc[start_idx:end_idx])
+            y_scores = model.predict_proba(x[start_idx:end_idx])
         else:
             raise NotImplementedError
 
     drift_detector = f_new_detector(start_idx, end_idx)
     drift_detector.fit(
-        x=x.iloc[start_idx:end_idx],
+        x=x[start_idx:end_idx],
         t=t[start_idx:end_idx],
         y=y[start_idx:end_idx],
         y_scores=y_scores,

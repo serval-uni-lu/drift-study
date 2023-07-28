@@ -21,6 +21,7 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 class DivergenceDrift(DriftDetector):
     def __init__(
         self,
+        x_metadata: pd.DataFrame,
         numerical_features: Optional[List[str]] = None,
         categorical_features: Optional[List[str]] = None,
         num_threshold: float = 0.05,
@@ -29,6 +30,7 @@ class DivergenceDrift(DriftDetector):
         drift_share: float = 0.5,
         **kwargs: Dict[str, Any],
     ) -> None:
+        self.x_metadata = x_metadata
         super().__init__(
             numerical_features=numerical_features,
             categorical_features=categorical_features,
@@ -65,6 +67,10 @@ class DivergenceDrift(DriftDetector):
         y_scores: NDFloat,
         model: Optional[Model],
     ) -> None:
+
+        if isinstance(x, np.ndarray):
+            x = pd.DataFrame(x, columns=self.x_metadata["feature"])
+
         self.x_ref = x.copy()
         self.x_last = x.copy()
         self.window_size = len(x)
@@ -125,6 +131,7 @@ class DivergenceDrift(DriftDetector):
             drifted.append(metric >= self.cat_threshold)
 
         drifted_mean = np.mean(drifted)
+        print(drifted_mean)
         is_drift = drifted_mean >= self.drift_share
         self.drift_logger.log_metric(
             "jsd_drift_share", drifted_mean, 1, 1, time.time()
@@ -133,7 +140,7 @@ class DivergenceDrift(DriftDetector):
             "jsd_is_drift", is_drift, 1, 1, time.time()
         )
 
-        return is_drift, is_drift, pd.DataFrame()
+        return is_drift, is_drift, None
 
     def needs_model(self) -> bool:
         return False

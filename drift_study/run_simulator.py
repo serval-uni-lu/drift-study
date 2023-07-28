@@ -3,7 +3,7 @@ import logging
 import math
 import os
 from multiprocessing import Lock, Manager
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import configutils
 import numpy as np
@@ -41,7 +41,7 @@ def run(
     lock_model_writing: Optional[Lock] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
     verbose=1,
-) -> Tuple[int, Union[float, List[float]]]:
+) -> RunResult:
     # CONFIG
     configure_logger(config)
     logger = logging.getLogger(__name__)
@@ -88,12 +88,9 @@ def run(
 
     # TRAIN FIRST MODEL
 
-    drift_data_path = (
-        f"./data/drift/{dataset.name}/{model_name}/"
-        f"schedules/{config.get('schedule_name')}"
-    )
-    logger.debug(drift_data_path)
-    if os.path.exists(drift_data_path):
+    schedule_data_path = config.get("schedule_data_path")
+    logger.debug(schedule_data_path)
+    if os.path.exists(schedule_data_path):
         logger.info("Path exists, skipping.")
         return -1, -1
 
@@ -106,6 +103,8 @@ def run(
     )
 
     logger.debug(f"start_index {start_idx}, end_index {end_idx}.")
+    x = x.to_numpy()
+    t = t.to_numpy()
 
     add_model(
         models,
@@ -122,8 +121,6 @@ def run(
         lock_model_writing,
         list_model_writing,
     )
-    x = x.to_numpy()
-    t = t.to_numpy()
 
     # Main loop
     for x_idx in tqdm(
@@ -233,13 +230,14 @@ def run(
     )
 
     # Save
-    save_drift_run(
-        drift_data_path=drift_data_path,
-        config=copy.deepcopy(config),
-        run_result=run_result,
-    )
+    if schedule_data_path is not None:
+        save_drift_run(
+            drift_data_path=schedule_data_path,
+            config=copy.deepcopy(config),
+            run_result=run_result,
+        )
 
-    return run_result.ml_metric, run_result.n_train
+    return run_result
 
 
 def run_many(
