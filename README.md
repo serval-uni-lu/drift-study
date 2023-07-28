@@ -73,16 +73,16 @@ optimization_iter:
 Do
 
 1. [x] Optimize model hyperparameters.
-1. Nothing baseline
+1. [x] Nothing baseline
 1. Periodic retraining
-   1. Pretrain model (periodic retraining).
+   1. [x] Pretrain model (periodic retraining).
    1. Periodic retraining baseline.
    1. Show results of periodic retraining baseline (Table + trace).
 1. Optimization/warm-up of drift detectors.
-   1. Pretrain models. (Optimization phase).
-   1. Optimization/warm-up of drift detectors.
+   1. [x] Pretrain models. (Optimization phase).
+   1. [x] Optimization/warm-up of drift detectors.
 1. Drift scheduler
-   1. Pretrain models. (Main phase).
+   1. [x] Pretrain models. (Main phase).
    1. Run Schedules.
    1. Show results of drift detectors (Graph + Trace).
 
@@ -104,14 +104,13 @@ data/drift/DATASET/MODEL/
     - SCHEDULENAME/detector_metrics.parquet
     - SCHEDULENAME/config.json
     - SCHEDULENAME/preds.parquet
-  - drift_opt/
+  - detector_opt/
     - SCHEDULENAME/
       - best_params.json
       - best_metrics.json
-      - iter_I_config.json
-      - iter_I_fold_J_metrics.json
-      - iter_I_fold_J_trace.json
-      - iter_I_drift_params.json
+      - optuna_sampler.joblib
+      - optuna_study.db
+      - schedules/ # same as above
 models/DATASET/MODEL/
   - MODELNAME_STARTIDX_ENDIDX.model
   - MODELNAME_name_STARTIDX_ENDIDX_cache.parquet
