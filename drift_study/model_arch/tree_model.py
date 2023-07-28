@@ -1,12 +1,15 @@
 from math import sqrt
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import optuna
+import pandas as pd
 from mlc.metrics.metric_factory import create_metric
 from mlc.models.sk_models import SkModel
+from mlc.transformers.tab_scaler import TabScaler
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 from drift_study.model_arch.sklearn_opt import TimeOptimizer
+from drift_study.typing import NDFloat, NDNumber
 
 
 class RandomForestRegressorModel(SkModel):
@@ -134,12 +137,67 @@ class Rf(SkModel):
         return params
 
 
+class RfScaled(Rf):
+    def __init__(
+        self, x_metadata: Optional[pd.DataFrame] = None, **kwargs: Any
+    ):
+        super().__init__(name="rf_scaled", n_jobs=-1, **kwargs)
+        self.x_metadata = x_metadata
+        self.scaler = TabScaler(num_scaler="standard", one_hot_encode=True)
+
+    def predict(self, x: NDFloat) -> NDNumber:
+        """
+        Returns the regression value or the concrete classes of binary /
+        multi-class-classification tasks.
+        (Save predictions to self.predictions)
+
+        :param x: test data
+        :return: predicted values / classes of test data (Shape N x 1)
+        """
+
+        x = self.scaler.transform(x)
+        return super().predict(x)
+
+    def predict_proba(self, x: NDFloat) -> NDFloat:
+        """
+        Only implemented for binary / multi-class-classification tasks.
+        Returns the probability distribution over the classes C.
+        (Save probabilities to self.prediction_probabilities)
+
+        :param x: test data
+        :return: probabilities for the classes (Shape N x C)
+        """
+
+        x = self.scaler.transform(x)
+        return super().predict_proba(x)
+
+    def fit(
+        self,
+        x: NDFloat,
+        y: NDNumber,
+        x_val: Optional[NDFloat] = None,
+        y_val: Optional[NDNumber] = None,
+    ) -> None:
+        self.scaler.fit(x, x_type=self.x_metadata["type"])
+        x = self.scaler.transform(x)
+        if x_val is not None:
+            x_val = self.scaler.transform(x_val)
+
+        super().fit(
+            x,
+            y,
+            x_val,
+            y_val,
+        )
+
+
 models = [
     ("rf_regression", RandomForestRegressorModel),
     ("rf_lcld", RfLcld),
     ("rf_lcld_new", RfLcldNew),
     ("rf_lcld_400", RfLcld400),
     ("rf_classifier", Rf),
+    ("rf_scaled", RfScaled),
     (
         "opt_rf_classifier",
         lambda **kwargs: TimeOptimizer(
