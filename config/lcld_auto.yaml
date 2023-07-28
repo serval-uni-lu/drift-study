@@ -1,19 +1,20 @@
 ---
 name: lcld_201317_ds_time
-dataset: 
+dataset:
   name: lcld_201317_ds_time
-models:
-  - source: drift_study.model_arch.tree_model
-    name: rf_scaled
-    metadata: true
 model:
   source: drift_study.model_arch.tree_model
   name: rf_scaled
   metadata: true
-detectors:
+schedules:
   - name: divergence
+    detectors:
+      - name: n_batch
+        params:
+          batch_size: 5000
+      - name: divergence
 first_train_window_size: -1
-train_window_size: [200000]
+train_window_size: 200000
 periods: [20000, 50000, 100000, 200000]
 test_start_idx: 400000
 training_step_size: 5000
@@ -25,7 +26,13 @@ delays:
   retraining: 4W
 optimization_iter:
   model: 10
-  detector: 100
+  detector: 20
+optimization_splits:
+  detector: 4
 metric:
   name: mcc
 predict_forward: 5000
+performance:
+  n_jobs:
+    detector_optimization: 1
+trial_params: {}
