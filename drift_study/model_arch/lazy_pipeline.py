@@ -1,5 +1,4 @@
 import os
-import time
 
 from mlc.load_do_save import load_hdf5, save_hdf5
 from mlc.models.pipeline import Pipeline
@@ -8,6 +7,7 @@ from mlc.models.pipeline import Pipeline
 class LazyPipeline:
     def __init__(self, pipeline: Pipeline):
         self.name = pipeline.name
+        self.objective = pipeline.objective
         self.pipeline = pipeline
         self.path = None
         self.loaded = False
@@ -26,9 +26,6 @@ class LazyPipeline:
             raise ValueError("Path is not set")
         if self.pred is None:
             pred_path = f"{self.path}.pred.hdf5"
-            while (time.time() - os.path.getmtime(pred_path)) < 30:
-                time.sleep(10)
-                print("Waiting for file.")
             self.pred = load_hdf5(pred_path)
 
     def load(self, path: str) -> None:
