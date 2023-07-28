@@ -34,7 +34,7 @@ class NoDetection(DriftDetector):
         y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
         y_scores: Union[npt.NDArray[np.float_]],
     ) -> Tuple[bool, bool, pd.DataFrame]:
-        return False, False, pd.DataFrame()
+        return False, False, None
 
     def needs_model(self) -> bool:
         return False
