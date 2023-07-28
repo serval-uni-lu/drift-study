@@ -1,9 +1,9 @@
-import dataclasses
+from dataclasses import dataclass
 
 from drift_study.typing import NDBool, NDInt, NDNumber
 
 
-@dataclasses
+@dataclass
 class RunResult:
 
     model_used: NDInt

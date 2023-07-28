@@ -7,33 +7,21 @@ import pandas as pd
 from mlc.datasets.dataset import Dataset
 from mlc.datasets.dataset_factory import get_dataset
 from mlc.models.model import Model
-from mlc.models.model_factory import get_model
-from mlc.models.pipeline import Pipeline
-from mlc.models.sk_models import SkModel
-from mlc.transformers.tabular_transformer import TabTransformer
 from numpy.typing import ArrayLike
 
 from drift_study.drift_detectors import DriftDetector
-from drift_study.drift_detectors.drift_detector_factory import (
-    get_drift_detector_from_conf,
-)
 from drift_study.model_arch.lazy_pipeline import LazyPipeline
+from drift_study.utils.datasets import update_dataset_name
 from drift_study.utils.date_sampler import sample_date
 from drift_study.utils.delays import Delays
+from drift_study.utils.detector import get_f_new_detector
 from drift_study.utils.drift_model import DriftModel
 from drift_study.utils.io_utils import load_do_save_model
-
-
-def update_dataset_name(
-    dataset: Dataset, minority_share: Optional[float]
-) -> None:
-    if minority_share is not None:
-        dataset.name = f"{dataset.name}_{str(minority_share)}"
+from drift_study.utils.model import get_f_new_model, quite_model
 
 
 def initialize(
     config: Dict[str, Any],
-    run_config: Dict[str, Any],
 ) -> Tuple[
     Dataset,
     Callable[[], Model],
@@ -46,117 +34,13 @@ def initialize(
     logger.debug(f"Loading dataset {config.get('dataset', {}).get('name')}")
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
-    x, y, t = sample_date(x, y, t, run_config.get("sampling_minority_share"))
-    update_dataset_name(dataset, run_config.get("sampling_minority_share"))
+    x, y, t = sample_date(x, y, t, config.get("sampling_minority_share"))
+    update_dataset_name(dataset, config.get("sampling_minority_share"))
 
     metadata = dataset.get_metadata(only_x=True)
-    f_new_model = get_f_new_model(config, run_config, metadata)
-    f_new_detector = get_f_new_detector(config, run_config, metadata)
+    f_new_model = get_f_new_model(config.get("model"), metadata)
+    f_new_detector = get_f_new_detector(config.get("detectors"), metadata)
     return dataset, f_new_model, f_new_detector, x, y, t
-
-
-def get_f_new_detector(
-    config: Dict[str, Any],
-    run_config: Dict[str, Any],
-    metadata_x: pd.DataFrame,
-) -> Callable[[int, int], DriftDetector]:
-    def f_new_detector(start_idx, end_idx) -> DriftDetector:
-        drift_detector = get_drift_detector_from_conf(
-            run_config.get("detectors"),
-            get_common_detectors_params(
-                config, metadata_x, start_idx, end_idx
-            ),
-        )
-        return drift_detector
-
-    return f_new_detector
-
-
-def get_f_new_model(
-    config: Dict[str, Any],
-    run_config: Dict[str, Any],
-    metadata_x: pd.DataFrame,
-) -> Callable[[], Model]:
-    def new_model() -> Model:
-        model = get_model_l(config, run_config, metadata_x)
-        model = LazyPipeline(
-            Pipeline(
-                steps=[
-                    TabTransformer(
-                        metadata=metadata_x, scale=True, one_hot_encode=True
-                    ),
-                    model,
-                ]
-            )
-        )
-        return model
-
-    return new_model
-
-
-def get_model_l(
-    config: Dict[str, Any], run_config: Dict[str, Any], metadata: pd.DataFrame
-) -> Model:
-
-    model_class = get_model(run_config.get("model"))
-    n_jobs = config.get("performance", {}).get("n_jobs", {}).get("model", None)
-    model = model_class(
-        # x_metadata=metadata,
-        verbose=0,
-        n_jobs=n_jobs,
-        random_state=run_config["random_state"],
-    )
-
-    return model
-
-
-def get_current_model(
-    models: List[DriftModel],
-    i,
-    t,
-    model_type: str,
-    last_model_used_idx=None,
-):
-    idx_to_add = 0
-    if last_model_used_idx is not None:
-        models = models[last_model_used_idx:]
-        idx_to_add = last_model_used_idx
-
-    model_idx = -1
-    for model in models:
-        if model_type == "ml":
-            t_model = model.ml_available_time
-
-        elif model_type == "drift":
-            t_model = model.drift_available_time
-        else:
-            raise NotImplementedError
-
-        i_model = model.end_idx
-        if (t_model <= t) and (i_model <= i):
-            model_idx += 1
-        else:
-            break
-
-    model_idx = model_idx + idx_to_add
-    model_idx = max(0, model_idx)
-    return model_idx
-
-
-def get_current_models(
-    models: List[DriftModel],
-    i,
-    t,
-    last_ml_model_used=None,
-    last_drift_model_used=None,
-) -> Tuple[int, int]:
-    ml_model_idx, drift_model_idx = (
-        get_current_model(models, i, t, "ml", last_ml_model_used),
-        get_current_model(models, i, t, "drift", last_drift_model_used),
-    )
-    if models[drift_model_idx].drift_detector.needs_model():
-        assert ml_model_idx == drift_model_idx
-    return ml_model_idx, drift_model_idx
 
 
 def compute_y_scores(
@@ -203,37 +87,11 @@ def get_ref_eval_config(configs: dict, ref_config_names: List[str]):
     return ref_configs, eval_configs
 
 
-def get_common_detectors_params(
-    config: dict, metadata: pd.DataFrame, start_idx: int, end_idx: int
-):
-    auto_detector_params = {
-        "x_metadata": metadata,
-        "features": metadata["feature"].to_list(),
-        "numerical_features": metadata["feature"][
-            metadata["type"] != "cat"
-        ].to_list(),
-        "categorical_features": metadata["feature"][
-            metadata["type"] == "cat"
-        ].to_list(),
-        "start_idx": start_idx,
-        "end_idx": end_idx,
-    }
-    return {**config.get("common_detectors_params"), **auto_detector_params}
-
-
-def quite_model(model: Model):
-    l_model = model
-    if isinstance(l_model, Pipeline):
-        l_model = l_model[-1]
-    if isinstance(l_model, SkModel):
-        l_model.model.set_params(**{"verbose": 0})
-
-
 def add_model(
     models: List[DriftModel],
     model_path: str,
     f_new_model: Callable[[], Model],
-    f_new_detector: Callable[[], DriftDetector],
+    f_new_detector: Callable[[int, int], DriftDetector],
     x_idx,
     delays: Delays,
     x,
@@ -284,13 +142,3 @@ def add_model(
             end_idx,
         )
     )
-
-
-def free_mem_models(
-    models: List[DriftModel], ml_model_idx: int, drift_model_idx: int
-) -> None:
-    for i in range(len(models)):
-        if i < ml_model_idx:
-            models[i].ml_model = None
-        if i < drift_model_idx:
-            models[i].drift_detector = None

@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import h5py
 import joblib
+import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from mlc.load_do_save import save_json
@@ -97,34 +98,51 @@ def save_arrays(
 
 
 def save_drift_run(
-    run_result: RunResult,
-    metrics: List[pd.DataFrame],
     drift_data_path: str,
     config: Dict[str, Any],
-    run_config: Dict[str, Any],
-):
+    run_result: RunResult,
+) -> None:
 
-    numpy_to_save = {
-        "is_drifts": run_result.is_drifts,
-        "is_drift_warnings": run_result.is_drift_warnings,
-        "y_scores": run_result.y_scores,
-        "model_used": run_result.model_used,
-        "model_start_idxs": run_result.model_start_idxs,
-        "model_end_idxs": run_result.model_end_idxs,
-    }
+    Path(drift_data_path).mkdir(parents=True, exist_ok=True)
+    # Save config
+    save_json(config, f"{drift_data_path}/config.json")
 
-    any_df = any([isinstance(e, pd.DataFrame) for e in metrics])
-    if any_df:
-        metrics = pd.concat(metrics).reset_index(drop=True)
-    else:
-        metrics = pd.DataFrame()
+    # Save preds
+    schedule = pd.DataFrame(
+        np.array(
+            [
+                run_result.is_drifts,
+                run_result.is_drift_warnings,
+                run_result.model_used,
+            ]
+        ).T,
+        columns=["is_drifts", "is_drift_warnings", "model_used"],
+    )
+    schedule.to_parquet(f"{drift_data_path}/schedule.parquet")
 
-    save_arrays(numpy_to_save, f"{drift_data_path}.hdf5")
-    metrics.to_hdf(f"{drift_data_path}_metrics.hdf5", "metrics")
+    preds = pd.DataFrame(
+        run_result.y_scores,
+        columns=[str(e) for e in range(run_result.y_scores.shape[1])],
+    )
+    preds.to_parquet(f"{drift_data_path}/preds.parquet")
 
-    config["runs"] = run_config
-    manual_save_run(
-        config, run_config, run_result.n_train, run_result.ml_metric
+    models_idxs = pd.DataFrame(
+        np.array([run_result.model_start_idxs, run_result.model_end_idxs]).T,
+        columns=["model_start_idxs", "model_end_idxs"],
+    )
+    models_idxs.to_parquet(f"{drift_data_path}/models_idxs.parquet")
+
+    # any_df = any([isinstance(e, pd.DataFrame) for e in metrics])
+    # if any_df:
+    #     metrics = pd.concat(metrics).reset_index(drop=True)
+    # else:
+    #     metrics = pd.DataFrame()
+
+    # metrics.to_hdf(f"{drift_data_path}_metrics.hdf5", "metrics")
+
+    save_json(
+        {"n_train": run_result.n_train, "ml_metric": run_result.ml_metric},
+        f"{drift_data_path}/metrics.json",
     )
 
 
