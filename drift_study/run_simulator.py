@@ -7,21 +7,18 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import configutils
 import numpy as np
-from configutils.utils import merge_parameters
 from joblib import Parallel, delayed, parallel_backend
 from mlc.metrics.compute import compute_metrics_from_scores
 from mlc.metrics.metric_factory import create_metric
 from tqdm import tqdm
 
 from drift_study.utils.delays import get_delays
-from drift_study.utils.drift_model import DriftModel
-from drift_study.utils.helpers import (
-    add_model,
-    compute_y_scores,
+from drift_study.utils.drift_model import (
+    DriftModel,
     free_mem_models,
     get_current_models,
-    initialize,
 )
+from drift_study.utils.helpers import add_model, compute_y_scores, initialize
 from drift_study.utils.io_utils import save_drift_run
 from drift_study.utils.logging import configure_logger
 from drift_study.utils.run_results import RunResult
@@ -41,7 +38,6 @@ def get_start_end_idx(end_idx: int, windows_size: int) -> Tuple[int, int]:
 
 def run(
     config,
-    run_i,
     lock_model_writing: Optional[Lock] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
     verbose=1,
@@ -49,45 +45,40 @@ def run(
     # CONFIG
     configure_logger(config)
     logger = logging.getLogger(__name__)
-    run_config = merge_parameters(
-        config.get("common_runs_params"), config.get("runs")[run_i]
-    )
-    logger.info(f"Running config {run_config.get('name')}")
+    logger.info(f"Running config {config.get('schedule_name')}")
     model_root_dir = config.get(
         "models_dir", os.environ.get("MODELS_DIR", "./models")
     )
 
     # INITIALIZE PARAMETERS
-    test_start_idx = run_config["test_start_idx"]
-    train_window_size = run_config["train_window_size"]
-    first_train_window_size = run_config["first_train_window_size"]
-    training_step_size = run_config.get("training_step_size", 1)
+    test_start_idx = config["test_start_idx"]
+    train_window_size = config["train_window_size"]
+    first_train_window_size = config["first_train_window_size"]
+    training_step_size = config.get("training_step_size", 1)
 
-    predict_forward = config.get("performance").get("predict_forward")
-    n_early_stopping = run_config.get("n_early_stopping", 0)
+    predict_forward = config.get("predict_forward")
+    n_early_stopping = config.get("n_early_stopping", 0)
     early_stopped = False
 
     # LOAD AND CREATE OBJECTS
     dataset, f_new_model, f_new_detector, x, y, t = initialize(
-        config, run_config
+        copy.deepcopy(config)
     )
 
-    logger.debug(f"N inputs {len(y)}, with distribution {y.mean()}.")
-
-    delays = get_delays(run_config, f_new_detector(0, 0))
-    last_idx = run_config.get("last_idx", -1)
+    delays = get_delays(config, f_new_detector(0, 0))
+    last_idx = config.get("last_idx", -1)
     if last_idx == -1:
         last_idx = len(x)
 
     # PREPARE DATASTRUCTURES
     models: List[DriftModel] = []
     model_used = np.full(last_idx, -1)
-    if config["evaluation_params"]["n_score"] == 1:
+
+    if f_new_model().objective == "regression":
         y_scores = np.full(last_idx, np.nan)
     else:
-        y_scores = np.full(
-            (last_idx, config["evaluation_params"]["n_score"]), np.nan
-        )
+        y_scores = np.full((last_idx, y.max() + 1), np.nan)
+
     is_drifts = np.full(last_idx, np.nan)
     is_drift_warnings = np.full(last_idx, np.nan)
     last_ml_model_used = 0
@@ -95,15 +86,11 @@ def run(
     metrics = []
     model_name = f_new_model().name
 
-    if run_config["random_state"] != 42:
-        model_name = f"{model_name}_{str(run_config['random_state'])}"
-
     # TRAIN FIRST MODEL
 
     drift_data_path = (
-        f"./data/simulator/"
-        f"{config['dataset']['name']}/{model_name}/"
-        f"{config['sub_dir_path']}/{run_config['name']}.hdf5"
+        f"./data/drift/{dataset.name}/{model_name}/"
+        f"schedules/{config.get('schedule_name')}"
     )
     logger.debug(drift_data_path)
     if os.path.exists(drift_data_path):
@@ -135,6 +122,8 @@ def run(
         lock_model_writing,
         list_model_writing,
     )
+    x = x.to_numpy()
+    t = t.to_numpy()
 
     # Main loop
     for x_idx in tqdm(
@@ -171,7 +160,7 @@ def run(
                 is_drift_warnings[x_idx],
                 metric,
             ) = drift_detector.update(
-                x=x.iloc[x_idx : x_idx + 1],
+                x=x[x_idx : x_idx + 1],
                 t=t[x_idx : x_idx + 1],
                 y=y[x_idx : x_idx + 1],
                 y_scores=y_scores[x_idx : x_idx + 1],
@@ -226,7 +215,7 @@ def run(
                     ):
                         early_stopped = True
 
-    prediction_metric = create_metric(config["evaluation_params"]["metric"])
+    prediction_metric = create_metric(config["metric"])
     ml_metric = compute_metrics_from_scores(
         prediction_metric,
         y[test_start_idx:last_idx],
@@ -235,23 +224,19 @@ def run(
 
     run_result = RunResult(
         model_used=model_used,
-        model_start_idx=np.array([model.start_idx for model in models]),
-        model_end_idx=np.array([model.end_idx for model in models]),
+        model_start_idxs=np.array([model.start_idx for model in models]),
+        model_end_idxs=np.array([model.end_idx for model in models]),
         y_scores=y_scores,
         ml_metric=ml_metric,
+        is_drifts=is_drifts,
+        is_drift_warnings=is_drift_warnings,
     )
 
     # Save
     save_drift_run(
-        run_result=run_result,
-        metrics=metrics,
-        drift_data_path=(
-            f"./data/simulator/"
-            f"{dataset.name}/{model_name}/"
-            f"{config['sub_dir_path']}/{run_config.get('name')}"
-        ),
+        drift_data_path=drift_data_path,
         config=copy.deepcopy(config),
-        run_config=copy.deepcopy(run_config),
+        run_result=run_result,
     )
 
     return run_result.ml_metric, run_result.n_train
