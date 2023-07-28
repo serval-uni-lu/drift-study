@@ -1,0 +1,4 @@
+---
+schedule_name: no_detection
+detectors:
+  - name: no_detection
