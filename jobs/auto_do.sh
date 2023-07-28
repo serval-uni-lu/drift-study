@@ -1,0 +1,1 @@
+python -m drift_study.run.pretrain_models -c config/logging.yaml -c ./config/lcld_auto.yaml -p pretrain_periodic=true -p use_auto_model_tuning=true
