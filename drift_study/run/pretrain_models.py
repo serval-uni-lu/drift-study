@@ -10,7 +10,7 @@ from mlc.datasets.dataset_factory import get_dataset
 from sklearn.model_selection import TimeSeriesSplit
 
 from drift_study.model_arch.lazy_pipeline import LazyPipeline
-from drift_study.run.no_retrain_baseline import add_best_params_to_models
+from drift_study.run.no_retrain_baseline import add_best_params_to_model
 from drift_study.run_simulator import get_start_end_idx
 from drift_study.utils.helpers import get_f_new_model
 from drift_study.utils.io_utils import load_do_save_model
@@ -47,6 +47,8 @@ def get_idx_window_size_period(
     last_idx: int,
 ) -> List[Tuple[int, int]]:
     train_idxs: List[Tuple[int, int]] = []
+    if isinstance(windows_sizes, int):
+        windows_sizes = [windows_sizes]
     for window_size in windows_sizes:
         for period in periods:
             for i in range(test_start_idx, last_idx + 1, period):
@@ -102,7 +104,8 @@ def get_pretrains(
 
 def run(config: Dict[str, Any]) -> None:
     if config.get("use_auto_model_tuning"):
-        config = add_best_params_to_models(config)
+        config = add_best_params_to_model(config)
+    print(config["model"]["params"])
     logger = logging.getLogger(__name__)
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
