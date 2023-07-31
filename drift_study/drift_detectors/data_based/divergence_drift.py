@@ -151,12 +151,17 @@ class DivergenceDrift(DriftDetector):
     ) -> Dict[str, Any]:
         return {
             "cat_threshold": trial.suggest_float(
-                "categorical_threshold", 1e-6, 0.5
+                "categorical_threshold", 1e-6, 0.5, log=True
             ),
             "num_threshold": trial.suggest_float(
-                "numerical_threshold", 1e-6, 0.5
+                "numerical_threshold", 1e-6, 0.5, log=True
             ),
-            "drift_share": trial.suggest_float("drift_share", 1e-6, 1),
+            "drift_share": trial.suggest_float(
+                "drift_share",
+                1 / trial_params["n_features"],
+                1,
+                step=1 / trial_params["n_features"],
+            ),
         }
 
     @staticmethod
@@ -164,8 +169,8 @@ class DivergenceDrift(DriftDetector):
         trial_params: Dict[str, Any]
     ) -> Optional[Dict[str, Any]]:
         return {
-            "num_threshold": 0.05,
-            "cat_threshold": 0.05,
+            "numerical_threshold": 0.05,
+            "categorical_threshold": 0.05,
             "drift_share": 0.5,
         }
 
