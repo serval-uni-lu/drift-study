@@ -13,6 +13,7 @@ import numpy.typing as npt
 import optuna
 from configutils.utils import merge_parameters
 from joblib import Parallel, delayed, parallel_backend
+from mlc.datasets.dataset_factory import get_dataset
 from mlc.load_do_save import load_json, save_json
 from optuna import Study
 from optuna._callbacks import MaxTrialsCallback, RetryFailedTrialCallback
@@ -81,6 +82,12 @@ def update_fold_params(
     ] = f"{config['schedule_data_path']}_fold_{fold_idx}"
     config["last_idx"] = config["test_start_idx"]
     config["test_start_idx"] = int(test_idxs[0])
+
+
+def add_auto_trial_params(config: Dict[str, Any]) -> None:
+    ds = get_dataset(config["dataset"])
+    n_feature = len(ds.get_metadata(only_x=True))
+    config["trial_params"]["n_features"] = n_feature
 
 
 def execute_one_fold(
@@ -154,6 +161,9 @@ def run(
     # Merge best params
     if config.get("use_auto_model_tuning"):
         config = add_best_params_to_model(config)
+
+    # Add auto trial params
+    add_auto_trial_params(config)
 
     optuna.logging.set_verbosity(optuna.logging.ERROR)
 
