@@ -141,7 +141,7 @@ def run(config: Dict[str, Any]) -> None:
     config_metrics = get_config_metrics(get_paths(config))
     add_rank_to_metrics(config_metrics)
     df = to_dataframe(config_metrics)
-    plot_ml_n_train(df, out_path=config.pop("plot_path"))
+    plot_ml_n_train(df, out_path=config.get("plot_path"))
 
 
 if __name__ == "__main__":
