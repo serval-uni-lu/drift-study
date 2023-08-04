@@ -98,3 +98,19 @@ def beautify_dataframe(
         df["Delays"] = df["delays"].map(lambda x: delays_names[x])
 
     return df
+
+
+name_to_type_dict = {
+    "no_retrain": "Baseline",
+    "divergence": "Data",
+    "no_detection": "Baseline",
+}
+
+
+def name_to_type(name: str) -> str:
+    name = name.split(("_iter_"))[0]
+    if name.startswith("periodic"):
+        return "Baseline"
+    if name in name_to_type_dict:
+        return name_to_type_dict[name]
+    return "Other"
