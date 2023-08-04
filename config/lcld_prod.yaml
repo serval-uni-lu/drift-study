@@ -21,7 +21,7 @@ test_dataset:
         preprocess_module: drift_study.prod.preprocess
   metadata:
     source:
-      file: 
+      file:
         path: ./data/mlc/lcld_201317_ds/lcld_201317_ds_metadata.csv
   tasks:
     - name: unavailable
