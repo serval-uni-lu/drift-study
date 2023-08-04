@@ -76,15 +76,16 @@ Do
 1. [x] Nothing baseline
 1. Periodic retraining
    1. [x] Pretrain model (periodic retraining).
-   1. Periodic retraining baseline.
+   1. [x] Periodic retraining baseline.
    1. Show results of periodic retraining baseline (Table + trace).
 1. Optimization/warm-up of drift detectors.
    1. [x] Pretrain models. (Optimization phase).
    1. [x] Optimization/warm-up of drift detectors.
 1. Drift scheduler
    1. [x] Pretrain models. (Main phase).
-   1. Run Schedules.
-   1. Show results of drift detectors (Graph + Trace).
+   1. [x] Run Schedules.
+   1. [x] Show results of drift detectors: Pareto.
+   1. Show results of drift detectors: Trace.
 
 Output files structure:
 
