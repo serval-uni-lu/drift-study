@@ -15,7 +15,7 @@ class StaticTimeDriftLogger(DriftLogger):
         model_id: str,
         last_transaction_id: str,
         timestamp: int,
-    ) -> None:
+    ):
         self.logger.log_metric(
             metric_name,
             metric_value,

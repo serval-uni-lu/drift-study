@@ -11,5 +11,5 @@ class DriftLogger(ABC):
         model_id: str,
         last_transaction_id: str,
         timestamp: int,
-    ) -> None:
+    ):
         pass

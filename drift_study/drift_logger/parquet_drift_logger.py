@@ -26,7 +26,7 @@ class ParquetDriftLogger(DriftLogger):
         model_id: str,
         last_transaction_id: str,
         timestamp: int,
-    ) -> None:
+    ):
         new_row = {
             "metric_name": metric_name,
             "metric_value": metric_value,
@@ -38,7 +38,7 @@ class ParquetDriftLogger(DriftLogger):
             [self.df, pd.DataFrame([new_row])], ignore_index=True
         )
 
-    def __del__(self) -> None:
+    def __del__(self):
         if Path(self.path).exists():
             self.df.to_parquet(self.path, engine="fastparquet", append=True)
         else:

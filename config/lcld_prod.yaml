@@ -1,0 +1,41 @@
+---
+train_dataset:
+  name: lcld_201317_ds_time
+n_train: 400000
+train_cache:
+  type: parquet
+  params:
+    path: ./data/drift_prod/train_cache.parquet
+
+test_dataset:
+  name: lcld_201317_ds_time
+  data:
+    source:
+      sql:
+        connection_string: postgresql://postgres:example@localhost/lcld
+        query: |
+          SELECT
+            *
+          FROM
+            x_data
+        preprocess_module: drift_study.prod.preprocess
+  metadata:
+    source:
+      file: 
+        path: ./data/mlc/lcld_201317_ds/lcld_201317_ds_metadata.csv
+  tasks:
+    - name: unavailable
+      task_type: classification
+      evaluation_metric: mcc
+  sorter: {}
+loggers:
+  - type: postgres
+    params:
+      db_url: postgresql://postgres:example@localhost/lcld
+      db_table: drift_metrics
+  - type: csv
+    params:
+      path: ./data/logs/lcld_metrics.csv
+  - type: parquet
+    params:
+      path: ./data/logs/lcld_metrics.parquet

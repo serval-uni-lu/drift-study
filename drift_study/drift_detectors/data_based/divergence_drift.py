@@ -41,10 +41,10 @@ class DivergenceDrift(DriftDetector):
         )
         self.window_size = 0
         self.numerical_features = (
-            numerical_features if numerical_features else []
+            numerical_features if numerical_features is not None else []
         )
         self.categorical_features = (
-            categorical_features if categorical_features else []
+            categorical_features if categorical_features is not None else []
         )
         self.drift_share = drift_share
         self.num_threshold = num_threshold
@@ -211,7 +211,7 @@ class DivergenceDrift(DriftDetector):
         )
         categorical[:] = np.nan
         for i, w in enumerate(self.cat_hists.values()):
-            categorical[: len(w), i] = v
+            categorical[: len(w), i] = w
 
         cache["cat_hists"] = pd.DataFrame(
             categorical, columns=self.cat_hists.keys()

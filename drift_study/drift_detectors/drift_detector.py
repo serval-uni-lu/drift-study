@@ -7,6 +7,7 @@ import optuna
 import pandas as pd
 from mlc.models.model import Model
 
+from drift_study.drift_cache.drift_cache import DriftCache
 from drift_study.drift_logger.drift_logger import DriftLogger
 from drift_study.drift_logger.empty_drift_logger import EmptyDriftLogger
 from drift_study.typing import NDFloat, NDInt, NDNumber
@@ -26,8 +27,12 @@ class NoModelException(Exception):
 
 class DriftDetector(ABC):
     def __init__(
-        self, drift_logger: Optional[DriftLogger] = None, **kwargs: Any
+        self,
+        drift_logger: Optional[DriftLogger] = None,
+        fit_cache: Optional[DriftCache] = None,
+        **kwargs: Any,
     ) -> None:
+        self.fit_cache = fit_cache
         if drift_logger is None:
             self.drift_logger = EmptyDriftLogger()
         else:
