@@ -26,7 +26,7 @@ delays:
   retraining: 4W
 optimization_iter:
   model: 10
-  detector: 20
+  detector: 100
 optimization_splits:
   detector: 4
 metric:
@@ -36,3 +36,4 @@ performance:
   n_jobs:
     detector_optimization: 1
 trial_params: {}
+use_auto_model_tuning: true
