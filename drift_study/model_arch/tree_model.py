@@ -136,6 +136,10 @@ class Rf(SkModel):
 
         return params
 
+    def many_predict(self, x: NDFloat, n_pred) -> NDFloat:
+        pred = self.rf.apply(x)
+        return pred
+
 
 class RfScaled(Rf):
     def __init__(
@@ -170,6 +174,10 @@ class RfScaled(Rf):
 
         x = self.scaler.transform(x)
         return super().predict_proba(x)
+
+    def many_predict(self, x: NDFloat, n_pred: int) -> NDFloat:
+        x = self.scaler.transform(x)
+        return super().many_predict(x, n_pred)
 
     def fit(
         self,

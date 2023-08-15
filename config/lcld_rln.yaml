@@ -1,0 +1,45 @@
+---
+name: lcld_201317_ds_time
+dataset:
+  name: lcld_201317_ds_time
+model:
+  source: drift_study.model_arch.mlp_rln
+  name: torchrln
+  metadata: true
+  params:
+    objective: classification
+    batch_size: 128
+    epochs: 100
+    early_stopping_rounds: 5
+    num_classes: 2
+schedules:
+  - name: divergence
+    detectors:
+      - name: n_batch
+        params:
+          batch_size: 5000
+      - name: divergence
+first_train_window_size: -1
+train_window_size: 200000
+periods: [20000, 50000, 100000, 200000]
+test_start_idx: 400000
+training_step_size: 5000
+common_detectors_params:
+  - batch_size: 5000
+delays:
+  drift: 0
+  label: 10days
+  retraining: 4W
+optimization_iter:
+  model: 10
+  detector: 100
+optimization_splits:
+  detector: 4
+metric:
+  name: mcc
+predict_forward: 5000
+performance:
+  n_jobs:
+    detector_optimization: 1
+trial_params: {}
+use_auto_model_tuning: true

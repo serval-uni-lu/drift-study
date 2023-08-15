@@ -32,6 +32,7 @@ class TimeOptimizer:
         self,
         output_path: str,
         model_class: Type[Model],
+        model_params: Dict[str, Any],
         metric_name: str,
         metric: Metric,
         n_iter: int,
@@ -39,6 +40,7 @@ class TimeOptimizer:
         x_metadata: Optional[pd.DataFrame] = None,
     ) -> None:
         self.model_class = model_class
+        self.model_params = model_params
         self.metric_name = metric_name
         self.metric = metric
         self.n_iter = n_iter
@@ -111,9 +113,11 @@ class TimeOptimizer:
         y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
     ) -> float:
         start = time.time()
-        model_params = self.model_class().define_trial_parameters(
+
+        model_params = self.model_class.define_trial_parameters(
             trial, trial_params
         )
+        model_params = {**self.model_params, **model_params}
         tscv = TimeSeriesSplit(n_splits=self.n_fold)
         metrics = [
             self._objective_fold(
@@ -191,9 +195,7 @@ class TimeOptimizer:
         n_completed = len(study.get_trials(states=(TrialState.COMPLETE,)))
 
         if n_completed == 0:
-            default_params = self.model_class().get_default_params(
-                trial_params
-            )
+            default_params = self.model_class.get_default_params(trial_params)
             if default_params is not None:
                 study.enqueue_trial(default_params)
 
@@ -233,6 +235,8 @@ def run(config: Dict[str, Any]):
     x, y = dataset.get_x_y()
     x_metadata = dataset.get_metadata(only_x=True)
     model_class = get_model(config.get("model"))
+    model_params = config.get("model").get("params", {})
+    print(model_params)
     test_start_idx = config.get("test_start_idx")
     x_train, y_train = (
         x.iloc[:test_start_idx],
@@ -242,10 +246,13 @@ def run(config: Dict[str, Any]):
         x.iloc[test_start_idx:],
         y[test_start_idx:],
     )
-    output_path = f"data/drift/{dataset.name}/{model_class().name}/model_opt"
+    output_path = (
+        f"data/drift/{dataset.name}/{model_class.get_name()}/model_opt"
+    )
     optimizer = TimeOptimizer(
         output_path=output_path,
         model_class=model_class,
+        model_params=model_params,
         metric_name=config.get("metric").get("name"),
         metric=create_metric(config.get("metric")),
         n_iter=config.get("optimization_iter").get("model"),

@@ -12,6 +12,7 @@ class LazyPipeline:
         self.path = None
         self.loaded = False
         self.pred = None
+        self.many_pred = None
 
     # LOADING METHODS
     def _pipeline_load(self):
@@ -27,6 +28,13 @@ class LazyPipeline:
         if self.pred is None:
             pred_path = f"{self.path}.pred.hdf5"
             self.pred = load_hdf5(pred_path)
+
+    def _many_pred_load(self):
+        if self.path is None:
+            raise ValueError("Path is not set")
+        if self.pred is None:
+            pred_path = f"{self.path}.many_pred.hdf5"
+            self.many_pred = load_hdf5(pred_path)
 
     def load(self, path: str) -> None:
         self.path = path
@@ -50,6 +58,14 @@ class LazyPipeline:
         else:
             raise ValueError("Unknown objective")
         save_hdf5(y_pred, pred_path)
+
+    def save_many_pred(self, x, n_pred) -> None:
+        many_pred_path = f"{self.path}.many_pred.hdf5"
+        if os.path.exists(many_pred_path):
+            return None
+        self._pipeline_load()
+        y_pred = self.pipeline.many_predict(x, n_pred)
+        save_hdf5(y_pred, many_pred_path)
 
     def save(self, path: str) -> None:
         self.path = path
@@ -90,6 +106,14 @@ class LazyPipeline:
     def safe_lazy_predict(self, x, start_idx, end_idx):
         self.save_pred(x)
         return self.lazy_predict(start_idx, end_idx)
+
+    def lazy_many_predict(self, start_idx, end_idx):
+        self._many_pred_load()
+        return self.many_pred[start_idx:end_idx]
+
+    def safe_lazy_many_predict(self, x, n_pred, start_idx, end_idx):
+        self.save_many_pred(x, n_pred)
+        return self.lazy_many_predict(start_idx, end_idx)
 
     def fit(self, x, y, x_val=None, y_val=None):
         self.pipeline.fit(x, y, x_val, y_val)
