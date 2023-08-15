@@ -32,7 +32,7 @@ class LazyPipeline:
     def _many_pred_load(self):
         if self.path is None:
             raise ValueError("Path is not set")
-        if self.pred is None:
+        if self.many_pred is None:
             pred_path = f"{self.path}.many_pred.hdf5"
             self.many_pred = load_hdf5(pred_path)
 

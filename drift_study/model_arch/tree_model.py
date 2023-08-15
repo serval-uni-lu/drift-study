@@ -137,7 +137,7 @@ class Rf(SkModel):
         return params
 
     def many_predict(self, x: NDFloat, n_pred) -> NDFloat:
-        pred = self.rf.apply(x)
+        pred = self.model.apply(x)
         return pred
 
 
@@ -197,6 +197,18 @@ class RfScaled(Rf):
             x_val,
             y_val,
         )
+
+    @staticmethod
+    def get_name() -> str:
+        return "rf_scaled"
+
+    def save(self, path: str) -> None:
+        self.scaler.save(f"{path}.scaler")
+        return super().save(path)
+
+    def load(self, path: str) -> None:
+        self.scaler.load(f"{path}.scaler")
+        return super().load(path)
 
 
 models = [
