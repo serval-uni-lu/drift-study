@@ -28,6 +28,7 @@ def train_model(
     list_model_writing: Optional[Dict[str, Any]] = None,
 ):
     model = f_new_model()
+    x = x.to_numpy()
     model = load_do_save_model(
         model,
         model_path,
