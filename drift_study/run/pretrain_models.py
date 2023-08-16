@@ -4,6 +4,7 @@ from multiprocessing import Lock
 from typing import Any, Dict, List, Optional, Tuple
 
 import configutils
+import joblib
 import numpy as np
 import pandas as pd
 from mlc.datasets.dataset_factory import get_dataset
@@ -131,12 +132,18 @@ def run(config: Dict[str, Any]) -> None:
             "models_dir", os.environ.get("MODELS_DIR", "./models")
         )
         model_name = f_new_model().name
-        for i, (start_idx, end_idx) in enumerate(idx_to_train):
+
+        def train_model_wrapper(
+            f_new_model,
+            x,
+            y,
+            start_idx,
+            end_idx,
+        ) -> None:
             logger.info(
                 f"Training model {i}/ {len(idx_to_train)} "
                 f"from {start_idx} to {end_idx}"
             )
-
             model_path = model_path = (
                 f"{model_root_dir}/{dataset.name}/"
                 f"{model_name}_{start_idx}_{end_idx}.joblib"
@@ -149,6 +156,29 @@ def run(config: Dict[str, Any]) -> None:
                 start_idx,
                 end_idx,
             )
+
+        if joblib.cpu_count() > 4:
+            n_jobs = joblib.cpu_count() // 4
+            # Parrallel training with joblib
+            joblib.Parallel(n_jobs=n_jobs)(
+                joblib.delayed(train_model_wrapper)(
+                    f_new_model,
+                    x,
+                    y,
+                    start_idx,
+                    end_idx,
+                )
+                for i, (start_idx, end_idx) in enumerate(idx_to_train)
+            )
+        else:
+            for i, (start_idx, end_idx) in enumerate(idx_to_train):
+                train_model_wrapper(
+                    f_new_model,
+                    x,
+                    y,
+                    start_idx,
+                    end_idx,
+                )
 
 
 if __name__ == "__main__":
