@@ -134,6 +134,7 @@ def run(config: Dict[str, Any]) -> None:
         model_name = f_new_model().name
 
         def train_model_wrapper(
+            i,
             f_new_model,
             x,
             y,
@@ -162,6 +163,7 @@ def run(config: Dict[str, Any]) -> None:
             # Parrallel training with joblib
             joblib.Parallel(n_jobs=n_jobs)(
                 joblib.delayed(train_model_wrapper)(
+                    i,
                     f_new_model,
                     x,
                     y,
@@ -173,6 +175,7 @@ def run(config: Dict[str, Any]) -> None:
         else:
             for i, (start_idx, end_idx) in enumerate(idx_to_train):
                 train_model_wrapper(
+                    i,
                     f_new_model,
                     x,
                     y,
