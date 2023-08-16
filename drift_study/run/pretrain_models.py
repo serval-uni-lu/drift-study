@@ -32,7 +32,7 @@ def train_model(
     model = load_do_save_model(
         model,
         model_path,
-        x.iloc[start_idx:end_idx],
+        x[start_idx:end_idx],
         y[start_idx:end_idx],
         lock_model_writing,
         list_model_writing,
