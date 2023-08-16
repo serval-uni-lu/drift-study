@@ -1,0 +1,5 @@
+---
+schedule:
+  name: manual
+  detectors:
+    - name: manual_index

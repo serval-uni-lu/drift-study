@@ -6,6 +6,7 @@ model:
   source: drift_study.model_arch.tree_model
   name: rf_scaled
   metadata: true
+  metric: mcc
 schedules:
   - name: divergence
     detectors:
@@ -14,10 +15,11 @@ schedules:
           batch_size: 480
       - name: divergence
 first_train_window_size: -1
-train_window_size: -1
+train_window_size: 17760
 train_window_sizes: [4380, 8760, 17520, 35040, -1]
 periods: [480, 960, 1920, 3840, 7680, 15360, 30720]
-test_start_idx: 17520
+manual_retrain: [20160, 22560, 32160]
+test_start_idx: 17760
 training_step_size: 480
 common_detectors_params:
   - batch_size: 480
@@ -33,6 +35,8 @@ optimization_splits:
 metric:
   name: mcc
 predict_forward: 1000
+evaluation:
+  batch_size: 480
 performance:
   n_jobs:
     detector_optimization: 1
