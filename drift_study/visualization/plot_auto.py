@@ -1,5 +1,5 @@
 import logging
-from os import listdir
+from os import listdir, path
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -33,11 +33,16 @@ def get_paths(config: Dict[str, Any]) -> List[str]:
 
     expected = (
         ["no_retrain"]
+        + ["manual"]
         + [f"periodic_{e}" for e in config.get("periods", [])]
         + [e["name"] for e in config.get("schedules", [])]
     )
 
     found_schedules = listdir(schedule_dir)
+    print(found_schedules)
+    found_schedules = [
+        e for e in found_schedules if path.isdir(f"{schedule_dir}/{e}")
+    ]
     for name in expected:
         check_present(found_schedules, name)
 
@@ -56,11 +61,11 @@ def get_config_metrics(
 ) -> List[Tuple[Dict[str, Any], Dict[str, Any]]]:
 
     out = []
-    for path in paths:
+    for p in paths:
         out.append(
             (
-                load_json(f"{path}/config.json"),
-                load_json(f"{path}/metrics.json"),
+                load_json(f"{p}/config.json"),
+                load_json(f"{p}/metrics.json"),
             )
         )
     return out

@@ -1,3 +1,4 @@
+import time
 from typing import Any, Dict, Optional, Union
 
 import numpy as np
@@ -10,7 +11,7 @@ from mlc.models.model import Model
 from optuna import Trial
 from optuna.samplers import TPESampler
 from sklearn.model_selection import TimeSeriesSplit
-import time
+
 
 class TimeOptimizer(Model):
     def __init__(
@@ -32,12 +33,20 @@ class TimeOptimizer(Model):
         self.metric = metric
         self.n_trials = n_trials
         self.n_splits = n_splits
+        self.x_metadata = (
+            model.x_metadata if hasattr(model, "x_metadata") else None
+        )
 
     def load(self, path: str) -> None:
         self.model.load(path)
 
     def save(self, path: str) -> None:
         self.model.save(path)
+
+    def many_predict(
+        self, x: npt.NDArray[np.float_], n_pred: int
+    ) -> npt.NDArray[np.float_]:
+        return self.model.many_predict(x, n_pred)
 
     @staticmethod
     def _compute_metric(
@@ -82,7 +91,7 @@ class TimeOptimizer(Model):
         metrics = [
             self._objective_one(
                 self.model.__class__(
-                    n_jobs=self.n_jobs, verbose=1, **model_params
+                    x_metadata=self.x_metadata, **model_params
                 ),
                 x[train_index],
                 x[test_index],
@@ -122,13 +131,14 @@ class TimeOptimizer(Model):
 
         study.optimize(
             lambda trial: self._objective(trial, trial_params, x, y),
-            n_trials=25,
+            n_trials=self.n_trials,
         )
 
         self.model = self.model.__class__(
             **study.best_trial.params,
+            x_metadata=self.x_metadata,
             random_state=42,
-            n_jobs=self.n_jobs,
+            # n_jobs=self.n_jobs,
             verbose=0,
         )
         with parallel_backend("threading"):

@@ -1,12 +1,14 @@
 from typing import Any, Callable, Dict
 
 import pandas as pd
+from mlc.metrics.metric_factory import create_metric
 from mlc.models.model import Model
 from mlc.models.model_factory import get_model
 from mlc.models.pipeline import Pipeline
 from mlc.models.sk_models import SkModel
 
 from drift_study.model_arch.lazy_pipeline import LazyPipeline
+from drift_study.model_arch.sklearn_opt import TimeOptimizer
 
 
 def quite_model(model: Model) -> None:
@@ -23,6 +25,8 @@ def get_f_new_model(
 ) -> Callable[[], Model]:
     def new_model() -> Model:
         model = get_model_l(config, metadata_x)
+        if config.get("optimize", False):
+            model = TimeOptimizer(model, create_metric(config.get("metric")))
         model = LazyPipeline(model)
         return model
 
