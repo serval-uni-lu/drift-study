@@ -7,22 +7,16 @@ model:
   name: rf_scaled
   metadata: true
   metric: mcc
-schedules:
-  - name: divergence
-    detectors:
-      - name: n_batch
-        params:
-          batch_size: 480
-      - name: divergence
+  params: {}
 first_train_window_size: -1
-train_window_size: 17760
-train_window_sizes: [4380, 8760, 17520, 35040, -1]
+train_window_size: 4440
+train_window_sizes: [4440, 8880, 17760, 35520, -1]
 periods: [480, 960, 1920, 3840, 7680, 15360, 30720]
 manual_retrain: [20160, 22560, 32160]
 test_start_idx: 17760
 training_step_size: 480
 common_detectors_params:
-  - batch_size: 480
+  batch_size: 480
 delays:
   drift: 0
   label: 10days
@@ -39,6 +33,6 @@ evaluation:
   batch_size: 480
 performance:
   n_jobs:
-    detector_optimization: 1
-trial_params: {}
-use_auto_model_tuning: true
+    detector_optimization: 32
+trial_params:
+  model_type: random_forest
