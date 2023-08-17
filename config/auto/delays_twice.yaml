@@ -1,5 +1,5 @@
 ---
 delays:
-  label: 10days
+  label: 1days
   drift: 0
-  retraining: 8W
+  retraining: 18days
