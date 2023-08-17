@@ -46,7 +46,7 @@ class TORCHRLN(BaseModelTorch):
         self.hidden_dim = hidden_dim
         self.norm = norm
         self.theta = theta
-
+        
         # Super call
 
         # Generate super call
@@ -65,19 +65,21 @@ class TORCHRLN(BaseModelTorch):
             scaler=scaler,
             **kwargs,
         )
-
+        # self.learning_rate = learning_rate
+        # self.lr = self.learning_rate
         # Compatibility
+        self.lr = self.learning_rate
 
         self.experiment = None
-
-        # self.dataset = args.dataset
-        lr = self.learning_rate
         self.scaler = scaler
-        # Generated
+
+        self.create_model()
+        
+    def create_model(self):
         self.num_features = (
-            x_metadata.shape[0]
-            if scaler is None
-            else scaler.get_transformed_num_features()
+            self.x_metadata.shape[0]
+            if self.scaler is None
+            else self.scaler.get_transformed_num_features()
         )
 
         self.model = MLP_ModelRLN(
@@ -97,16 +99,11 @@ class TORCHRLN(BaseModelTorch):
         self.wrapper_model = self.model
         self.to_device()
 
-        # layer = (
-        #     self.model.module.layers[0]
-        #     if hasattr(self.model, "module")
-        #     else self.model.layers[0]
-        # )
         self.rln_callback = RLNCallback(
             layer,
             norm=self.norm,
             avg_reg=self.theta,
-            learning_rate=lr,
+            learning_rate=self.lr,
         )
 
     def fit(
@@ -128,16 +125,15 @@ class TORCHRLN(BaseModelTorch):
                 x, y, test_size=0.2, random_state=42, stratify=y
             )
 
+        x = torch.tensor(x).float()
+        x_val = torch.tensor(x_val).float()
         self.rln_callback.on_train_begin()
 
         if self.scaler is None:
             self.scaler = TabScaler()
             self.scaler.fit(x, x_type=self.x_metadata["type"])
-            self.model = nn.Sequential(
-                self.scaler.get_transorm_nn(), self.model
-            )
-            self.wrapper_model = self.model
-
+            self.create_model()
+        
         if self.scaler is not None:
             previous_model = self.model
             self.model = self.model[1]
@@ -327,6 +323,14 @@ class RLNCallback(object):
 
     def _update_values(self) -> None:
         self._weights = DataFrame(torch.t(self._layer.weight.cpu().detach()))
+        
+    def save(self, path: str) -> None:
+        self.scaler.save(f"{path}.scaler")
+        return super().save(path)
+
+    def load(self, path: str) -> None:
+        self.scaler.load(f"{path}.scaler")
+        return super().load(path)
 
 
 models: List[Tuple[str, Type[Model]]] = [("torchrln", TORCHRLN)]

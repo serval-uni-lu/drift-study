@@ -127,7 +127,7 @@ def add_model(
 
     if isinstance(model, LazyPipeline):
         y_scores = model.safe_lazy_predict(x, start_idx, end_idx)
-        model.safe_lazy_many_predict(x, 50, start_idx, end_idx)
+        # model.safe_lazy_many_predict(x, 50, start_idx, end_idx)
     else:
         if model.objective in ["regression"]:
             y_scores = model.predict(x[start_idx:end_idx])

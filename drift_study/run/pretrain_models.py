@@ -40,12 +40,12 @@ def train_model(
     )
     if isinstance(model, LazyPipeline):
         model.safe_lazy_predict(x, start_idx, end_idx)
-        model.safe_lazy_many_predict(
-            x,
-            50,
-            start_idx,
-            end_idx,
-        )
+        # model.safe_lazy_many_predict(
+        #     x,
+        #     50,
+        #     start_idx,
+        #     end_idx,
+        # )
 
 
 def get_idx_window_size_period(
