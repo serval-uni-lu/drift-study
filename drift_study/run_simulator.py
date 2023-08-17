@@ -167,7 +167,7 @@ def run(
             # not using the latest drift model available
             # Due to delay
             if drift_model_idx == len(models) - 1:
-                end_idx = round_up_to_multiple(x_idx + 1, training_step_size)
+                end_idx = round_up_to_multiple(x_idx + 1 - test_start_idx, training_step_size) + test_start_idx
                 if is_drifts[x_idx] and (end_idx < last_idx):
                     logger.debug(f"Drift at index {x_idx}")
                     start_idx, end_idx = get_start_end_idx(
