@@ -93,6 +93,7 @@ class DivergenceDrift(DriftDetector):
         y: NDNumber,
         y_scores: NDFloat,
     ) -> Tuple[bool, bool, pd.DataFrame]:
+        x = pd.DataFrame(x, columns=self.x_metadata["feature"])
         self.x_last = pd.concat([self.x_last, x], ignore_index=True)
         self.x_last = self.x_last.iloc[-self.window_size :]
 

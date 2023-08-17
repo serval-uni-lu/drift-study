@@ -21,6 +21,7 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 class EvidentlyDrift(DriftDetector):
     def __init__(
         self,
+        x_metadata: pd.DataFrame,
         numerical_features: List[str] = None,
         categorical_features: List[str] = None,
         num_threshold: float = 0.05,
@@ -51,6 +52,7 @@ class EvidentlyDrift(DriftDetector):
         self.x_last = pd.DataFrame()
         self.fit_first_update = fit_first_update
         self.is_first_update = True
+        self.x_metadata = x_metadata
 
     def fit(
         self,
@@ -60,6 +62,8 @@ class EvidentlyDrift(DriftDetector):
         y_scores: Union[npt.NDArray[np.float_]],
         model: Optional[Model],
     ) -> None:
+        
+        x = pd.DataFrame(x, columns=self.x_metadata["feature"])
 
         metric = DataDriftPreset(
             drift_share=self.drift_share,

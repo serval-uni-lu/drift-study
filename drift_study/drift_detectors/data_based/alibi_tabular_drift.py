@@ -59,7 +59,7 @@ class TabularAlibiDrift(DriftDetector):
             alternative=self.alternative,
             categories_per_feature=categories_per_feature,
         )
-        self.x_test = x
+        self.x_test = pd.DataFrame(x, columns=self.x_metadata["feature"])
         self.window_size = len(x)
 
     def update(
@@ -69,7 +69,7 @@ class TabularAlibiDrift(DriftDetector):
         y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
         y_scores: Union[npt.NDArray[np.float_]],
     ) -> Tuple[bool, bool, pd.DataFrame]:
-        x = pd.DataFrame(x)
+        x = pd.DataFrame(x, columns=self.x_metadata["feature"])
         self.x_test = pd.concat([self.x_test, x])
         self.x_test = self.x_test.iloc[-self.window_size :]
 

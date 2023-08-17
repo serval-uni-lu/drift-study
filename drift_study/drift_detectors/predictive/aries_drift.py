@@ -24,6 +24,7 @@ class AriesDrift(DriftDetector):
     def __init__(
         self,
         drift_detector: DriftDetector,
+        x_metadata,
         accuracy_type: int = 0,
         section_num: int = 50,
         **kwargs: Dict[str, Any],
@@ -41,6 +42,7 @@ class AriesDrift(DriftDetector):
         self.base_acc = -1
         self.accuracy_type = accuracy_type
         self.section_num = section_num
+        self.x_metadata = x_metadata
 
     def fit(
         self,
@@ -50,17 +52,18 @@ class AriesDrift(DriftDetector):
         y_scores: Union[npt.NDArray[np.float_]],
         model: Optional[Model],
     ) -> None:
+        x = pd.DataFrame(x, columns=self.x_metadata["feature"])
         self.model = model
         if isinstance(self.model, LazyPipeline):
             self.model._pipeline_load()
             self.model = self.model.pipeline
 
-        if not isinstance(self.model, Pipeline):
-            raise NotImplementedError
-        if isinstance(self.model[-1].model, RandomForestClassifier):
-            self.section_num = self.model[-1].model.n_estimators
-        if isinstance(self.model[-1].model, TimeOptimizer):
-            self.section_num = self.model[-1].model.model.n_estimators
+        # if not isinstance(self.model, Pipeline):
+        #     raise NotImplementedError
+        if isinstance(self.model, RandomForestClassifier):
+            self.section_num = self.model.n_estimators
+        if isinstance(self.model, TimeOptimizer):
+            self.section_num = self.model.model.model.n_estimators
         self.pred_hist = build_hist(
             self.model, x, y, section_num=self.section_num
         )
@@ -74,7 +77,7 @@ class AriesDrift(DriftDetector):
         y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
         y_scores: Union[npt.NDArray[np.float_]],
     ) -> Tuple[bool, bool, pd.DataFrame]:
-        x = pd.DataFrame(x)
+        x = pd.DataFrame(x, columns=self.x_metadata["feature"])
 
         if self.pred_hist is None:
             raise NotFittedDetectorException
@@ -181,7 +184,7 @@ def predict_n_times(
 
 
 def compute_mode(model, x, section_num) -> npt.NDArray[np.int_]:
-    if isinstance(model[-1].model, nn.Module):
+    if isinstance(model, nn.Module):
         # Make many prediction
         t_predictions_list = predict_n_times(model, x, section_num)
         # Calculate the mode
@@ -194,19 +197,19 @@ def compute_mode(model, x, section_num) -> npt.NDArray[np.int_]:
             )[1][0]
             mode_list.append(mode_num)
         return np.asarray(mode_list)
-    elif isinstance(model[-1].model, RandomForestClassifier):
+    elif isinstance(model, RandomForestClassifier):
         prediction = model.predict_proba(x)
         prediction = np.max(prediction, axis=1)
-        mode_list = np.round(prediction * model[-1].model.n_estimators).astype(
+        mode_list = np.round(prediction * model.n_estimators).astype(
             int
         )
         return mode_list
 
-    elif isinstance(model[-1].model, TimeOptimizer):
+    elif isinstance(model, TimeOptimizer):
         prediction = model.predict_proba(x)
         prediction = np.max(prediction, axis=1)
         mode_list = np.round(
-            prediction * model[-1].model.model.n_estimators
+            prediction * model.model.model.n_estimators
         ).astype(int)
         return mode_list
 

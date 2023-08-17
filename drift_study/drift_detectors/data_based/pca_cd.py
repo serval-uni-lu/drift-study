@@ -49,6 +49,7 @@ class PcaCdDrift(DriftDetector):
     def __init__(
         self,
         batch_size: int,
+        x_metadata,
         divergence_metric: str = "kl",
         ev_threshold: float = 0.99,
         delta: float = 0.1,
@@ -112,6 +113,7 @@ class PcaCdDrift(DriftDetector):
         self._reference_pca_projection = pd.DataFrame()
         self._test_pca_projection = pd.DataFrame()
         self._density_reference = {}
+        self.x_metadata = x_metadata
 
     def fit(
         self,
@@ -121,7 +123,7 @@ class PcaCdDrift(DriftDetector):
         y_scores: Union[npt.NDArray[np.float_]],
         model: Optional[Model],
     ) -> None:
-
+        x = pd.DataFrame(x, columns=self.x_metadata["feature"])
         self.window_size = len(x)
         self.ph_threshold = (
             round(self.ph_t_ratio * self.window_size) / self.batch_size
@@ -182,7 +184,7 @@ class PcaCdDrift(DriftDetector):
         y: Union[npt.NDArray[np.int_], npt.NDArray[np.float_]],
         y_scores: Union[npt.NDArray[np.float_]],
     ) -> Tuple[bool, bool, pd.DataFrame]:
-        x = pd.DataFrame(x)
+        x = pd.DataFrame(x, columns=self.x_metadata["feature"])
         self._test_window = pd.concat([self._test_window, x])
         self._test_window = self._test_window.iloc[-self.window_size :]
 

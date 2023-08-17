@@ -27,6 +27,7 @@ class RfUncertaintyDrift(DriftDetector):
     def __init__(
         self,
         drift_detector: DriftDetector,
+        x_metadata,
         uncertainty_type: str,
         **kwargs: Dict[str, Any],
     ) -> None:
@@ -42,6 +43,7 @@ class RfUncertaintyDrift(DriftDetector):
         ] = None
         self.rf = None
         self.model: Optional[Model] = None
+        self.x_metadata = x_metadata
 
     def fit(
         self,
@@ -51,6 +53,7 @@ class RfUncertaintyDrift(DriftDetector):
         y_scores: Union[npt.NDArray[np.float_]],
         model: Optional[Model],
     ) -> None:
+        x = pd.DataFrame(x, columns=self.x_metadata["feature"])
         if model is None:
             raise NoModelException
 
@@ -58,10 +61,10 @@ class RfUncertaintyDrift(DriftDetector):
             model._pipeline_load()
             model = model.pipeline
 
-        if not isinstance(model, Pipeline):
-            raise NotImplementedError("Model is expected to be a Pipeline")
+        # if not isinstance(model, Pipeline):
+        #     raise NotImplementedError("Model is expected to be a Pipeline")
 
-        internal_model = model[-1]
+        internal_model = model
         while hasattr(internal_model, "model"):
             internal_model = internal_model.model
         self.rf = internal_model
@@ -70,12 +73,12 @@ class RfUncertaintyDrift(DriftDetector):
         self.rf_uncertainty = RandomForestClassifierWithUncertainty(
             random_forest=self.rf
         )
-        self.rf_uncertainty.fit(self.model.transform(x), y)
+        self.rf_uncertainty.fit(self.model.model.scaler.transform(x), y)
         (
             _,
             uncertainties,
         ) = self.rf_uncertainty.predict_proba_with_uncertainty(
-            self.model.transform(x)
+            self.model.model.scaler.transform(x)
         )
         uncertainties = uncertainties[UNCERTAINTY_TYPE[self.uncertainty_type]]
         x_new = pd.DataFrame.from_dict({"uncertainty": uncertainties})
@@ -97,11 +100,11 @@ class RfUncertaintyDrift(DriftDetector):
     ) -> Tuple[bool, bool, pd.DataFrame]:
         if (self.model is None) or (self.rf_uncertainty is None):
             raise NotFittedDetectorException
-        if not isinstance(self.model, Pipeline):
-            raise NotImplementedError("Model is expected to be a Pipeline")
+        # if not isinstance(self.model, Pipeline):
+        #     raise NotImplementedError("Model is expected to be a Pipeline")
         x = pandas.DataFrame(x)
         _, uncertainties = self.rf_uncertainty.predict_proba_with_uncertainty(
-            self.model.transform(x)
+            self.model.model.scaler.transform(x)
         )
 
         uncertainties = uncertainties[UNCERTAINTY_TYPE[self.uncertainty_type]]
