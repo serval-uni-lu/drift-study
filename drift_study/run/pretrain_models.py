@@ -98,6 +98,7 @@ def get_pretrains(
         ):
             local_test_start_idx = test_idx[0]
             local_last_idx = test_start_idx
+            train_idxs.append((0, local_test_start_idx))
             train_idxs.extend(
                 get_idx_window_size_period(
                     config.get("train_window_size"),
@@ -106,6 +107,7 @@ def get_pretrains(
                     local_last_idx,
                 )
             )
+            print(train_idxs)
 
     return list(set(train_idxs))
 

@@ -280,7 +280,7 @@ def run_any(config: Dict[str, Any]) -> None:
         return run(config)
 
     n_jobs_optimiser = (
-        config["performance"].get("n_jobs", {}).get("optimizer", 1)
+        config["performance"].get("n_jobs", {}).get("detector_optimization", 1)
     )
     logger = logging.getLogger(__name__)
 
