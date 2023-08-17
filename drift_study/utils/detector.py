@@ -29,11 +29,12 @@ def get_auto_detectors_params(
 def get_f_new_detector(
     config: Dict[str, Any],
     metadata_x: pd.DataFrame,
+    common_parms: Dict[str, Any]
 ) -> Callable[[int, int], DriftDetector]:
     def f_new_detector(start_idx, end_idx) -> DriftDetector:
         drift_detector = get_drift_detector_from_conf(
             config,
-            get_auto_detectors_params(metadata_x, start_idx, end_idx),
+            {**common_parms, **get_auto_detectors_params(metadata_x, start_idx, end_idx)},
         )
         return drift_detector
 

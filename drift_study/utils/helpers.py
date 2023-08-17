@@ -19,6 +19,16 @@ from drift_study.utils.drift_model import DriftModel
 from drift_study.utils.io_utils import load_do_save_model
 from drift_study.utils.model import get_f_new_model, quite_model
 
+# def batch_size_fix(config: Dict[str, Any], schedule_config: Dict[str, Any]):
+#     batch_size = 
+#     detectors = schedule_config["detectors"]
+    
+#     for i in range(len(schedule_config["detectors"])):
+#         e = detectors[i]
+#         if e["name"] == "n_batch":
+#             params = e.get("params")
+#             if params if None:
+#                 e["params"] = {"batch_size": con}
 
 def initialize(
     config: Dict[str, Any],
@@ -40,7 +50,7 @@ def initialize(
     metadata = dataset.get_metadata(only_x=True)
     f_new_model = get_f_new_model(config.get("model"), metadata)
     f_new_detector = get_f_new_detector(
-        config["schedule"]["detectors"], metadata
+        config["schedule"]["detectors"], metadata, config.get("common_detectors_params", {})
     )
     return dataset, f_new_model, f_new_detector, x, y, t
 
