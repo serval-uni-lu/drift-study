@@ -104,13 +104,52 @@ name_to_type_dict = {
     "no_retrain": "Baseline",
     "divergence": "Data",
     "no_detection": "Baseline",
+    "n_batch_tabular_alibi": "Data",
+    "n_batch_evidently": "Data",
+    "data_evidently": "Data",
+    "n_batch_pca_cd": "Data",
+    "pca_cd": "Data",
+    "adwin_class_error": "Error",
+    "adwin_proba_error": "Error",
+    "adwin_proba": "Error",
+    "adwin_class": "Error",
+    "ddm": "Error",
+    "eddm": "Error",
+    "hddm_a": "Error",
+    "hddm_a_error": "Error",
+    "hddm_w_error": "Error",
+    "hddm_w": "Error",
+    "kswin_class_error": "Error",
+    "kswin_proba_error": "Error",
+    "page_hinkley_class_error": "Error",
+    "page_hinkley_proba_error": "Error",
+    "n_batch_rf_uncertainty_adwin": "Error",
+    "rf_uncertainty": "Error",
+    "n_batch_rf_uncertainty_adwin_y_scores": "Error",
+    "n_batch_aries_adwin": "Error",
+    "manual_rf_odav": "Error",
+    "aries_all": "Error",
+    "tabular_alibi": "Error",
+    "ddm_error": "Error",
+    "eddm_error": "Error",
 }
 
 
 def name_to_type(name: str) -> str:
     name = name.split(("_iter_"))[0]
+    print(name)
     if name.startswith("periodic"):
         return "Baseline"
     if name in name_to_type_dict:
         return name_to_type_dict[name]
+    return "Other"
+
+
+def name_to_name(name: str) -> str:
+    name = name.split(("_iter_"))[0]
+    print(name)
+    if name.startswith("periodic"):
+        return "Periodic"
+    if name in name_to_type_dict:
+        return detector_names[name]
     return "Other"

@@ -9,7 +9,7 @@ import pandas as pd
 import plotly.express as px
 from mlc.load_do_save import load_json
 
-from drift_study.reports.naming import name_to_type
+from drift_study.reports.naming import name_to_type, name_to_name
 from drift_study.utils.logging import configure_logger
 from drift_study.utils.pareto import calc_pareto_rank
 
@@ -137,6 +137,7 @@ def to_dataframe(
     prepare["schedule_type"] = [
         name_to_type(e[0]["schedule"]["name"]) for e in config_metrics
     ]
+    prepare["shedule_nice_name"] = [name_to_name(e[0]["schedule"]["name"]) for e in config_metrics]
     return pd.DataFrame(prepare)
 
 
@@ -146,6 +147,12 @@ def run(config: Dict[str, Any]) -> None:
     config_metrics = get_config_metrics(get_paths(config))
     add_rank_to_metrics(config_metrics)
     df = to_dataframe(config_metrics)
+    df.to_csv(config.get("plot_path")+".csv")
+    
+    aggregated_df = df.groupby('shedule_nice_name').agg(
+        total_count=('shedule_nice_name', 'count'),
+        sum_display_rank_1=('pareto_rank', lambda x: (x == 1).sum())
+    ).reset_index().to_csv(config.get("plot_path")+".agg.csv")
     plot_ml_n_train(df, out_path=config.get("plot_path"))
 
 

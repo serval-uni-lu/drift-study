@@ -67,7 +67,7 @@ def run(config: Dict[str, Any]) -> None:
     logger.info(f"Running {len(confs)} schedules.")
 
     n_jobs_optimiser = (
-        config["performance"].get("n_jobs", {}).get("optimizer", 1)
+        config["performance"].get("n_jobs", {}).get("detector", 1)
     )
 
     if config.get("dry_run"):

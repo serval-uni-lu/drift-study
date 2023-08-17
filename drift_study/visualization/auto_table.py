@@ -26,8 +26,15 @@ def to_df(config_metrics: Tuple[Dict[str, Any], Dict[str, Any]]) -> pd.DataFrame
 def run(config: Dict[str, Any]):
     
     schedule_data_path = config["schedule_data_path"]
-    
-    paths = [f"{schedule_data_path}/{w}/periodic_{p}" for w in config.get("train_window_sizes") for p in config.get("periods")]
+
+    train_window_sizes = config.get("train_window_sizes")
+    if isinstance(train_window_sizes, list):
+        paths = [f"{schedule_data_path}/{w}/periodic_{p}" for w in config.get("train_window_sizes") for p in config.get("periods")]
+    elif isinstance(train_window_sizes, int):
+        paths = [f"{schedule_data_path}/periodic_{p}" for p in config.get("periods")]
+    else:
+        paths =[]
+        
     print(paths)
     config_metrics = get_config_metrics(paths)
     
