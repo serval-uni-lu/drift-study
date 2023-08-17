@@ -34,5 +34,6 @@ evaluation:
 performance:
   n_jobs:
     detector_optimization: 32
+    detector: 32
 trial_params:
   model_type: random_forest
