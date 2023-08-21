@@ -10,10 +10,12 @@ model:
   params:
     objective: classification
     batch_size: 64
-    epochs: 5
-    early_stopping_rounds: 0
+    epochs: 100
+    early_stopping_rounds: 5
     num_classes: 2
     class_weight: balanced
+    hidden_dim: 10
+    n_layers: 10
 first_train_window_size: -1
 train_window_size: 4440
 train_window_sizes: [4440, 8880, 17760, 35520, -1]
