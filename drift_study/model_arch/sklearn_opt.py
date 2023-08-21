@@ -88,6 +88,11 @@ class TimeOptimizer(Model):
     ) -> float:
         model_params = self.model.define_trial_parameters(trial, trial_params)
         tscv = TimeSeriesSplit(n_splits=self.n_splits)
+        if hasattr(self.model, "get_non_tunable_params"):
+            model_params = {
+                **self.model.get_non_tunable_params(),
+                **model_params,
+            }
         metrics = [
             self._objective_one(
                 self.model.__class__(
@@ -134,8 +139,14 @@ class TimeOptimizer(Model):
             n_trials=self.n_trials,
         )
 
+        model_params = study.best_trial.params
+        if hasattr(self.model, "get_non_tunable_params"):
+            model_params = {
+                **self.model.get_non_tunable_params(),
+                **model_params,
+            }
         self.model = self.model.__class__(
-            **study.best_trial.params,
+            **model_params,
             x_metadata=self.x_metadata,
             random_state=42,
             # n_jobs=self.n_jobs,

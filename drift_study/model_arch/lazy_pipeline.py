@@ -117,3 +117,4 @@ class LazyPipeline:
 
     def fit(self, x, y, x_val=None, y_val=None):
         self.pipeline.fit(x, y, x_val, y_val)
+        self.loaded = True

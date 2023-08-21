@@ -3,16 +3,15 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 import numpy as np
 import optuna
 import pandas as pd
-from sklearn.model_selection import train_test_split
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from pandas import DataFrame
-
 from mlc.models.model import Model
 from mlc.models.torch_models import BaseModelTorch
 from mlc.transformers.tab_scaler import TabScaler
 from mlc.typing import NDFloat, NDNumber
+from pandas import DataFrame
+from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 
 """
@@ -46,7 +45,7 @@ class TORCHRLN(BaseModelTorch):
         self.hidden_dim = hidden_dim
         self.norm = norm
         self.theta = theta
-        
+
         # Super call
 
         # Generate super call
@@ -74,7 +73,17 @@ class TORCHRLN(BaseModelTorch):
         self.scaler = scaler
 
         self.create_model()
-        
+
+    def get_non_tunable_params(self) -> Dict[str, Any]:
+        return {
+            "objective": self.objective,
+            "batch_size": self.batch_size,
+            "epochs": self.epochs,
+            "early_stopping_rounds": self.early_stopping_rounds,
+            "num_classes": self.num_classes,
+            "class_weight": self.class_weight,
+        }
+
     def create_model(self):
         self.num_features = (
             self.x_metadata.shape[0]
@@ -133,7 +142,7 @@ class TORCHRLN(BaseModelTorch):
             self.scaler = TabScaler()
             self.scaler.fit(x, x_type=self.x_metadata["type"])
             self.create_model()
-        
+
         if self.scaler is not None:
             previous_model = self.model
             self.model = self.model[1]
@@ -323,14 +332,14 @@ class RLNCallback(object):
 
     def _update_values(self) -> None:
         self._weights = DataFrame(torch.t(self._layer.weight.cpu().detach()))
-        
-    def save(self, path: str) -> None:
-        self.scaler.save(f"{path}.scaler")
-        return super().save(path)
 
-    def load(self, path: str) -> None:
-        self.scaler.load(f"{path}.scaler")
-        return super().load(path)
+    # def save(self, path: str) -> None:
+    #     self.scaler.save(f"{path}.scaler")
+    #     return super().save(path)
+
+    # def load(self, path: str) -> None:
+    #     self.scaler.load(f"{path}.scaler")
+    #     return super().load(path)
 
 
 models: List[Tuple[str, Type[Model]]] = [("torchrln", TORCHRLN)]

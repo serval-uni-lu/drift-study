@@ -39,13 +39,13 @@ def run(auto_config: Dict[str, Any]) -> None:
     if auto_config.get("use_auto_model_tuning"):
         config_to_run = add_best_params_to_model(config_to_run)
 
-    config_opt = deepcopy(config_to_run)
-    config_opt["model"]["optimize"] = True
-    config_opt["schedule_data_path"] = (
-        config_opt["schedule_data_path"].rstrip("/") + "_opt/"
-    )
-    # simulator_run(config_to_run)
-    simulator_run(config_opt)
+    # config_opt = deepcopy(config_to_run)
+    # config_opt["model"]["optimize"] = True
+    # config_opt["schedule_data_path"] = (
+    #     config_opt["schedule_data_path"].rstrip("/") + "_opt/"
+    # )
+    simulator_run(config_to_run)
+    # simulator_run(config_opt)
 
 
 if __name__ == "__main__":

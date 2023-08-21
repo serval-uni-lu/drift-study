@@ -216,8 +216,9 @@ class TimeOptimizer:
         save_json(
             study.best_trial.params, f"{self.output_path}/best_params.json"
         )
+        model_params = {**self.model_params, **study.best_trial.params}
         metric_out = self._train_test_model(
-            model_params=study.best_trial.params,
+            model_params=model_params,
             x_train=x_train,
             x_test=x_test,
             y_train=y_train,
