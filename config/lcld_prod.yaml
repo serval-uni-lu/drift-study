@@ -7,6 +7,31 @@ train_cache:
   params:
     path: ./data/drift_prod/train_cache.parquet
 
+hotstart_dataset:
+  name: lcld_201317_ds_time
+  data:
+    source:
+      sql:
+        connection_string: postgresql://postgres:example@localhost/lcld
+        query: |
+          SELECT
+            *
+          FROM
+            x_data
+        preprocess_module: drift_study.prod.preprocess_hotstart
+  metadata:
+    source:
+      file:
+        path: ./data/mlc/lcld_201317_ds/lcld_201317_ds_metadata.csv
+  tasks:
+    - name: unavailable
+      task_type: classification
+      evaluation_metric: mcc
+  sorter: 
+    date: date
+hoststart_freq: 1day
+testing_window: 13W
+date_round: D
 test_dataset:
   name: lcld_201317_ds_time
   data:
@@ -27,12 +52,13 @@ test_dataset:
     - name: unavailable
       task_type: classification
       evaluation_metric: mcc
-  sorter: {}
+  sorter: 
+    date: date
 loggers:
   - type: postgres
     params:
       db_url: postgresql://postgres:example@localhost/lcld
-      db_table: drift_metrics
+      db_table: drift_second
   - type: csv
     params:
       path: ./data/logs/lcld_metrics.csv

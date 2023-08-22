@@ -11,7 +11,7 @@ class ParquetDriftCache(DriftCache):
     def __init__(self, path: str, compression="gzip") -> None:
         self.path = path
         self.compression = compression
-        self.cache_data
+        self.cache_data = None
         super().__init__()
 
     def save(self, caches: Dict[str, pd.DataFrame]) -> None:

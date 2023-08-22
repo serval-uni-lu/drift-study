@@ -28,34 +28,6 @@ def get_logger(
     return logger
 
 
-def get_test(dataset: Dataset) -> pd.DataFrame:
-    N_TRAIN = 400000
-    N_TEST = 300000
-    x, _ = dataset.get_x_y()
-    x_test = x.iloc[N_TRAIN : N_TRAIN + N_TEST]
-    return x_test
-
-
-def get_db_test(current_time, time_window) -> pd.DataFrame:
-    USERNAME = "postgres"
-    PASSWORD = "example"
-    DATABASE = "lcld"
-    SERVER = "localhost"
-
-    engine = create_engine(
-        f"postgresql://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}"
-    )
-
-    query = (
-        f"SELECT * FROM x_data "
-        f"WHERE date <= to_timestamp({current_time}) "
-        f"AND date >= to_timestamp({current_time - time_window}) "
-        f"ORDER BY date"
-    )
-
-    return pd.read_sql_query(query, engine).drop(columns=["date", "index"])
-
-
 def get_drift_detector(
     dataset: Dataset, cache: DriftCache, logger: DriftLogger
 ) -> DriftDetector:
