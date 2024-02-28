@@ -2,6 +2,7 @@ import os
 
 from mlc.load_do_save import load_hdf5, save_hdf5
 from mlc.models.pipeline import Pipeline
+from mlc.models.torch_models import BaseModelTorch
 
 
 class LazyPipeline:
@@ -19,7 +20,16 @@ class LazyPipeline:
         if self.path is None:
             raise ValueError("Path is not set")
         if not self.loaded:
-            self.pipeline.load(self.path)
+            print("Loading pipeline: ", self.path)
+            if isinstance(self.pipeline, BaseModelTorch):
+                print("Scaler", self.pipeline.scaler)
+                self.pipeline = self.pipeline.__class__.load_class(
+                    self.path,
+                    x_metadata=self.pipeline.x_metadata,
+                    scaler=self.pipeline.scaler,
+                )
+            else:
+                self.pipeline.load(self.path)
             self.loaded = True
 
     def _pred_load(self):
