@@ -1,12 +1,11 @@
 import time
 from typing import Any, Dict, List
 
+import joblib
 import numpy as np
-import pandas as pd
 from configutils import get_config
 from mlc.datasets.dataset import Dataset
 from mlc.datasets.dataset_factory import get_dataset_from_config
-from sqlalchemy import create_engine
 
 from drift_study.drift_cache.drift_cache import DriftCache
 from drift_study.drift_cache.factory import create_drift_cache
@@ -14,6 +13,9 @@ from drift_study.drift_detectors.data_based.divergence_drift import (
     DivergenceDrift,
 )
 from drift_study.drift_detectors.drift_detector import DriftDetector
+from drift_study.drift_detectors.predictive.rf_bayesian_uncertainty.rf_uncertainty_drift_prod import (
+    RfUncertaintyDrift,
+)
 from drift_study.drift_logger.drift_logger import DriftLogger
 from drift_study.drift_logger.factory import create_drift_logger
 from drift_study.drift_logger.multi_logger import MultiDriftLogger
@@ -46,29 +48,57 @@ def get_drift_detector(
     return detector
 
 
-def run(
-    drift_cache: DriftCache, dataset: Dataset, logger: DriftLogger
-) -> None:
+def get_drift_detectors(
+    dataset: Dataset,
+    config: Dict[str, Any],
+    logger: DriftLogger,
+    model_path: str,
+) -> List[DriftDetector]:
+
+    divergence_detector = get_drift_detector(
+        dataset,
+        create_drift_cache(config["train_cache"]["divergence"]),
+        logger,
+    )
+
+    detector = RfUncertaintyDrift(
+        None,
+        dataset.get_metadata(only_x=True),
+        "total",
+        fit_cache=create_drift_cache(config["train_cache"]["uncertainty"]),
+        rf=joblib.load(model_path),
+        drift_logger=logger,
+    )
+
+    return [divergence_detector, detector]
+
+
+def run(config: Dict[str, Any], dataset: Dataset, logger: DriftLogger) -> None:
     print("Compute_drift.py")
 
-    detector = get_drift_detector(dataset, drift_cache, logger)
-    detector.fit_from_cache()
+    # detector = get_drift_detector(dataset, drift_cache, logger)
+    # detector.fit_from_cache()
 
     x, _ = dataset.get_x_y()
+    print(x.columns)
     place_holder = np.zeros(len(x))
-    detector.evaluate(
-        x=x,
-        t=place_holder,
-        y=place_holder,
-        y_scores=place_holder,
-    )
+    for detector in get_drift_detectors(
+        dataset, config, logger, config["model_path"]
+    ):
+        detector.fit_from_cache()
+        detector.evaluate(
+            x=x,
+            t=place_holder,
+            y=place_holder,
+            y_scores=place_holder,
+        )
 
 
 def run_config(config: Dict[str, Any], current_time) -> None:
     dataset = get_dataset_from_config(config["test_dataset"])
-    drift_cache = create_drift_cache(config["train_cache"])
+    # drift_cache = create_drift_cache(config["train_cache"])
     logger = get_logger(config["loggers"], current_time)
-    run(drift_cache, dataset, logger)
+    run(config, dataset, logger)
 
 
 if __name__ == "__main__":
