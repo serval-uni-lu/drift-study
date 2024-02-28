@@ -3,10 +3,15 @@ train_dataset:
   name: lcld_201317_ds_time
 n_train: 400000
 train_cache:
-  type: parquet
-  params:
-    path: ./data/drift_prod/train_cache.parquet
-
+  divergence:
+    type: parquet
+    params:
+      path: ./data/drift_prod/divergence_cache.parquet
+  uncertainty:
+    type: parquet
+    params:
+      path: ./data/drift_prod/uncertainty_cache.parquet
+model_path: ./data/drift_prod/models/lcld_test_rf.joblib
 hotstart_dataset:
   name: lcld_201317_ds_time
   data:
