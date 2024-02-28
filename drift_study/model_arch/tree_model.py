@@ -210,7 +210,11 @@ class RfScaled(Rf):
         self.scaler.load(f"{path}.scaler")
         return super().load(path)
 
-
+class RfScaledNt(RfScaled):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name="rf_scaled_nt"
+        
 models = [
     ("rf_regression", RandomForestRegressorModel),
     ("rf_lcld", RfLcld),
@@ -218,6 +222,7 @@ models = [
     ("rf_lcld_400", RfLcld400),
     ("rf_classifier", Rf),
     ("rf_scaled", RfScaled),
+    ("rf_scaled_nt", RfScaledNt),
     (
         "opt_rf_classifier",
         lambda **kwargs: TimeOptimizer(
