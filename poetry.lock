@@ -190,6 +190,18 @@ files = [
 python-dateutil = ">=2.7.0"
 
 [[package]]
+name = "astor"
+version = "0.8.1"
+description = "Read/rewrite/write Python ASTs"
+category = "main"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
+files = [
+    {file = "astor-0.8.1-py2.py3-none-any.whl", hash = "sha256:070a54e890cefb5b3739d19f30f5a5ec840ffc9c50ffa7d23cc9fc1a38ebbfc5"},
+    {file = "astor-0.8.1.tar.gz", hash = "sha256:6a6effda93f4e1ce9f618779b2dd1d9d84f1e32812c23a29b3fff6fd7f63fa5e"},
+]
+
+[[package]]
 name = "astroid"
 version = "2.14.2"
 description = "An abstract syntax tree for Python with inference support."
@@ -269,6 +281,21 @@ files = [
 [package.dependencies]
 future = ">=0.15.2"
 numpy = ">=1.12"
+
+[[package]]
+name = "autograd-gamma"
+version = "0.5.0"
+description = "Autograd compatible approximations to the gamma family of functions"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "autograd-gamma-0.5.0.tar.gz", hash = "sha256:f27abb7b8bb9cffc8badcbf59f3fe44a9db39e124ecacf1992b6d952934ac9c4"},
+]
+
+[package.dependencies]
+autograd = ">=1.2.0"
+scipy = ">=1.2.0"
 
 [[package]]
 name = "backcall"
@@ -1283,6 +1310,18 @@ files = [
 ]
 
 [[package]]
+name = "et-xmlfile"
+version = "1.1.0"
+description = "An implementation of lxml.xmlfile for the standard library"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "et_xmlfile-1.1.0-py3-none-any.whl", hash = "sha256:a2ba85d1d6a74ef63837eed693bcb89c3f752169b0e3e7ae5b16ca5e1b3deada"},
+    {file = "et_xmlfile-1.1.0.tar.gz", hash = "sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c"},
+]
+
+[[package]]
 name = "everett"
 version = "3.1.0"
 description = "Configuration library for Python applications"
@@ -1432,6 +1471,32 @@ unicode = ["unicodedata2 (>=14.0.0)"]
 woff = ["brotli (>=1.0.1)", "brotlicffi (>=0.8.0)", "zopfli (>=0.1.4)"]
 
 [[package]]
+name = "formulaic"
+version = "0.6.6"
+description = "An implementation of Wilkinson formulas."
+category = "main"
+optional = false
+python-versions = ">=3.7.2"
+files = [
+    {file = "formulaic-0.6.6-py3-none-any.whl", hash = "sha256:0f34f1f8011871bb697e3ad3fefe87d331d73532c2c118f9521ff25f66544a34"},
+    {file = "formulaic-0.6.6.tar.gz", hash = "sha256:455c0b8391e56da01a064183ebeddb434f5556ff69fd34022b9a86707b73318b"},
+]
+
+[package.dependencies]
+astor = ">=0.8"
+graphlib-backport = {version = ">=1.0.0", markers = "python_version < \"3.9\""}
+interface-meta = ">=1.2.0"
+numpy = ">=1.16.5"
+pandas = ">=1.0"
+scipy = ">=1.6"
+typing-extensions = ">=4.2.0"
+wrapt = ">=1.0"
+
+[package.extras]
+arrow = ["pyarrow (>=1)"]
+calculus = ["sympy (>=1.3,!=1.10)"]
+
+[[package]]
 name = "fqdn"
 version = "1.5.1"
 description = "Validates fully-qualified domain names against RFC 1123, so that they are acceptable to modern bowsers"
@@ -1519,6 +1584,18 @@ files = [
 
 [package.dependencies]
 gitdb = ">=4.0.1,<5"
+
+[[package]]
+name = "graphlib-backport"
+version = "1.0.3"
+description = "Backport of the Python 3.9 graphlib module for Python 3.6+"
+category = "main"
+optional = false
+python-versions = ">=3.6,<4.0"
+files = [
+    {file = "graphlib_backport-1.0.3-py3-none-any.whl", hash = "sha256:24246967b9e7e6a91550bc770e6169585d35aa32790258579a8a3899a8c18fde"},
+    {file = "graphlib_backport-1.0.3.tar.gz", hash = "sha256:7bb8fc7757b8ae4e6d8000a26cd49e9232aaa9a3aa57edb478474b8424bfaae2"},
+]
 
 [[package]]
 name = "graphviz"
@@ -1744,6 +1821,18 @@ zipp = {version = ">=3.1.0", markers = "python_version < \"3.10\""}
 [package.extras]
 docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
 testing = ["flake8 (<5)", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)"]
+
+[[package]]
+name = "interface-meta"
+version = "1.3.0"
+description = "`interface_meta` provides a convenient way to expose an extensible API with enforced method signatures and consistent documentation."
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "interface_meta-1.3.0-py3-none-any.whl", hash = "sha256:de35dc5241431886e709e20a14d6597ed07c9f1e8b4bfcffde2190ca5b700ee8"},
+    {file = "interface_meta-1.3.0.tar.gz", hash = "sha256:8a4493f8bdb73fb9655dcd5115bc897e207319e36c8835f39c516a2d7e9d79a1"},
+]
 
 [[package]]
 name = "ipykernel"
@@ -2241,6 +2330,27 @@ numpy = ">=1.17,<2"
 pynvml = ">=8.0,<9"
 torch = ">=1.6,<2"
 tqdm = ">=4.0,<5"
+
+[[package]]
+name = "lifelines"
+version = "0.27.8"
+description = "Survival analysis in Python, including Kaplan Meier, Nelson Aalen and regression"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "lifelines-0.27.8-py3-none-any.whl", hash = "sha256:77851d860eec0bb168bf29bd1ff235de13fdccfdc0f07ddbd3c007ce42af40d3"},
+    {file = "lifelines-0.27.8.tar.gz", hash = "sha256:125548ab4c30842531737e5c6392efb2876d3f229e220447c878df400e7b6e26"},
+]
+
+[package.dependencies]
+autograd = ">=1.5"
+autograd-gamma = ">=0.3"
+formulaic = ">=0.2.2"
+matplotlib = ">=3.0"
+numpy = ">=1.14.0,<2.0"
+pandas = ">=1.0.0"
+scipy = ">=1.2.0"
 
 [[package]]
 name = "llvmlite"
@@ -2999,6 +3109,21 @@ numpy = [
     {version = ">=1.19.3", markers = "python_version >= \"3.6\" and platform_system == \"Linux\" and platform_machine == \"aarch64\""},
     {version = ">=1.21.0", markers = "python_version <= \"3.9\" and platform_system == \"Darwin\" and platform_machine == \"arm64\""},
 ]
+
+[[package]]
+name = "openpyxl"
+version = "3.1.2"
+description = "A Python library to read/write Excel 2010 xlsx/xlsm files"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "openpyxl-3.1.2-py2.py3-none-any.whl", hash = "sha256:f91456ead12ab3c6c2e9491cf33ba6d08357d802192379bb482f1033ade496f5"},
+    {file = "openpyxl-3.1.2.tar.gz", hash = "sha256:a6f5977418eff3b2d5500d54d9db50c8277a368436f4e4f8ddb1be3422870184"},
+]
+
+[package.dependencies]
+et-xmlfile = "*"
 
 [[package]]
 name = "optuna"
@@ -3894,6 +4019,25 @@ files = [
 ]
 
 [[package]]
+name = "pytorch-tabnet"
+version = "4.1.0"
+description = "PyTorch implementation of TabNet"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pytorch_tabnet-4.1.0-py3-none-any.whl", hash = "sha256:70e8c9803f68f7cb26930d4cdb88857d1d98c745e0daf99d0f870fc70698515f"},
+    {file = "pytorch_tabnet-4.1.0.tar.gz", hash = "sha256:18887b993a8bf86ec05a576b5cf93f09e08b778cd9f418c5b254b6566df673a5"},
+]
+
+[package.dependencies]
+numpy = ">=1.17"
+scikit_learn = ">0.21"
+scipy = ">1.4"
+torch = ">=1.3"
+tqdm = ">=4.36"
+
+[[package]]
 name = "pytz"
 version = "2022.7"
 description = "World timezone definitions, modern and historical"
@@ -4784,7 +4928,7 @@ PyYAML = ">=5.1,<7.0"
 
 [[package]]
 name = "serval-ml-commons"
-version = "0.1.4"
+version = "0.1.5"
 description = "SerVal Machine learning commons is a tools box that ease the development of ML experiments at SerVal."
 category = "main"
 optional = false
@@ -4800,10 +4944,12 @@ h5py = ">=2.0.0"
 icecream = "2.1.3"
 imbalanced-learn = "0.10.1"
 libzero = "0.0.4"
+lifelines = "^0.27.8"
 numba = "^0.50.0"
 numpy = ">=1.21.0"
 optuna = {version = "^3.1.1", optional = true}
 pandas = ">=1.1.5"
+pytorch-tabnet = "^4.1.0"
 requests = ">=2.25"
 rtdl = "0.0.13"
 scikit-learn = ">=0.24.0"
@@ -5970,4 +6116,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.8.10"
-content-hash = "15ac61fe9cb8202c2936c3d5337a24a950fc6ef5e3f2556ea9e75bb8d334db9b"
+content-hash = "6111b601942987ea73d3d1f25b578b09e8203f9811b8d6a0975208e656532ac7"
