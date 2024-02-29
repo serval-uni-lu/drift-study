@@ -45,3 +45,5 @@ performance:
     detector: 32
 trial_params:
   model_type: random_forest
+logger_config_path: ./config/default_logger_config.yaml
+models_dir: ./data/drift_202402/models
