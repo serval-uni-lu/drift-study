@@ -5,6 +5,10 @@ import configutils
 from configutils.utils import ConfigFileParser, merge_parameters
 
 from drift_study.run_simulator import run as simulator_run
+import logging
+from mlc.logging.setup import setup_logging
+
+logger = logging.getLogger(__name__)
 
 
 def add_best_params_to_model(config: Dict[str, Any]) -> Dict[str, Any]:
@@ -29,7 +33,6 @@ def run(auto_config: Dict[str, Any]) -> None:
         config_to_run, ConfigFileParser().do("./config/auto/delays_none.yaml")
     )
     detect_idxs = [e - 1 for e in config_to_run["manual_retrain"]]
-    print(detect_idxs)
     config_to_run["schedule"]["detectors"][0]["params"] = {
         "detect_idxs": detect_idxs
     }
@@ -50,4 +53,5 @@ def run(auto_config: Dict[str, Any]) -> None:
 
 if __name__ == "__main__":
     auto_config = configutils.get_config()
+    setup_logging(auto_config.get("logger_config_path"))
     run(auto_config)
