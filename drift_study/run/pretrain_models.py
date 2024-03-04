@@ -16,7 +16,10 @@ from drift_study.run_simulator import get_start_end_idx
 from drift_study.utils.helpers import get_f_new_model
 from drift_study.utils.io_utils import load_do_save_model
 from drift_study.utils.logging import configure_logger
+import logging
+from mlc.logging.setup import setup_logging, delayed_with_logging
 
+logger = logging.getLogger(__name__)
 
 def train_model(
     f_new_model,
@@ -107,7 +110,7 @@ def get_pretrains(
                     local_last_idx,
                 )
             )
-            print(train_idxs)
+            logger.debug(train_idxs)
 
     return list(set(train_idxs))
 
@@ -115,8 +118,7 @@ def get_pretrains(
 def run(config: Dict[str, Any]) -> None:
     if config.get("use_auto_model_tuning"):
         config = add_best_params_to_model(config)
-    print(config["model"]["params"])
-    logger = logging.getLogger(__name__)
+    logger.debug(f"Model parameters {config['model']['params']}")
     dataset = get_dataset(config.get("dataset"))
     x, y, t = dataset.get_x_y_t()
     metadata = dataset.get_metadata(only_x=True)
@@ -144,7 +146,7 @@ def run(config: Dict[str, Any]) -> None:
             end_idx,
         ) -> None:
             logger.info(
-                f"Training model {i}/ {len(idx_to_train)} "
+                f"Training model {i+1}/ {len(idx_to_train)} "
                 f"from {start_idx} to {end_idx}"
             )
             model_path = model_path = (
@@ -164,7 +166,7 @@ def run(config: Dict[str, Any]) -> None:
             n_jobs = joblib.cpu_count() // 4
             # Parrallel training with joblib
             joblib.Parallel(n_jobs=n_jobs)(
-                joblib.delayed(train_model_wrapper)(
+                delayed_with_logging(train_model_wrapper)(
                     i,
                     f_new_model,
                     x,
@@ -188,5 +190,5 @@ def run(config: Dict[str, Any]) -> None:
 
 if __name__ == "__main__":
     config = configutils.get_config()
-    configure_logger(config)
+    setup_logging(config.get("logger_config_path"))
     run(config)
