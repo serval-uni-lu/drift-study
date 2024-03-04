@@ -17,6 +17,7 @@ model:
     hidden_dim: 10
     n_layers: 10
 first_train_window_size: -1
+train_window_size: 17760
 train_window_sizes: [4440, 8880, 17760, 35520, -1]
 periods: [480, 960, 1920, 3840, 7680, 15360, 30720]
 test_start_idx: 17760
@@ -40,7 +41,7 @@ evaluation:
 performance:
   n_jobs:
     detector_optimization: 32
-    detector: 32
+    detector: 2
 trial_params:
   model_type: random_forest
 logger_config_path: ./config/default_logger_config.yaml
