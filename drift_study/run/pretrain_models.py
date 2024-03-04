@@ -76,6 +76,16 @@ def get_pretrains(
     if config.get("pretrain_periodic"):
         train_idxs.extend(
             get_idx_window_size_period(
+                config.get("train_window_size"),
+                config.get("periods"),
+                test_start_idx,
+                last_idx,
+            )
+        )
+        
+    if config.get("pretrain_window_size"):
+        train_idxs.extend(
+            get_idx_window_size_period(
                 config.get("train_window_sizes"),
                 config.get("periods"),
                 test_start_idx,
