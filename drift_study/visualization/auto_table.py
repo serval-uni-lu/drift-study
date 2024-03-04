@@ -28,6 +28,8 @@ def run(config: Dict[str, Any]):
     schedule_data_path = config["schedule_data_path"]
 
     train_window_sizes = config.get("train_window_sizes")
+    if config.get("single_window_size"):
+        train_window_sizes = config.get("train_window_size")
     if isinstance(train_window_sizes, list):
         paths = [f"{schedule_data_path}/{w}/periodic_{p}" for w in config.get("train_window_sizes") for p in config.get("periods")]
     elif isinstance(train_window_sizes, int):
