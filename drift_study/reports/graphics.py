@@ -271,6 +271,7 @@ def scatterplot(
     markers=None,
     xlim=None,
     ylim=None,
+    path=None,
     **kwargs,
 ):
     # - fig = plt.figure(figsize=fig_size)
@@ -306,8 +307,10 @@ def scatterplot(
         plt.ylim(ylim)
 
     plt.tight_layout()
-
-    plt.savefig(_get_filename(name), dpi=DPI)
+    if path is not None:
+        plt.savefig(path, dpi=DPI, bbox_inches="tight")
+    else:
+        plt.savefig(_get_filename(name), dpi=DPI)
     plt.close("all")
 
 

@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 from mlc.load_do_save import load_json
-
+from drift_study.reports.graphics import scatterplot
 from drift_study.reports.naming import name_to_type, name_to_name
 from drift_study.utils.logging import configure_logger
 from drift_study.utils.pareto import calc_pareto_rank
@@ -86,6 +86,35 @@ def add_rank_to_metrics(
         e[1]["pareto_rank"] = pareto_rank[i]
 
 
+def prepare_pdf_df(df: pd.DataFrame) -> pd.DataFrame:
+    pdf_df = df[df["display_rank"] == 1]
+    pdf_df["Type"] = pdf_df["schedule_type"]
+
+    pdf_df_sort = {
+        "Baseline": 0,
+        "Data": 1,
+        "Error": 2,
+        "Predictive": 3,
+    }
+    pdf_df["sort_type"] = pdf_df["Type"].map(pdf_df_sort)
+    pdf_df = pdf_df.sort_values("sort_type")
+    return pdf_df
+
+
+def get_markers(pdf_df: pd.DataFrame) -> List[str]:
+
+    pdf_df_sort = {
+        "Baseline": "x",
+        "Data": "s",
+        "Error": "^",
+        "Predictive": "o",
+    }
+    # print(pdf_df["Type"].unique().tolist())
+    # print(pdf_df["Type"].map(pdf_df_sort).unique().tolist())
+    # exit(0)
+    return pdf_df["Type"].map(pdf_df_sort).unique().tolist()
+
+
 def filter_max_pareto_rank(
     df: pd.DataFrame,
     max_pareto_rank: int = 1,
@@ -123,6 +152,22 @@ def plot_ml_n_train(df: pd.DataFrame, out_path: Optional[str] = None) -> None:
     else:
         fig.write_html(out_path)
 
+    # PDF
+    pdf_df = prepare_pdf_df(new_df)
+    scatterplot(
+        pdf_df,
+        "Placeholder",
+        x="n_train",
+        y="ml_metric",
+        y_label="MCC",
+        hue="Type",
+        x_label="\\# Train",
+        fig_size=(6, 4),
+        legend_pos="best",
+        markers=get_markers(pdf_df),
+        path=f"{out_path}.pdf",
+    )
+
 
 def to_dataframe(
     config_metrics: List[Tuple[Dict[str, Any], Dict[str, Any]]]
@@ -137,7 +182,9 @@ def to_dataframe(
     prepare["schedule_type"] = [
         name_to_type(e[0]["schedule"]["name"]) for e in config_metrics
     ]
-    prepare["shedule_nice_name"] = [name_to_name(e[0]["schedule"]["name"]) for e in config_metrics]
+    prepare["shedule_nice_name"] = [
+        name_to_name(e[0]["schedule"]["name"]) for e in config_metrics
+    ]
     return pd.DataFrame(prepare)
 
 
@@ -147,12 +194,17 @@ def run(config: Dict[str, Any]) -> None:
     config_metrics = get_config_metrics(get_paths(config))
     add_rank_to_metrics(config_metrics)
     df = to_dataframe(config_metrics)
-    df.to_csv(config.get("plot_path")+".csv")
-    
-    aggregated_df = df.groupby('shedule_nice_name').agg(
-        total_count=('shedule_nice_name', 'count'),
-        sum_display_rank_1=('pareto_rank', lambda x: (x == 1).sum())
-    ).reset_index().to_csv(config.get("plot_path")+".agg.csv")
+    df.to_csv(config.get("plot_path") + ".csv")
+
+    aggregated_df = (
+        df.groupby("shedule_nice_name")
+        .agg(
+            total_count=("shedule_nice_name", "count"),
+            sum_display_rank_1=("pareto_rank", lambda x: (x == 1).sum()),
+        )
+        .reset_index()
+        .to_csv(config.get("plot_path") + ".agg.csv")
+    )
     plot_ml_n_train(df, out_path=config.get("plot_path"))
 
 
