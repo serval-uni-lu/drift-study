@@ -247,8 +247,9 @@ def run(config: Dict[str, Any]):
         x.iloc[test_start_idx:],
         y[test_start_idx:],
     )
+    root_path = config["data_root"]
     output_path = (
-        f"data/drift/{dataset.name}/{model_class.get_name()}/model_opt"
+        f"{root_path}/{dataset.name}/{model_class.get_name()}/model_opt"
     )
     optimizer = TimeOptimizer(
         output_path=output_path,
