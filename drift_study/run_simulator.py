@@ -20,7 +20,6 @@ from drift_study.utils.drift_model import (
 )
 from drift_study.utils.helpers import add_model, compute_y_scores, initialize
 from drift_study.utils.io_utils import save_drift_run
-from drift_study.utils.logging import configure_logger
 from drift_study.utils.run_results import RunResult
 
 
@@ -41,11 +40,14 @@ def run(
     lock_model_writing: Optional[Lock] = None,
     list_model_writing: Optional[Dict[str, Any]] = None,
     verbose=1,
+    n=None, 
+    n_max=None,
 ) -> RunResult:
     # CONFIG
-    configure_logger(config)
+    # configure_logger(config)
     logger = logging.getLogger(__name__)
-    logger.info(f"Running config {config.get('schedule_name')}")
+    count_str = f"{n+1}/{n_max}" if ((n is not None) and (n_max is not None)) else ""
+    logger.info(f"Running config {count_str} {config.get('schedule', {}).get('name')}")
     model_root_dir = config.get(
         "models_dir", os.environ.get("MODELS_DIR", "./models")
     )

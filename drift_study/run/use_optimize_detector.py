@@ -4,12 +4,13 @@ from multiprocessing import Manager
 from typing import Any, Dict, List
 
 import configutils
-from joblib import Parallel, delayed, parallel_backend
+from joblib import Parallel, parallel_backend
 from mlc.load_do_save import load_json
 
 from drift_study import run_simulator
 from drift_study.run.no_retrain_baseline import add_best_params_to_model
 from drift_study.utils.logging import configure_logger
+from mlc.logging.setup import setup_logging, delayed_with_logging
 
 
 def prep_conf_schedule(config: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -59,8 +60,6 @@ def prep_conf_list_schedule(config: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 def run(config: Dict[str, Any]) -> None:
-    configure_logger(config)
-
     confs = prep_conf_list_schedule(config)
 
     logger = logging.getLogger(__name__)
@@ -85,11 +84,11 @@ def run(config: Dict[str, Any]) -> None:
             dico: Dict[str, Any] = manager.dict()
             with parallel_backend("loky", n_jobs=n_jobs_optimiser):
                 Parallel()(
-                    delayed(run_simulator.run)(e, lock, dico) for e in confs
+                    delayed_with_logging(run_simulator.run)(e, lock, dico, 0, i, len(confs)) for i, e in enumerate(confs)
                 )
 
 
 if __name__ == "__main__":
     config = configutils.get_config()
-    configure_logger(config)
+    setup_logging(config.get("logger_config_path"))
     run(config=config)
