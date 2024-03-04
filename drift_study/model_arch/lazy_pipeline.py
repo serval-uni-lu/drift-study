@@ -55,11 +55,9 @@ class LazyPipeline:
 
     def save_pred(self, x) -> None:
         pred_path = f"{self.path}.pred.hdf5"
-        print(pred_path)
         if os.path.exists(pred_path):
             return None
 
-        print("Saving predictions")
         self._pipeline_load()
         if self.pipeline.objective in ["regression"]:
             y_pred = self.pipeline.predict(x)
