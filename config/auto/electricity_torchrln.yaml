@@ -17,10 +17,8 @@ model:
     hidden_dim: 10
     n_layers: 10
 first_train_window_size: -1
-train_window_size: 4440
 train_window_sizes: [4440, 8880, 17760, 35520, -1]
 periods: [480, 960, 1920, 3840, 7680, 15360, 30720]
-manual_retrain: [20160, 22560, 32160]
 test_start_idx: 17760
 training_step_size: 480
 common_detectors_params:
