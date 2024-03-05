@@ -12,6 +12,7 @@ import optuna
 import pandas as pd
 from mlc.datasets.dataset_factory import get_dataset
 from mlc.load_do_save import save_json
+from mlc.logging.setup import setup_logging
 from mlc.metrics.compute import compute_metric
 from mlc.metrics.metric import Metric
 from mlc.metrics.metric_factory import create_metric
@@ -24,7 +25,6 @@ from optuna.trial import TrialState
 from sklearn.model_selection import TimeSeriesSplit
 
 from drift_study.typing import NDFloat, NDNumber
-from drift_study.utils.logging import configure_logger
 
 
 class TimeOptimizer:
@@ -266,6 +266,7 @@ def run(config: Dict[str, Any]):
 
 if __name__ == "__main__":
     config = configutils.get_config()
-    configure_logger(config)
+    config_path = config.get("logger_config_path")
+    setup_logging(config_path)
 
     run(config=config)
