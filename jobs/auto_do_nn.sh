@@ -2,7 +2,7 @@
 
 # CONSTANT
 DATASET_NAME=electricity
-MODEL_NAME=torchrln
+MODEL_NAME=vime
 AUTO_CONFIG=./config/auto/${DATASET_NAME}_${MODEL_NAME}.yaml
 DATA_ROOT=./data/drift_202402
 MODELS_DIR=./data/drift_202402/models
@@ -44,12 +44,13 @@ echo "Running stage: $stage"
 if [ "$stage" = "all" ] || [ "$stage" = 1 ]; then
     # OPTIMIZE MODEL PARAMETERS. This is done only once.
     echo "Running optimize_model"
-    python -m drift_study.run.optimize_model -c config/logging.yaml -c ${AUTO_CONFIG} -p data_root=${DATA_ROOT} -p models_dir=${MODELS_DIR}
+    eval "python -m drift_study.run.optimize_model -c config/logging.yaml -c ${AUTO_CONFIG} -p data_root=${DATA_ROOT} -p models_dir=${MODELS_DIR}"
+    exit
     # BASELINE NO RETRAIN
     echo "Running no_retrain_baseline"
     python -m drift_study.run.no_retrain_baseline -c config/logging.yaml -c ${AUTO_CONFIG} -p use_auto_model_tuning=true -p schedule_data_path=${PATH_PREFIX}/no_retrain/
     python -m drift_study.visualization.line_graph_auto -c config/logging.yaml -c ${AUTO_CONFIG} -p schedule_data_path=${PATH_PREFIX}/ -p plot_path=${PATH_PREFIX}/baseline.html
-    
+
     echo "Read the file ${PATH_PREFIX}/baseline.html and check where the model is not performing well."
     echo "Add this in ${AUTO_CONFIG}, manual_retrain."
 fi
@@ -60,7 +61,7 @@ if [ "$stage" = "all" ] || [ "$stage" = 2 ]; then
     # BASELINE MANUAL RETRAIN
     echo "Running manual_baseline"
     python -m drift_study.run.manual_baseline -c config/logging.yaml -c ${AUTO_CONFIG} -p use_auto_model_tuning=true -p schedule_data_path=${PATH_PREFIX}/manual/ ${manual_params}
-    python -m drift_study.visualization.line_graph_auto -c config/logging.yaml -c ${AUTO_CONFIG} -p schedule_data_path=${PATH_PREFIX}/ -p plot_path=${PATH_PREFIX}/baseline_manual.html ${manual_params}  
+    python -m drift_study.visualization.line_graph_auto -c config/logging.yaml -c ${AUTO_CONFIG} -p schedule_data_path=${PATH_PREFIX}/ -p plot_path=${PATH_PREFIX}/baseline_manual.html ${manual_params}
 fi
 
 # --- STAGE 3 ---
@@ -93,38 +94,38 @@ fi
 # --- STAGE 5 ---
 if [ "$stage" = "all" ] || [ "$stage" = 5 ]; then
     echo "Detectors"
-    
+
     #    DETECTOR
 
     # Optimization
-    
+
     python -m drift_study.run.pretrain_models -c config/logging.yaml -c ${AUTO_CONFIG} -p pretrain_schedules_opt=true ${extra_params}
     python -m drift_study.run.optimize_detector -c config/logging.yaml -c ${AUTO_CONFIG} -c config/auto/schedules_${MODEL_TYPE}.yaml -p schedule_data_path=${PATH_PREFIX}/detector_opt/ ${extra_params}
     python -m drift_study.run.optimize_detector -c config/logging.yaml -c ${AUTO_CONFIG} -c config/auto/schedules_${MODEL_TYPE}.yaml -p schedule_data_path=${PATH_PREFIX}/detector_opt_no_delays/ ${extra_params} -c ./config/auto/delays_none.yaml
-    
+
     # Evaluation
     python -m drift_study.run.use_optimize_detector -c config/logging.yaml -c ${AUTO_CONFIG} -c config/auto/schedules_${MODEL_TYPE}.yaml -p schedule_data_path=${PATH_PREFIX}/detector/ -p detector_optimization_path=${PATH_PREFIX}/detector_opt/ ${extra_params}
     python -m drift_study.run.use_optimize_detector -c config/logging.yaml -c ${AUTO_CONFIG} -c config/auto/schedules_${MODEL_TYPE}.yaml -p schedule_data_path=${PATH_PREFIX}/detector_no_delays/ -p detector_optimization_path=${PATH_PREFIX}/detector_opt_no_delays/ ${extra_params} -c ./config/auto/delays_none.yaml
-    
+
     python -m drift_study.run.use_optimize_detector -c config/logging.yaml -c ${AUTO_CONFIG} -c config/auto/schedules_${MODEL_TYPE}.yaml -p schedule_data_path=${PATH_PREFIX}/detector_half_delays/ -p detector_optimization_path=${PATH_PREFIX}/detector_opt/ ${extra_params} -c ./config/auto/delays_half.yaml
     python -m drift_study.run.use_optimize_detector -c config/logging.yaml -c ${AUTO_CONFIG} -c config/auto/schedules_${MODEL_TYPE}.yaml -p schedule_data_path=${PATH_PREFIX}/detector_twice_delays/ -p detector_optimization_path=${PATH_PREFIX}/detector_opt/ ${extra_params} -c ./config/auto/delays_twice.yaml
-    
+
 
     # Copy of the baselines
     python -m drift_study.run.periodic_baseline -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector/
     python -m drift_study.run.periodic_baseline -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector_no_delays/ -c ./config/auto/delays_none.yaml
     python -m drift_study.run.periodic_baseline -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector_half_delays/ -c ./config/auto/delays_half.yaml
     python -m drift_study.run.periodic_baseline -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector_twice_delays/ -c ./config/auto/delays_twice.yaml
-    
+
     python -m drift_study.run.no_retrain_baseline -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector/no_retrain
     python -m drift_study.run.no_retrain_baseline -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector_no_delays/no_retrain
     python -m drift_study.run.no_retrain_baseline -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector_half_delays/no_retrain
     python -m drift_study.run.no_retrain_baseline -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector_twice_delays/no_retrain
 
-    # Visualization 
+    # Visualization
     python -m drift_study.visualization.plot_auto -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector/ -p plot_path=${PATH_PREFIX}/detector.html -c config/auto/schedules_${MODEL_TYPE}.yaml
     python -m drift_study.visualization.plot_auto -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector_no_delays/ -p plot_path=${PATH_PREFIX}/detector_no_delays.html -c config/auto/schedules_${MODEL_TYPE}.yaml
     python -m drift_study.visualization.plot_auto -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector_half_delays/ -p plot_path=${PATH_PREFIX}/detector_half_delays.html -c config/auto/schedules_${MODEL_TYPE}.yaml
     python -m drift_study.visualization.plot_auto -c config/logging.yaml -c ${AUTO_CONFIG} ${extra_params} -p schedule_data_path=${PATH_PREFIX}/detector_twice_delays/ -p plot_path=${PATH_PREFIX}/detector_twice_delays.html -c config/auto/schedules_${MODEL_TYPE}.yaml
-    
+
 fi
