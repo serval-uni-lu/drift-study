@@ -10,7 +10,7 @@ model:
   params:
     objective: classification
     batch_size: 64
-    epochs: 2
+    epochs: 100
     early_stopping_rounds: 5
     num_classes: 2
     class_weight: balanced

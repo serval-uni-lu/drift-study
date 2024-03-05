@@ -2,7 +2,7 @@
 
 # CONSTANT
 DATASET_NAME=electricity
-MODEL_NAME=vime
+MODEL_NAME=torchrln
 AUTO_CONFIG=./config/auto/${DATASET_NAME}_${MODEL_NAME}.yaml
 DATA_ROOT=./data/drift_202402
 MODELS_DIR=./data/drift_202402/models
