@@ -2,13 +2,17 @@
 
 # CONSTANT
 DATASET_NAME=electricity
-MODEL_NAME=torchrln
+# MODEL_NAME=torchrln
 AUTO_CONFIG=./config/auto/${DATASET_NAME}_${MODEL_NAME}.yaml
-DATA_ROOT=./data/drift_202402
-MODELS_DIR=./data/drift_202402/models
+DATA_ROOT=./data/drift_202402_1
+MODELS_DIR=./data/drift_202402_1/models
 DEFAULT_WINDOW_SIZE=17760
 MODEL_TYPE=nn
 PATH_PREFIX=${DATA_ROOT}/${DATASET_NAME}/${MODEL_NAME}
+
+
+export DATA_ROOT=${DATA_ROOT}
+export MODELS_DIR=${MODELS_DIR}
 
 RETRAIN_OPT_SEARCH=false
 
