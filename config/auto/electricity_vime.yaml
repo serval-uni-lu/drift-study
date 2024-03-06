@@ -10,14 +10,10 @@ model:
   params:
     objective: classification
     batch_size: 64
-    epochs: 1
+    epochs: 100
     early_stopping_rounds: 5
     num_classes: 2
     class_weight: balanced
-    # p_m: 0.3
-    # K: 3
-    # alpha: 2
-    # beta: 1
 first_train_window_size: -1
 train_window_size: 17760
 train_window_sizes: [4440, 8880, 17760, 35520, -1]
@@ -31,7 +27,7 @@ delays:
   label: 1days
   retraining: 9days
 optimization_iter:
-  model: 2
+  model: 25
   detector: 25
 optimization_splits:
   detector: 4
