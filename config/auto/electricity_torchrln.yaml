@@ -10,7 +10,7 @@ model:
   params:
     objective: classification
     batch_size: 64
-    epochs: 2
+    epochs: 100
     early_stopping_rounds: 5
     num_classes: 2
     class_weight: balanced
@@ -27,7 +27,7 @@ delays:
   label: 1days
   retraining: 9days
 optimization_iter:
-  model: 2
+  model: 25
   detector: 25
 optimization_splits:
   detector: 4
@@ -41,5 +41,5 @@ performance:
     detector_optimization: 32
     detector: 2
 trial_params:
-  model_type: random_forest
+  model_type: nn
 logger_config_path: ./config/default_logger_config.yaml
