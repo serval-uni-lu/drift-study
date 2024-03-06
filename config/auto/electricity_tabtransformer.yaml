@@ -3,21 +3,17 @@ name: electricity
 dataset:
   name: electricity
 model:
-  source: mlc.models.tabsurvey.vime
-  name: vime
+  source: mlc.models.tabsurvey.tabtransformer
+  name: tabtransformer
   metadata: true
   metric: mcc
   params:
     objective: classification
     batch_size: 64
-    epochs: 1
+    epochs: 2
     early_stopping_rounds: 5
     num_classes: 2
     class_weight: balanced
-    # p_m: 0.3
-    # K: 3
-    # alpha: 2
-    # beta: 1
 first_train_window_size: -1
 train_window_size: 17760
 train_window_sizes: [4440, 8880, 17760, 35520, -1]
@@ -43,7 +39,7 @@ evaluation:
 performance:
   n_jobs:
     detector_optimization: 32
-    detector: 1
+    detector: 2
 trial_params:
   model_type: random_forest
 logger_config_path: ./config/default_logger_config.yaml
