@@ -1,20 +1,22 @@
-from copy import deepcopy
+import logging
+import os
 from typing import Any, Dict
 
 import configutils
 from configutils.utils import ConfigFileParser, merge_parameters
+from mlc.logging.setup import setup_logging
 
 from drift_study.run_simulator import run as simulator_run
-import logging
-from mlc.logging.setup import setup_logging
 
 logger = logging.getLogger(__name__)
 
 
 def add_best_params_to_model(config: Dict[str, Any]) -> Dict[str, Any]:
     model = config["model"]
+
+    data_root = config.get("data_root", os.environ.get("DATA_ROOT", "./data"))
     path = (
-        f"./data/drift/{config.get('dataset', {}).get('name')}/"
+        f"{data_root}/{config.get('dataset', {}).get('name')}/"
         f"{model.get('name')}/model_opt/best_params.json"
     )
     model_params = ConfigFileParser().do(path)
