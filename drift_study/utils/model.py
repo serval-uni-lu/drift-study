@@ -24,9 +24,15 @@ def get_f_new_model(
     metadata_x: pd.DataFrame,
 ) -> Callable[[], Model]:
     def new_model() -> Model:
-        model = get_model_l(config, metadata_x)
         if config.get("optimize", False):
+            config["params"] = {
+                **config["params"],
+                **get_model(config).get_default_params(),
+            }
             model = TimeOptimizer(model, create_metric(config.get("metric")))
+        else:
+            model = get_model_l(config, metadata_x)
+
         model = LazyPipeline(model)
         return model
 
