@@ -9,8 +9,8 @@ from joblib import Parallel, delayed, parallel_backend
 
 from drift_study import run_simulator
 from drift_study.run.no_retrain_baseline import add_best_params_to_model
-from drift_study.utils.logging import configure_logger
 from mlc.logging.setup import delayed_with_logging
+from mlc.logging.setup import setup_logging
 
 
 def create_config_params(
@@ -18,15 +18,14 @@ def create_config_params(
 ) -> Dict[str, Any]:
     config["schedule"]["detectors"][0]["params"] = {"period": period}
     config["schedule"]["name"] = f"{config['schedule']['name']}_{period}"
-    config[
-        "schedule_data_path"
-    ] = f"{config['schedule_data_path']}/{config['schedule']['name']}"
+    config["schedule_data_path"] = (
+        f"{config['schedule_data_path']}/{config['schedule']['name']}"
+    )
     return config
 
 
 def run(config: Dict[str, Any]) -> None:
 
-    configure_logger(config)
     logger = logging.getLogger(__name__)
 
     # Merge the auto config
@@ -73,4 +72,5 @@ def run(config: Dict[str, Any]) -> None:
 
 if __name__ == "__main__":
     config = configutils.get_config()
+    setup_logging(config.get("logger_config_path"))
     run(config)
