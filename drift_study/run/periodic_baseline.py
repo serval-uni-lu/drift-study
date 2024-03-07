@@ -10,6 +10,7 @@ from joblib import Parallel, delayed, parallel_backend
 from drift_study import run_simulator
 from drift_study.run.no_retrain_baseline import add_best_params_to_model
 from drift_study.utils.logging import configure_logger
+from mlc.logging.setup import delayed_with_logging
 
 
 def create_config_params(
@@ -65,7 +66,7 @@ def run(config: Dict[str, Any]) -> None:
             dico: Dict[str, Any] = manager.dict()
             with parallel_backend("loky", n_jobs=n_jobs_optimiser):
                 Parallel()(
-                    delayed(run_simulator.run)(e, lock, dico)
+                    delayed_with_logging(run_simulator.run)(e, lock, dico)
                     for e in config_to_run
                 )
 
