@@ -22,7 +22,7 @@ class TimeOptimizer(Model):
         self,
         model: Model,
         metric: Metric,
-        n_trials: int = 1,
+        n_trials: int = 25,
         n_splits: int = 5,
         model_params: Optional[Dict[str, Any]] = None,
         **kwargs: Dict[str, Any],
