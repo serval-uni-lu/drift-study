@@ -12,6 +12,10 @@ from optuna import Trial
 from optuna.samplers import TPESampler
 from sklearn.model_selection import TimeSeriesSplit
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class TimeOptimizer(Model):
     def __init__(
@@ -20,6 +24,7 @@ class TimeOptimizer(Model):
         metric: Metric,
         n_trials: int = 25,
         n_splits: int = 5,
+        model_params: Optional[Dict[str, Any]] = None,
         **kwargs: Dict[str, Any],
     ):
         name = f"opt_{model.name}"
@@ -36,6 +41,9 @@ class TimeOptimizer(Model):
         self.x_metadata = (
             model.x_metadata if hasattr(model, "x_metadata") else None
         )
+        self.model_params = model_params
+        if self.model_params is None:
+            self.model_params = {}
 
     def load(self, path: str) -> None:
         self.model.load(path)
@@ -76,7 +84,7 @@ class TimeOptimizer(Model):
             y_scores = np.argmax(y_scores, axis=1)
         metric = self.metric.compute(y_test, y_scores)
         elasped = time.time() - start
-        print(f"Train_time {elasped}")
+        logger.info(f"Train_time {elasped}")
         return metric
 
     def _objective(
@@ -93,11 +101,14 @@ class TimeOptimizer(Model):
                 **self.model.get_non_tunable_params(),
                 **model_params,
             }
+        model_params = {
+            **self.model_params,
+            **model_params,
+            **{"x_metadata": self.x_metadata},
+        }
         metrics = [
             self._objective_one(
-                self.model.__class__(
-                    x_metadata=self.x_metadata, **model_params
-                ),
+                self.model.__class__(**model_params),
                 x[train_index],
                 x[test_index],
                 y[train_index],
