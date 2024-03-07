@@ -27,7 +27,7 @@ def get_f_new_model(
         if config.get("optimize", False):
             config["params"] = {
                 **config["params"],
-                **get_model(config).get_default_params(),
+                **get_model(config).get_default_params({}),
             }
             model = TimeOptimizer(model, create_metric(config.get("metric")))
         else:
