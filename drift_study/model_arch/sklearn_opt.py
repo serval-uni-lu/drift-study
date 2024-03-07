@@ -163,5 +163,5 @@ class TimeOptimizer(Model):
             # n_jobs=self.n_jobs,
             verbose=0,
         )
-        with parallel_backend("threading"):
-            self.model.fit(x, y)
+        # with parallel_backend("threading"):
+        self.model.fit(x, y)
