@@ -22,7 +22,7 @@ class TimeOptimizer(Model):
         self,
         model: Model,
         metric: Metric,
-        n_trials: int = 25,
+        n_trials: int = 1,
         n_splits: int = 5,
         model_params: Optional[Dict[str, Any]] = None,
         **kwargs: Dict[str, Any],
@@ -156,11 +156,15 @@ class TimeOptimizer(Model):
                 **self.model.get_non_tunable_params(),
                 **model_params,
             }
+
+        model_params = {
+            **self.model_params,
+            **model_params,
+            **{"x_metadata": self.x_metadata},
+        }
         self.model = self.model.__class__(
             **model_params,
-            x_metadata=self.x_metadata,
             random_state=42,
-            # n_jobs=self.n_jobs,
             verbose=0,
         )
         # with parallel_backend("threading"):
