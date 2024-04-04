@@ -12,7 +12,7 @@ import optuna
 import pandas as pd
 from mlc.datasets.dataset_factory import get_dataset
 from mlc.load_do_save import save_json
-from mlc.logging.setup import setup_logging
+from mlc.logging.setup import delayed_with_logging, setup_logging
 from mlc.metrics.compute import compute_metric
 from mlc.metrics.metric import Metric
 from mlc.metrics.metric_factory import create_metric
@@ -133,6 +133,22 @@ class TimeOptimizer:
                 reversed(list(tscv.split(x)))
             )
         ]
+        # With delays parallel joblib
+        metrics = joblib.Parallel(n_jobs=self.n_fold)(
+            delayed_with_logging(self._objective_fold)(
+                trial.number,
+                fold_idx,
+                model_params,
+                x.iloc[train_index],
+                x.iloc[test_index],
+                y[train_index],
+                y[test_index],
+            )
+            for fold_idx, (train_index, test_index) in enumerate(
+                reversed(list(tscv.split(x)))
+            )
+        )
+
         metric = float(np.mean(metrics))
         end = time.time() - start
         metric_out = {
