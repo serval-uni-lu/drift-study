@@ -49,7 +49,6 @@ if [ "$stage" = "all" ] || [ "$stage" = 1 ]; then
     # OPTIMIZE MODEL PARAMETERS. This is done only once.
     echo "Running optimize_model"
     eval "python -m drift_study.run.optimize_model -c config/logging.yaml -c ${AUTO_CONFIG} -p data_root=${DATA_ROOT} -p models_dir=${MODELS_DIR}"
-    exit
     # BASELINE NO RETRAIN
     echo "Running no_retrain_baseline"
     python -m drift_study.run.no_retrain_baseline -c config/logging.yaml -c ${AUTO_CONFIG} -p use_auto_model_tuning=true -p schedule_data_path=${PATH_PREFIX}/no_retrain/
