@@ -10,6 +10,7 @@ import numpy as np
 import numpy.typing as npt
 import optuna
 import pandas as pd
+import torch
 from mlc.datasets.dataset_factory import get_dataset
 from mlc.load_do_save import save_json
 from mlc.logging.setup import delayed_with_logging, setup_logging
@@ -60,6 +61,7 @@ class TimeOptimizer:
         y_train: NDNumber,
         y_test: NDNumber,
     ):
+        torch.set_num_threads(3)
         model = self.model_class(
             verbose=0, **model_params, x_metadata=self.x_metadata
         )
