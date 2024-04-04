@@ -19,12 +19,12 @@ constrained-attacks = {path = "../constrained-attacks/", develop = true }
 plotly = "5.11.0"
 
 tables = "^3.7.0"
-menelaus = "^0.1.2"
-# torch = {version="~1.12.1", source="torchcu116"}
-torch = {url= "https://download.pytorch.org/whl/cu116/torch-1.12.1%2Bcu116-cp38-cp38-linux_x86_64.whl"}
+# menelaus = "^0.1.2"
+torch = {version="~1.12.1"}
+# torch = {url= "https://download.pytorch.org/whl/cu116/torch-1.12.1%2Bcu116-cp38-cp38-linux_x86_64.whl"}
 # autoattack = { git = "https://github.com/fra31/auto-attack.git", rev = "6482e4d6fbeeb51ae9585c41b16d50d14576aadc" }
 seaborn = "^0.12.1"
-alibi-detect = {extras = ["torch"], version = "^0.10.4"}
+alibi-detect = {extras = ["torch"], version = ">=0.10.4"}
 imbalanced-learn = "^0.10.1"
 optuna = "^3.1.0"
 isort = "^5.12.0"
@@ -33,6 +33,8 @@ streamlit = "^1.25.0"
 psycopg2 = "^2.9.6"
 lifelines = "^0.27.8"
 openpyxl = "^3.1.2"
+llvmlite = "^0.41.0"
+fastparquet = "^2024.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
