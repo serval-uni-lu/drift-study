@@ -121,20 +121,20 @@ class TimeOptimizer:
         )
         model_params = {**self.model_params, **model_params}
         tscv = TimeSeriesSplit(n_splits=self.n_fold)
-        metrics = [
-            self._objective_fold(
-                trial.number,
-                fold_idx,
-                model_params,
-                x.iloc[train_index],
-                x.iloc[test_index],
-                y[train_index],
-                y[test_index],
-            )
-            for fold_idx, (train_index, test_index) in enumerate(
-                reversed(list(tscv.split(x)))
-            )
-        ]
+        # metrics = [
+        #     self._objective_fold(
+        #         trial.number,
+        #         fold_idx,
+        #         model_params,
+        #         x.iloc[train_index],
+        #         x.iloc[test_index],
+        #         y[train_index],
+        #         y[test_index],
+        #     )
+        #     for fold_idx, (train_index, test_index) in enumerate(
+        #         reversed(list(tscv.split(x)))
+        #     )
+        # ]
         # With delays parallel joblib
         metrics = joblib.Parallel(n_jobs=self.n_fold)(
             delayed_with_logging(self._objective_fold)(
