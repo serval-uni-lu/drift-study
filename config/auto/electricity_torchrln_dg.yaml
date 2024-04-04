@@ -28,7 +28,7 @@ delays:
   label: 1days
   retraining: 9days
 optimization_iter:
-  model: 500
+  model: 100
   detector: 25
 optimization_splits:
   detector: 4
