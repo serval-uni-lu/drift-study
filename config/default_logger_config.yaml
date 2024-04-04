@@ -25,5 +25,5 @@ loggers:
     handlers:
     - zqueue_handler
   'mlc.models.torch_models':
-    level: WARNING
+    level: INFO
     # propagate: false

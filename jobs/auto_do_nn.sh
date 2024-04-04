@@ -75,7 +75,7 @@ if [ "$stage" = "all" ] || [ "$stage" = 3 ]; then
     python -m drift_study.run.periodic_baseline -c config/logging.yaml -c ${AUTO_CONFIG} -p use_auto_model_tuning=true -p schedule_data_path=${PATH_PREFIX}/periodic/ -c ./config/auto/delays_none.yaml
     python -m drift_study.visualization.auto_table -c config/logging.yaml -c ${AUTO_CONFIG} -p schedule_data_path=${PATH_PREFIX}/periodic -p out_path=${PATH_PREFIX}/periodic.csv -p single_window_size=true
 
-    if [ -z "$RETRAIN_OPT_SEARCH" ]; then
+    if $RETRAIN_OPT_SEARCH; then
         echo "Periodic with re-train optimization"
         python -m drift_study.run.periodic_baseline -c config/logging.yaml -c ${AUTO_CONFIG} -p model.optimize=true -p schedule_data_path=${PATH_PREFIX}/opt_periodic/ -c ./config/auto/delays_none.yaml
         python -m drift_study.visualization.auto_table -c config/logging.yaml -c ${AUTO_CONFIG} -p schedule_data_path=${PATH_PREFIX}/opt_periodic -p out_path=${PATH_PREFIX}/opt_periodic.csv -p single_window_size=true

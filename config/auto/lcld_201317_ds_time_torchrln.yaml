@@ -1,0 +1,45 @@
+---
+name: lcld_201317_ds_time
+dataset:
+  name: lcld_201317_ds_time
+model:
+  source: mlc.models.tabsurvey.mlp_rln
+  name: torchrln
+  metadata: true
+  metric: mcc
+  params:
+    objective: classification
+    batch_size: 1000
+    epochs: 100
+    early_stopping_rounds: 5
+    num_classes: 2
+    class_weight: balanced
+first_train_window_size: -1
+train_window_size: 200000
+train_window_sizes: [50000,100000,200000,400000,-1]
+periods: [5000, 10000, 20000, 50000, 100000, 200000]
+test_start_idx: 400000
+training_step_size: 5000
+common_detectors_params:
+  batch_size: 5000
+delays:
+  drift: 0
+  label: 10days
+  retraining: 4W
+optimization_iter:
+  model: 25
+  detector: 25
+optimization_splits:
+  detector: 4
+metric:
+  name: mcc
+predict_forward: 5000
+evaluation:
+  batch_size: 20000
+performance:
+  n_jobs:
+    detector_optimization: 32
+    detector: 2
+trial_params:
+  model_type: nn
+logger_config_path: ./config/default_logger_config.yaml
