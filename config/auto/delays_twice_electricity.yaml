@@ -1,0 +1,5 @@
+---
+delays:
+  label: 1days
+  drift: 0
+  retraining: 18days

@@ -1,5 +1,5 @@
 ---
-name: lcld
+name: lcld_201317_ds_time
 dataset:
   name: lcld_201317_ds_time
 model:
@@ -9,16 +9,15 @@ model:
   metric: mcc
   params:
     objective: classification
-    batch_size: 1000
+    batch_size: 1024
     epochs: 100
     early_stopping_rounds: 5
     num_classes: 2
     class_weight: balanced
-    hidden_dim: 10
-    n_layers: 10
 first_train_window_size: -1
-train_window_size: 200000
-periods: [20000, 50000, 100000, 200000]
+train_window_size: 400000
+train_window_sizes: [20000, 50000, 100000, 200000, 400000]
+periods: [5000, 10000, 20000, 50000, 100000, 200000, 400000]
 test_start_idx: 400000
 training_step_size: 5000
 common_detectors_params:
@@ -28,15 +27,18 @@ delays:
   label: 10days
   retraining: 4W
 optimization_iter:
-  model: 10
-  detector: 3
+  model: 25
+  detector: 25
 optimization_splits:
   detector: 4
 metric:
   name: mcc
-predict_forward: 5000
+predict_forward: 1000
+evaluation:
+  batch_size: 5000
 performance:
   n_jobs:
-    detector_optimization: 1
+    detector_optimization: 32
+    detector: 32
 trial_params: {}
-use_auto_model_tuning: true
+logger_config_path: ./config/default_logger_config.yaml
